@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+        <%= title %>
+    </title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/header.css">
+    <link rel="stylesheet" href="/css/calories.css">
+    <link rel="stylesheet" href="/css/footer.css">
+</head>
+
+<body>
+    <%- include('../partials/header') %>
+
+        <main class="calWrap">
+            <div class="container">
+                <h1 class="calTitle">КАЛЬКУЛЯТОР КАЛОРИЙ</h1>
+
+                <div class="calBox">
+                    <div class="calRow calRow--head">
+                        <div>Блюдо</div>
+                        <div>Порция</div>
+                        <div>Ккал/порция</div>
+                        <div>Кол-во</div>
+                        <div>Итого</div>
+                        <div></div>
+                    </div>
+
+                    <div id="calList"></div>
+
+                    <div class="calActions">
+                        <button class="btn btn--outline" type="button" id="addLine">Добавить блюдо</button>
+                    </div>
+
+                    <div class="calTotal">
+                        <div>
+                            <div class="muted">Общий вес</div>
+                            <div class="calTotal__n" id="sumWeight">0 г</div>
+                        </div>
+                        <div>
+                            <div class="muted">Итого калорий</div>
+                            <div class="calTotal__n" id="sumKcal">0 ккал</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <script>
+            const PRODUCTS = <% - JSON.stringify(products) %>;
+        </script>
+        <script src="/js/calories.js"></script>
+
+        <%- include('../partials/footer') %>
+</body>
+
+</html>

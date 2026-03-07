@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+        <%= title %>
+    </title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/header.css">
+    <link rel="stylesheet" href="/css/product.css">
+    <link rel="stylesheet" href="/css/footer.css">
+</head>
+
+<body>
+    <%- include('../partials/header') %>
+
+        <main class="prodWrap">
+            <div class="container">
+                <div class="prodTop">
+                    <div class="prodCat">
+                        <%= product.category_title %>
+                    </div>
+                    <h1 class="prodTitle">
+                        <%= product.name %>
+                    </h1>
+
+                    <% if (product.description) { %>
+                        <p class="prodDesc">
+                            <%= product.description %>
+                        </p>
+                        <% } %>
+                </div>
+
+                <section class="prodCard">
+                    <div class="prodImgBox">
+                        <img class="prodImg" src="<%= product.image_url || '/img/products/placeholder.png' %>"
+                            alt="<%= product.name %>">
+                    </div>
+
+                    <div class="nutri">
+                        <div class="nutriHead">
+                            <div class="nutriTitle">ПИЩЕВАЯ ЦЕННОСТЬ</div>
+                            <a class="nutriLink" href="/calories">в калькулятор →</a>
+                        </div>
+
+                        <div class="nutriGrid">
+                            <div class="nutriRow nutriRow--head">
+                                <div></div>
+                                <div>Порция</div>
+                                <div>В 100 г</div>
+                            </div>
+
+                            <div class="nutriRow">
+                                <div class="muted">Вес</div>
+                                <div>
+                                    <%= product.weight_g ? product.weight_g + ' г' : '—' %>
+                                </div>
+                                <div>100 г</div>
+                            </div>
+
+                            <div class="nutriRow">
+                                <div class="muted">Калории</div>
+                                <div>
+                                    <%= kcalPortion ? kcalPortion + ' ккал' : '—' %>
+                                </div>
+                                <div>
+                                    <%= product.kcal_100g ? Math.round(Number(product.kcal_100g)) + ' ккал' : '—' %>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="prodPrice">
+                            <div class="muted">Цена</div>
+                            <div class="prodPrice__n">
+                                <%= Number(product.price).toFixed(0) %> ₽
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <% if (related.length) { %>
+                    <section class="rel">
+                        <h2 class="relTitle">Похожие блюда</h2>
+                        <div class="relGrid">
+                            <% related.forEach(r=> { %>
+                                <a class="relItem" href="/product/<%= r.id %>">
+                                    <img src="<%= r.image_url || '/img/products/placeholder.png' %>"
+                                        alt="<%= r.name %>">
+                                    <div>
+                                        <%= r.name %>
+                                    </div>
+                                </a>
+                                <% }) %>
+                        </div>
+                    </section>
+                    <% } %>
+            </div>
+        </main>
+
+        <%- include('../partials/footer') %>
+</body>
+
+</html>

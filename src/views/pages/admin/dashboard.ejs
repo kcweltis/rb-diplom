@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>
+    <%= title %>
+  </title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+
+<body>
+  <%- include('../../partials/header') %>
+    <main class="container">
+      <h1 class="page-title">Админ-панель</h1>
+      <div class="admin-nav">
+        <a class="btn btn--outline btn--small" href="/admin/categories">Категории</a>
+        <a class="btn btn--outline btn--small" href="/admin/products">Товары</a>
+        <a class="btn btn--outline btn--small" href="/admin/featured">Популярные блюда</a>
+        <a class="btn btn--outline btn--small" href="/admin/users">Пользователи</a>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat__n">
+            <%= stats.products %>
+          </div>
+          <div class="muted">Товаров</div>
+        </div>
+        <div class="stat">
+          <div class="stat__n">
+            <%= stats.users %>
+          </div>
+          <div class="muted">Пользователей</div>
+        </div>
+        <div class="stat">
+          <div class="stat__n">
+            <%= stats.orders %>
+          </div>
+          <div class="muted">Заказов</div>
+        </div>
+      </div>
+    </main>
+    <%- include('../../partials/footer') %>
+
+</body>
+
+</html>

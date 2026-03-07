@@ -1,0 +1,93 @@
+.calWrap {
+    background: #F6F1EA;
+    min-height: calc(100vh - 120px);
+    padding: 18px 0 56px;
+}
+
+.calTitle {
+    font-family: Manrope, system-ui, sans-serif;
+    font-weight: 900;
+    font-size: 34px;
+    letter-spacing: .08em;
+    text-align: center;
+    margin: 18px 0 18px;
+}
+
+.calBox {
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, .10);
+    border-radius: 18px;
+    padding: 14px;
+}
+
+.calRow {
+    display: grid;
+    grid-template-columns: 2fr 110px 120px 90px 120px 40px;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 8px;
+    border-bottom: 1px solid rgba(0, 0, 0, .06);
+}
+
+.calRow--head {
+    font-family: Manrope, system-ui, sans-serif;
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: rgba(0, 0, 0, .70);
+    background: rgba(0, 0, 0, .03);
+    border-radius: 12px;
+}
+
+.calSelect,
+.calInput {
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, .14);
+    background: #fff;
+    font: inherit;
+}
+
+.calRemove {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 18px;
+    opacity: .7;
+}
+
+.calRemove:hover {
+    opacity: 1;
+}
+
+.calActions {
+    padding: 12px 6px;
+}
+
+.calTotal {
+    display: flex;
+    justify-content: flex-end;
+    gap: 24px;
+    padding: 12px 6px 4px;
+}
+
+.calTotal__n {
+    font-family: Manrope, system-ui, sans-serif;
+    font-weight: 900;
+    font-size: 22px;
+}
+
+@media (max-width: 980px) {
+    .calRow {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .calRow--head {
+        display: none;
+    }
+
+    .calTotal {
+        justify-content: space-between;
+    }
+}

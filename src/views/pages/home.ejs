@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>
+    <%= title %>
+  </title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+
+<body>
+  <%- include('../partials/header') %>
+    <main class="page">
+      <section class="hero">
+        <div class="container hero__inner">
+          <div class="hero__left">
+            <h1 class="hero__title">
+              Готовим<br>
+              для<br>
+              Вас с<br>
+              <span class="hero__accent">душой</span>!
+            </h1>
+
+
+            <div class="hero__actions">
+              <a class="btn btn--outline" href="/delivery">ДОСТАВКА</a>
+              <a class="btn btn--primary" href="/menu">МЕНЮ</a>
+            </div>
+          </div>
+
+          <div class="hero__right">
+            <div class="hero__grad"></div>
+
+            <div class="heroShot heroShot--1">
+              <img src="/img/hero/hero1.png" alt="">
+            </div>
+
+            <div class="heroShot heroShot--2">
+              <img src="/img/hero/hero2.png" alt="">
+            </div>
+
+            <div class="heroShot heroShot--3">
+              <img src="/img/hero/hero3.png" alt="">
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <section class="section container">
+        <div class="section__head">
+          <h2 class="section__title">Популярные блюда</h2>
+          <a class="btn btn--primary btn--small" href="/menu">ПОДРОБНЕЕ</a>
+        </div>
+
+        <div class="cards">
+          <% if (featured && featured.length) { %>
+            <% featured.forEach(p=> { %>
+              <article class="card">
+                <img class="card__img" src="<%= p.image_url || '/img/products/placeholder.png' %>" alt="<%= p.name %>">
+                <div class="card__body">
+                  <h3 class="card__title">
+                    <%= p.name %>
+                  </h3>
+                  <div class="card__bottom">
+                    <span class="card__price">
+                      <%= Number(p.price).toFixed(0) %> руб.
+                    </span>
+                    <a class="btn btn--pill" href="/menu">В корзину</a>
+                  </div>
+                </div>
+              </article>
+              <% }) %>
+                <% } else { %>
+                  <p class="muted">Администратор ещё не выбрал популярные блюда. Добавь их в админке → «Популярные
+                    блюда».</p>
+                  <% } %>
+        </div>
+
+        <div class="section__cta">
+          <a class="btn btn--primary" href="/menu">Перейти в меню</a>
+        </div>
+      </section>
+
+      <section class="delivery-block">
+        <div class="container delivery-block__inner">
+          <div class="delivery-block__text">
+            <h2 class="section__title">Собственная доставка</h2>
+            <p class="muted">Мы доставляем заказы собственной курьерской службой — без посредников и дополнительных
+              комиссий.</p>
+          </div>
+          <img class="delivery-block__icon" src="/img/icons/courier.png" alt="">
+        </div>
+      </section>
+
+      <section class="section container">
+        <h2 class="section__title section__title--center">Как сделать заказ</h2>
+
+        <div class="steps">
+          <div class="step">
+            <div class="step__icon">🛒</div>
+            <div class="step__text">Выберите блюда</div>
+          </div>
+          <div class="step">
+            <div class="step__icon">🧾</div>
+            <div class="step__text">Оформите заказ</div>
+          </div>
+          <div class="step">
+            <div class="step__icon">👨‍🍳</div>
+            <div class="step__text">Мы приготовим</div>
+          </div>
+          <div class="step">
+            <div class="step__icon">🚴</div>
+            <div class="step__text">Курьер доставит</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="worktime">
+        РАБОТАЕМ С ДУШОЙ КАЖДЫЙ ДЕНЬ С 10.00 ДО 22.00
+      </section>
+    </main>
+    <%- include('../partials/footer') %>
+</body>
+
+</html>

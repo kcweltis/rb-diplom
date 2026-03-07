@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>
+    <%= title %>
+  </title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+
+<body>
+  <%- include('../../partials/header') %>
+    <main class="container">
+      <h1 class="page-title">Товары</h1>
+
+      <form class="form" method="POST" action="/admin/products" enctype="multipart/form-data">
+        <div class="grid-2">
+          <div>
+            <label class="label">Категория</label>
+            <select class="input" name="category_id" required>
+              <% categories.forEach(c=> { %>
+                <option value="<%= c.id %>">
+                  <%= c.title %>
+                </option>
+                <% }) %>
+            </select>
+          </div>
+
+          <div>
+            <label class="label">Цена</label>
+            <input class="input" name="price" type="number" step="0.01" min="0" required>
+          </div>
+        </div>
+
+        <label class="label">Название</label>
+        <input class="input" name="name" required>
+
+        <label class="label">Описание</label>
+        <textarea class="input" name="description" rows="2"></textarea>
+
+        <label class="label">Картинка (файл)</label>
+        <input class="input" type="file" name="image" accept="image/png,image/jpeg,image/webp">
+
+        <button class="btn btn--primary" type="submit">Добавить товар</button>
+      </form>
+
+
+      <div class="table table--products" style="margin-top:18px;">
+        <div class="table__row table__head">
+          <div>ID</div>
+          <div>Фото</div>
+          <div>Название</div>
+          <div>Категория</div>
+          <div>Цена</div>
+          <div>Действия</div>
+        </div>
+
+        <% products.forEach(p=> { %>
+          <div class="table__row <%= !p.is_active ? 'is-inactive' : '' %>">
+            <div>
+              <%= p.id %>
+            </div>
+
+            <div>
+              <img class="thumb" src="<%= p.image_url || '/img/products/placeholder.png' %>" alt="">
+            </div>
+
+            <!-- INLINE FORM EDIT + ACTIONS -->
+            <div style="grid-column: span 4;">
+              <form class="inlineForm" method="POST" action="/admin/products/<%= p.id %>/edit"
+                enctype="multipart/form-data">
+
+                <input class="input input--sm" name="name" value="<%= p.name %>" required>
+
+                <select class="input input--sm" name="category_id" required>
+                  <% categories.forEach(c=> { %>
+                    <option value="<%= c.id %>" <%=c.id===p.category_id ? 'selected' : '' %>>
+                      <%= c.title %>
+                    </option>
+                    <% }) %>
+                </select>
+
+                <input class="input input--sm" name="price" type="number" step="0.01" min="0" value="<%= p.price %>"
+                  required>
+
+                <input class="input input--sm" type="file" name="image" accept="image/png,image/jpeg,image/webp">
+
+                <button class="btn btn--outline btn--small" type="submit">Сохранить</button>
+              </form>
+
+              <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:8px;">
+                <!-- Toggle active -->
+                <form method="POST" action="/admin/products/<%= p.id %>/toggle">
+                  <button class="btn btn--small <%= p.is_active ? 'btn-off' : 'btn-on' %>">
+                    <%= p.is_active ? 'Выключить' : 'Включить' %>
+                  </button>
+                </form>
+
+
+                <!-- Delete -->
+                <form method="POST" action="/admin/products/<%= p.id %>/delete"
+                  onsubmit="return confirm('Удалить товар?')">
+                  <button class="btn btn--small" style="background:#fff;border:1px solid rgba(0,0,0,.12);">
+                    Удалить
+                  </button>
+                </form>
+              </div>
+
+            </div>
+          </div>
+          <% }) %>
+      </div>
+
+
+
+
+      <a class="btn btn--outline" href="/admin">Назад</a>
+    </main>
+    <%- include('../../partials/footer') %>
+</body>
+
+</html>

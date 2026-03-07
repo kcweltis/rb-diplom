@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>
+    <%= title %>
+  </title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+
+<body>
+  <%- include('../../partials/header') %>
+    <main class="container">
+      <h1 class="page-title">Популярные блюда (главная)</h1>
+
+      <form class="form form--inline" method="POST" action="/admin/featured">
+        <select class="input" name="product_id" required>
+          <% products.forEach(p=> { %>
+            <option value="<%= p.id %>">
+              <%= p.name %>
+            </option>
+            <% }) %>
+        </select>
+        <input class="input" name="sort_order" type="number" min="0" value="0" style="max-width:140px;"
+          placeholder="Порядок">
+        <button class="btn btn--primary" type="submit">Добавить/обновить</button>
+      </form>
+
+      <div class="table" style="margin-top:18px;">
+        <div class="table__row table__head">
+          <div>ID</div>
+          <div>Товар</div>
+          <div>Цена</div>
+          <div>Порядок</div>
+          <div></div>
+        </div>
+
+        <% featured.forEach(f=> { %>
+          <div class="table__row">
+            <div>
+              <%= f.id %>
+            </div>
+            <div>
+              <%= f.name %>
+            </div>
+            <div>
+              <%= Number(f.price).toFixed(0) %>
+            </div>
+            <div>
+              <%= f.sort_order %>
+            </div>
+            <div>
+              <form method="POST" action="/admin/featured/<%= f.id %>/delete"
+                onsubmit="return confirm('Убрать из популярных?')">
+                <button class="btn btn--outline btn--small" type="submit">Удалить</button>
+              </form>
+            </div>
+          </div>
+          <% }) %>
+      </div>
+
+      <a class="btn btn--outline" href="/admin">Назад</a>
+    </main>
+    <%- include('../../partials/footer') %>
+
+</body>
+
+</html>

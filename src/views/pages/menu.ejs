@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="ru" id="top">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>
+    <%= title %>
+  </title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/header.css">
+  <link rel="stylesheet" href="/css/menu.css">
+  <link rel="stylesheet" href="/css/footer.css">
+</head>
+
+<body>
+  <%- include('../partials/header') %>
+
+    <main class="menuWrap">
+      <div class="container">
+        <h1 class="menuTitle">НАШЕ МЕНЮ</h1>
+        <div class="menuOrnament" aria-hidden="true"></div>
+
+        <div class="menuLayout">
+          <aside class="menuAside">
+            <form class="menuSearch" method="GET" action="/menu">
+              <input class="menuSearch__input" name="q" value="<%= q %>" placeholder="Поиск по меню">
+              <button class="menuSearch__btn" type="submit">Найти</button>
+            </form>
+
+            <nav class="catNav">
+              <% categories.forEach((c, idx)=> { %>
+                <a class="catNav__link <%= idx===0 ? 'is-active' : '' %>" href="#cat-<%= c.id %>">
+                  <%= c.title %>
+                </a>
+                <% }) %>
+
+                  <a class="catNav__link catNav__link--calc" href="/calories">
+                    Калькулятор калорий →
+                  </a>
+            </nav>
+          </aside>
+
+          <section class="menuContent">
+            <% categories.forEach(c=> {
+              const list = byCat.get(c.id) || [];
+              if (!list.length) return;
+              %>
+              <section class="catBlock" id="cat-<%= c.id %>">
+                <h2 class="catTitle">
+                  <%= c.title %>
+                </h2>
+
+                <div class="itemsGrid">
+                  <% list.forEach(p=> { %>
+                    <article class="itemCard">
+                      <a class="itemCard__imgBox" href="/product/<%= p.id %>">
+                        <img class="itemCard__img" src="<%= p.image_url || '/img/products/placeholder.png' %>"
+                          alt="<%= p.name %>">
+                      </a>
+
+                      <div class="itemCard__name">
+                        <a href="/product/<%= p.id %>">
+                          <%= p.name %>
+                        </a>
+                      </div>
+
+                      <div class="itemCard__meta">
+                        <% if (p.weight_g && p.kcal_100g) { %>
+                          <span>
+                            <%= p.weight_g %> г
+                          </span>
+                          <span>·</span>
+                          <span>
+                            <%= Math.round((Number(p.weight_g) * Number(p.kcal_100g)) / 100) %> ккал
+                          </span>
+                          <% } else { %>
+                            <span class="muted">ккал не указаны</span>
+                            <% } %>
+                      </div>
+
+                      <div class="itemCard__bottom">
+                        <div class="itemPrice">
+                          <%= Number(p.price).toFixed(0) %> ₽
+                        </div>
+
+                        <form method="POST" action="/cart/add">
+                          <input type="hidden" name="productId" value="<%= p.id %>">
+                          <button class="itemBtn" type="submit">Заказать</button>
+                        </form>
+                      </div>
+                    </article>
+                    <% }) %>
+                </div>
+              </section>
+              <% }) %>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <%- include('../partials/footer') %>
+
+      <script src="/js/menu.js"></script>
+</body>
+
+</html>

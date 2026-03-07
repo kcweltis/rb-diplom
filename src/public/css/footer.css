@@ -1,0 +1,244 @@
+.rb-footer {
+  margin-top: 56px;
+  color: #eef3f9;
+  background: #1f2c41;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+.rb-footer__top {
+  padding: 64px 0;
+}
+
+.rb-footer__main {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr 0.9fr;
+  gap: 56px;
+}
+
+.rb-footer__logo {
+  width: 150px;
+  height: auto;
+  display: block;
+  filter: brightness(0) invert(1);
+}
+
+.rb-footer__text {
+  margin: 28px 0 0;
+  color: rgba(238, 243, 249, 0.92);
+  line-height: 1.5;
+  font-size: 15px;
+  max-width: 520px;
+}
+
+.rb-footer__social {
+  margin-top: 32px;
+  display: flex;
+  gap: 20px;
+}
+
+.rb-footer__social-link {
+  width: 56px;
+  height: 56px;
+  border: 2px solid rgba(255, 255, 255, 0.92);
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 10px;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.rb-footer__social-link:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px);
+}
+
+.rb-footer__title {
+  margin: 0 0 18px;
+  font-size: 20px;
+  line-height: 1.2;
+  font-weight: 600;
+  color: #fff;
+}
+
+.rb-footer__nav {
+  display: flex;
+  flex-direction: column;
+}
+
+.rb-footer__link {
+  display: block;
+  font-size: 17px;
+  line-height: 1.3;
+  color: rgba(238, 243, 249, 0.95);
+  margin: 0 0 12px;
+}
+
+.rb-footer__link:hover {
+  color: #fff;
+}
+
+.rb-footer__apps {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  justify-content: center;
+}
+
+.rb-store-badge {
+  background: #000;
+  color: #fff;
+  border-radius: 12px;
+  padding: 12px 16px;
+  min-width: 150px;
+  min-height: 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.rb-store-badge__top {
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  opacity: 0.92;
+}
+
+.rb-store-badge__name {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.rb-footer__bottom {
+  background: #172235;
+  padding: 32px 0;
+}
+
+.rb-footer__bottom-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.rb-footer__copy {
+  margin: 0;
+  font-size: 15px;
+  color: rgba(238, 243, 249, 0.7);
+}
+
+.rb-footer__payments {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.rb-pay {
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  font-size: 20px;
+}
+
+.rb-pay--mc {
+  color: #ffb83f;
+}
+
+.rb-pay--visa {
+  color: #2d8cff;
+}
+
+.rb-pay--mir {
+  color: #62d17e;
+}
+
+@media (max-width: 1200px) {
+  .rb-footer__main {
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+  }
+
+  .rb-footer__apps {
+    align-items: flex-start;
+  }
+
+  .rb-footer__title {
+    font-size: 34px;
+  }
+
+  .rb-footer__link {
+    font-size: 28px;
+  }
+
+  .rb-footer__text {
+    font-size: 20px;
+  }
+
+  .rb-footer__copy,
+  .rb-pay,
+  .rb-store-badge__name {
+    font-size: 26px;
+  }
+}
+
+@media (max-width: 760px) {
+  .rb-footer {
+    margin-top: 40px;
+  }
+
+  .rb-footer__top {
+    padding: 40px 0;
+  }
+
+  .rb-footer__main {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .rb-footer__logo {
+    width: 190px;
+  }
+
+  .rb-footer__text {
+    margin-top: 18px;
+    font-size: 16px;
+  }
+
+  .rb-footer__social-link {
+    width: 48px;
+    height: 48px;
+    font-size: 14px;
+  }
+
+  .rb-footer__title {
+    font-size: 28px;
+    margin-bottom: 12px;
+  }
+
+  .rb-footer__link {
+    margin-bottom: 8px;
+    font-size: 22px;
+  }
+
+  .rb-store-badge {
+    min-width: 100%;
+    min-height: 62px;
+  }
+
+  .rb-store-badge__top {
+    font-size: 11px;
+  }
+
+  .rb-store-badge__name,
+  .rb-footer__copy,
+  .rb-pay {
+    font-size: 20px;
+  }
+
+  .rb-footer__bottom-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

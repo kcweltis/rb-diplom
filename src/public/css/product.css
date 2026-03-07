@@ -1,0 +1,177 @@
+.prodWrap {
+    background: #F6F1EA;
+    min-height: calc(100vh - 120px);
+    padding: 18px 0 56px;
+}
+
+.prodTop {
+    text-align: center;
+    margin: 18px 0 18px;
+}
+
+.prodCat {
+    font-family: Manrope, system-ui, sans-serif;
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: .10em;
+    text-transform: uppercase;
+    color: rgba(0, 0, 0, .55);
+}
+
+.prodTitle {
+    font-family: Manrope, system-ui, sans-serif;
+    font-weight: 900;
+    font-size: 42px;
+    letter-spacing: .04em;
+    margin: 10px 0 8px;
+}
+
+.prodDesc {
+    margin: 0 auto;
+    max-width: 760px;
+    color: rgba(0, 0, 0, .62);
+}
+
+.prodCard {
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, .10);
+    border-radius: 18px;
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: 18px;
+    padding: 18px;
+}
+
+.prodImgBox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 320px;
+}
+
+.prodImg {
+    width: 100%;
+    max-width: 520px;
+    object-fit: contain;
+    filter: drop-shadow(0 12px 18px rgba(0, 0, 0, .14));
+}
+
+.nutriHead {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.nutriTitle {
+    font-family: Manrope, system-ui, sans-serif;
+    font-weight: 900;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.nutriLink {
+    font-size: 12px;
+    color: rgba(0, 0, 0, .60);
+}
+
+.nutriLink:hover {
+    text-decoration: underline;
+}
+
+.nutriGrid {
+    border: 1px solid rgba(0, 0, 0, .08);
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.nutriRow {
+    display: grid;
+    grid-template-columns: 1fr 140px 140px;
+    gap: 10px;
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(0, 0, 0, .06);
+    align-items: center;
+}
+
+.nutriRow:last-child {
+    border-bottom: none;
+}
+
+.nutriRow--head {
+    background: rgba(0, 0, 0, .03);
+    font-family: Manrope, system-ui, sans-serif;
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: rgba(0, 0, 0, .65);
+}
+
+.prodPrice {
+    margin-top: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    padding: 10px 2px;
+}
+
+.prodPrice__n {
+    font-family: Manrope, system-ui, sans-serif;
+    font-weight: 900;
+    font-size: 26px;
+}
+
+.rel {
+    margin-top: 26px;
+}
+
+.relTitle {
+    font-family: Manrope, system-ui, sans-serif;
+    font-weight: 900;
+    font-size: 18px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin: 0 0 12px;
+}
+
+.relGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+}
+
+.relItem {
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, .10);
+    border-radius: 16px;
+    padding: 12px;
+    text-align: center;
+}
+
+.relItem img {
+    width: 100%;
+    height: 110px;
+    object-fit: contain;
+    margin-bottom: 8px;
+    filter: drop-shadow(0 8px 12px rgba(0, 0, 0, .12));
+}
+
+@media (max-width: 980px) {
+    .prodCard {
+        grid-template-columns: 1fr;
+    }
+
+    .relGrid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .nutriRow {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .nutriRow--head {
+        display: none;
+    }
+}

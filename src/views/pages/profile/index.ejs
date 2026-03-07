@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+        <%= title %>
+    </title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/header.css">
+    <link rel="stylesheet" href="/css/profile.css">
+
+</head>
+
+<body>
+    <%- include('../../partials/header') %>
+
+        <main class="container profilePage">
+            <div class="profileTop">
+                <h1 class="page-title">Личный кабинет</h1>
+                <a class="btn btn--primary btn--small" href="/logout">Выход</a>
+            </div>
+
+            <% if (ok==='profile' ) { %>
+                <div class="notice">Данные обновлены.</div>
+                <% } %>
+                    <% if (ok==='pass' ) { %>
+                        <div class="notice">Пароль изменён.</div>
+                        <% } %>
+                            <% if (err==='badpass' ) { %>
+                                <div class="notice notice--err">Старый пароль неверный.</div>
+                                <% } %>
+
+                                    <section class="cardBox">
+                                        <h2 class="secTitle">Профиль</h2>
+
+                                        <div class="kv">
+                                            <div class="kv__row"><span>Email:</span><b>
+                                                    <%= u.email %>
+                                                </b></div>
+                                            <div class="kv__row"><span>Имя:</span><b>
+                                                    <%= u.username %>
+                                                </b></div>
+                                        </div>
+
+                                        <form class="form" method="POST" action="/profile/update">
+                                            <label class="label">Телефон</label>
+                                            <input class="input" name="phone" value="<%= u.phone || '' %>"
+                                                placeholder="+7..." />
+                                            <button class="btn btn--outline btn--small" type="submit">Сохранить
+                                                телефон</button>
+                                        </form>
+
+                                        <form class="form" method="POST" action="/profile/change-password"
+                                            style="margin-top:16px;">
+                                            <label class="label">Смена пароля</label>
+                                            <input class="input" type="password" name="old_password"
+                                                placeholder="Старый пароль" required />
+                                            <input class="input" type="password" name="new_password"
+                                                placeholder="Новый пароль" required />
+                                            <button class="btn btn--outline btn--small" type="submit">Сменить
+                                                пароль</button>
+                                        </form>
+
+                                        <p class="muted" style="margin-top:14px;">
+                                            В дальнейшем будет добавлена регистрация по SMS-коду (OTP).
+                                        </p>
+                                    </section>
+
+                                    <section class="cardBox">
+                                        <h2 class="secTitle">Мои заказы</h2>
+
+                                        <% if (!orders.length) { %>
+                                            <p class="muted">У вас пока нет заказов.</p>
+                                            <% } else { %>
+                                                <div class="orders">
+                                                    <% orders.forEach(o=> { %>
+                                                        <div class="orderRow">
+                                                            <div>
+                                                                <div class="orderId">Заказ #<%= o.id %>
+                                                                </div>
+                                                                <div class="orderMeta muted">
+                                                                    <%= new Date(o.created_at).toLocaleString() %> ·
+                                                                        <%= o.order_type==='delivery' ? 'Доставка'
+                                                                            : 'Самовывоз' %>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="orderStatus">
+                                                                <span
+                                                                    class="badge badge--<%= o.status.toLowerCase() %>">
+                                                                    <%= o.status %>
+                                                                </span>
+                                                                <div class="orderPrice">
+                                                                    <%= Number(o.total_price).toFixed(0) %> ₽
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <% }) %>
+                                                </div>
+                                                <% } %>
+                                    </section>
+        </main>
+
+        <%- include('../../partials/footer') %>
+</body>
+
+</html>
