@@ -7,57 +7,48 @@
   <title>
     <%= title %>
   </title>
+  <link rel="icon" type="image/png" href="/img/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@500;600;700;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Philosopher:wght@400;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css" />
 </head>
 
 <body>
-  <%- include('../partials/header') %>
-    <main class="page">
-      <section class="hero">
-        <div class="container hero__inner">
-          <div class="hero__left">
-            <h1 class="hero__title">
-              Готовим<br>
-              для<br>
-              Вас с<br>
-              <span class="hero__accent">душой</span>!
-            </h1>
+  <%- include('../partials/header', { isHome: true }) %>
+    <main class="page page-home">
 
+      <section class="hero-slider-section">
+        <div class="hero-slider" id="heroSlider">
+          <% if (typeof banners !=='undefined' && banners.length> 0) { %>
+            <% banners.forEach((banner, index)=> { %>
+              <div class="slide <%= index === 0 ? 'active' : '' %>"
+                style="background-image: url('<%= banner.image_url %>')"></div>
+              <% }) %>
+                <% } else { %>
+                  <div class="slide active" style="background-image: url('/img/banner1.jpg')"></div>
+                  <% } %>
+        </div>
 
-            <div class="hero__actions">
-              <a class="btn btn--outline" href="/delivery">ДОСТАВКА</a>
-              <a class="btn btn--primary" href="/menu">МЕНЮ</a>
-            </div>
-          </div>
-
-          <div class="hero__right">
-            <div class="hero__grad"></div>
-
-            <div class="heroShot heroShot--1">
-              <img src="/img/hero/hero1.png" alt="">
-            </div>
-
-            <div class="heroShot heroShot--2">
-              <img src="/img/hero/hero2.png" alt="">
-            </div>
-
-            <div class="heroShot heroShot--3">
-              <img src="/img/hero/hero3.png" alt="">
-            </div>
+        <div class="hero-content container">
+          <h1 class="hero-title">
+            Готовим<br>
+            для Вас с<br>
+            <span class="text-brand">душой</span>!
+          </h1>
+          <div class="hero-actions">
+            <a href="/delivery" class="btn btn--outline"
+              style="background: rgba(255,255,255,0.9); color: #333; border-color: transparent;">ДОСТАВКА</a>
+            <a href="/menu" class="btn btn--primary">МЕНЮ</a>
           </div>
         </div>
       </section>
 
-
       <section class="section container">
         <div class="section__head">
           <h2 class="section__title">Популярные блюда</h2>
-          <a class="btn btn--primary btn--small" href="/menu">ПОДРОБНЕЕ</a>
         </div>
 
         <div class="cards">
@@ -128,6 +119,22 @@
       </section>
     </main>
     <%- include('../partials/footer') %>
+
+      <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          const slides = document.querySelectorAll('.hero-slider .slide');
+          if (slides.length === 0) return;
+
+          let currentSlide = 0;
+          const slideInterval = 4000;
+
+          setInterval(() => {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+          }, slideInterval);
+        });
+      </script>
 </body>
 
 </html>

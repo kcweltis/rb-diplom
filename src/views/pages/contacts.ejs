@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+        <%= title %>
+    </title>
+    <link rel="icon" type="image/png" href="/img/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Philosopher:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/contacts.css" />
+
+    <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
+
+    <style>
+        .address-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 350px;
+            /* Ограничиваем высоту */
+            overflow-y: auto;
+            /* Добавляем прокрутку */
+            padding-right: 10px;
+        }
+
+        .address-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .address-list::-webkit-scrollbar-thumb {
+            background: rgba(227, 6, 19, 0.4);
+            border-radius: 10px;
+        }
+
+        .address-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .address-list li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .address-list li::before {
+            content: '📍';
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('../partials/header') %>
+
+        <main class="page container">
+            <h1 class="page-title" style="text-align: center;">Контакты</h1>
+
+            <div class="tabs-container">
+                <div class="toggle toggle--contacts">
+                    <button class="toggle__btn is-active" type="button" data-tab="info">Адреса и контакты</button>
+                    <button class="toggle__btn" type="button" data-tab="feedback">Отзыв</button>
+                </div>
+            </div>
+
+            <section id="tab-info" class="tab-content is-active">
+                <div class="contacts-grid">
+                    <div class="contacts-info">
+                        <h3>Единая справочная служба</h3>
+                        <p class="contacts-phone" style="color: #E30613; font-weight: 800; font-size: 28px;">+7 (800)
+                            500-80-05</p>
+                        <p class="muted">Ежедневно с 10:00 до 22:00</p>
+
+                        <h3 style="margin-top: 24px;">Электронная почта</h3>
+                        <p>info@rusbliny.ru</p>
+
+                        <h3 style="margin-top: 24px;">Наши рестораны в Оренбурге</h3>
+                        <ul class="address-list">
+                            <li>ул. Салмышская, 49</li>
+                            <li>ул. Чкалова 26/1</li>
+                            <li>ул. Володарского, 14</li>
+                            <li>ул. Аксакова, 8</li>
+                            <li>ул. Пролетарская, 294</li>
+                            <li>пр-т Победы, 20</li>
+                            <li>Загородное шоссе, 36/2 стр. 1</li>
+                            <li>ул. 8 марта, д. 42 (ТРЦ ВОСХОД)</li>
+                            <li>ул. Берёзовая Ростошь, 2а</li>
+                            <li>ул. Новая, 4 (ТРК Гулливер)</li>
+                            <li>Нежинское шоссе, 2а (ТРЦ Армада 2)</li>
+                            <li>пр-т Дзержинского 23 (ТРЦ Север)</li>
+                            <li>ул. Салмышская, 41 (ТРЦ Новый Мир)</li>
+                            <li>ул. Беляевская, 19/1</li>
+                            <li>Шарлыкское шоссе, 1/2 (Мегамолл Мармелад)</li>
+                            <li>ул. Советская, 13</li>
+                            <li>ул. Советская, 44</li>
+                        </ul>
+                    </div>
+
+                    <div class="contacts-map">
+                        <div id="map"
+                            style="width: 100%; height: 100%; min-height: 500px; border-radius: var(--radius); overflow: hidden; background: #e9e9e9;">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tab-feedback" class="tab-content" style="display: none;">
+                <div class="feedback-wrapper">
+                    <div class="feedback-header">
+                        <h2 class="feedback-title">ВАШЕ МНЕНИЕ</h2>
+                    </div>
+                    <p class="feedback-desc">
+                        Нам очень важна обратная связь от Вас, все жалобы/вопросы/предложения разбираются сотрудниками
+                        компании, включая высшее руководство. Пожалуйста, заполните форму ниже.
+                    </p>
+
+                    <form class="form feedback-form" action="/api/feedback" method="POST" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label class="label">Тема обращения</label>
+                            <select class="input" name="topic">
+                                <option value="Благодарность">Благодарность</option>
+                                <option value="Жалоба">Жалоба</option>
+                                <option value="Вопрос">Вопрос</option>
+                                <option value="Предложение">Предложение</option>
+                            </select>
+                        </div>
+
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="label">Ваше имя <span style="color:red">*</span></label>
+                                <input type="text" class="input" name="name" placeholder="Имя" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="label">Ваш email <span style="color:red">*</span></label>
+                                <input type="email" class="input" name="email" placeholder="Email" required>
+                            </div>
+                        </div>
+
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="label">Ваш телефон <span style="color:red">*</span></label>
+                                <input type="tel" class="input" name="phone" placeholder="+7 (999) 999-99-99" required>
+                            </div>
+                            <div class="form-group" style="display: flex; align-items: flex-end;"></div>
+                        </div>
+
+                        <div class="form-group" style="margin-top: 20px;">
+                            <label class="label">Ресторан <span style="color:red">*</span></label>
+                            <select class="input" name="restaurant" required>
+                                <option value="Оренбург, Аксакова, 8">Оренбург, Аксакова, 8</option>
+                                <option value="Оренбург, ТРЦ Армада">Оренбург, ТРЦ "Армада"</option>
+                            </select>
+                        </div>
+
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="label">Дата посещения</label>
+                                <input type="date" class="input" name="visit_date">
+                            </div>
+                            <div class="form-group">
+                                <label class="label">Время посещения</label>
+                                <input type="time" class="input" name="visit_time">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="label">Сообщение <span style="color:red">*</span></label>
+                            <textarea class="input" name="message" rows="5" placeholder="Введите текст сообщения"
+                                required></textarea>
+                        </div>
+
+                        <div class="file-upload">
+                            <label class="btn btn--outline" style="cursor: pointer;">
+                                📎 Прикрепить файл
+                                <input type="file" name="attachment" style="display: none;"
+                                    accept=".doc,.pdf,.ppt,.docx,.pptx,.xls,.jpg,.png">
+                            </label>
+                            <span class="muted" style="font-size: 12px; margin-left: 10px;">.doc, .pdf, .jpg, .png до
+                                10Мб</span>
+                        </div>
+
+                        <div class="form-group consent-group">
+                            <label style="font-size: 12px; display: flex; gap: 8px; align-items: center;">
+                                <input type="checkbox" required>
+                                <span>Даю согласие на <a href="#"
+                                        style="color: #E30613; text-decoration: underline;">обработку персональных
+                                        данных</a> в соответствии с <a href="#"
+                                        style="color: #E30613; text-decoration: underline;">политикой
+                                        конфиденциальности</a> сайта</span>
+                            </label>
+                        </div>
+
+                        <div style="margin-top: 10px;">
+                            <button type="submit" class="btn btn--primary">Отправить</button>
+                            <p class="muted" style="font-size: 12px; margin-top: 8px;"><span style="color:red">*</span>
+                                — Обязательно для заполнения</p>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </main>
+
+        <%- include('../partials/footer') %>
+
+            <script>
+                const btns = document.querySelectorAll('.toggle--contacts .toggle__btn');
+                const tabs = document.querySelectorAll('.tab-content');
+
+                btns.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        btns.forEach(b => b.classList.remove('is-active'));
+                        tabs.forEach(t => t.style.display = 'none');
+                        btn.classList.add('is-active');
+                        document.getElementById('tab-' + btn.dataset.tab).style.display = 'block';
+                    });
+                });
+            </script>
+
+            <script>
+                ymaps.ready(initMap);
+
+                function initMap() {
+                    // Создаем карту, центрируем на Оренбурге
+                    var myMap = new ymaps.Map("map", {
+                        center: [51.768199, 55.096955], // Координаты Оренбурга
+                        zoom: 12,
+                        controls: ['zoomControl', 'fullscreenControl']
+                    });
+
+                    // Все адреса для поиска на карте
+                    var addresses = [
+                        "Оренбург, ул. Салмышская, 49", "Оренбург, ул. Чкалова 26/1",
+                        "Оренбург, ул. Володарского, 14", "Оренбург, ул. Аксакова, 8",
+                        "Оренбург, ул. Пролетарская, 294", "Оренбург, пр-т Победы, 20",
+                        "Оренбург, Загородное шоссе, 36/2", "Оренбург, ул. 8 марта, 42",
+                        "Оренбург, ул. Берёзовая Ростошь, 2а", "Оренбург, ул. Новая, 4",
+                        "Оренбург, Нежинское шоссе, 2а", "Оренбург, пр-т Дзержинского, 23",
+                        "Оренбург, ул. Салмышская, 41", "Оренбург, ул. Беляевская, 19/1",
+                        "Оренбург, Шарлыкское шоссе, 1/2", "Оренбург, ул. Советская, 13",
+                        "Оренбург, ул. Советская, 44"
+                    ];
+
+                    // Ищем координаты и ставим метки
+                    addresses.forEach(function (address) {
+                        ymaps.geocode(address, {
+                            results: 1
+                        }).then(function (res) {
+                            var firstGeoObject = res.geoObjects.get(0);
+                            if (firstGeoObject) {
+                                var placemark = new ymaps.Placemark(firstGeoObject.geometry.getCoordinates(), {
+                                    balloonContent: '<b>Русские Блины</b><br>' + address,
+                                    hintContent: 'Русские Блины'
+                                }, {
+                                    preset: 'islands#redFoodIcon' // Красная иконка еды
+                                });
+                                myMap.geoObjects.add(placemark);
+                            }
+                        });
+                    });
+                }
+            </script>
+</body>
+
+</html>

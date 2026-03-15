@@ -1,4 +1,4 @@
-<header class="topbar">
+<header class="topbar <%= typeof isHome !== 'undefined' && isHome ? 'topbar--transparent' : '' %>">
   <div class="container topbar__inner">
     <a class="topbar__brand" href="/">
       <img class="topbar__logo" src="/img/logo.png" alt="Русские блины">
@@ -8,8 +8,8 @@
 
       <nav class="topbar__nav">
         <a class="topbar__link" href="/menu">МЕНЮ</a>
-        <a class="topbar__link" href="/cart">КОРЗИНА</a>
-        <a class="topbar__link" href="/promos">АКЦИИ</a>
+        <a class="topbar__link" href="/cart" id="openSideCartBtn">КОРЗИНА</a>
+        <a class="topbar__link" href="/promotions">АКЦИИ</a>
 
         <% if (!isAdmin) { %>
           <a class="topbar__link" href="<%= user ? '/profile' : '/login' %>">ЛИЧНЫЙ КАБИНЕТ</a>
@@ -19,7 +19,7 @@
 
             <% if (isAdmin) { %>
               <a class="topbar__link topbar__link--admin" href="/admin">АДМИН-ПАНЕЛЬ</a>
-              <a class="topbar__link" href="/logout" style="color:#FFD700;">ВЫХОД</a>
+              <a class="topbar__link" href="/logout" style="color:#E30613;">ВЫХОД</a>
               <% } %>
       </nav>
 
@@ -30,17 +30,13 @@
   </div>
 </header>
 
-
-<!-- Address modal -->
 <div class="modal" id="addrModal" aria-hidden="true">
   <div class="modal__overlay" data-close="1"></div>
-
   <div class="modal__panel" role="dialog" aria-modal="true" aria-labelledby="addrTitle">
     <div class="modal__head">
       <div class="modal__title" id="addrTitle">Выбор адреса</div>
       <button class="modal__close" type="button" data-close="1">✕</button>
     </div>
-
     <div class="modal__body">
       <label class="label">Город</label>
       <select class="input" id="citySelect">
@@ -48,25 +44,19 @@
         <option value="Тула">Тула</option>
         <option value="Москва">Москва</option>
       </select>
-
       <div class="toggle">
         <button class="toggle__btn is-active" type="button" data-mode="pickup">Самовывоз</button>
         <button class="toggle__btn" type="button" data-mode="delivery">Доставка</button>
       </div>
-
-      <!-- Самовывоз: список точек -->
       <div id="pickupBlock">
         <div class="muted" style="margin:8px 0 10px;">Выберите точку</div>
         <div class="addrList" id="pickupList"></div>
       </div>
-
-      <!-- Доставка: ввод адреса -->
       <div id="deliveryBlock" style="display:none;">
         <label class="label">Адрес доставки</label>
         <input class="input" id="deliveryInput" placeholder="Улица, дом, квартира (если есть)">
         <input class="input" id="deliveryComment" placeholder="Подъезд, этаж, домофон...">
       </div>
-
       <div class="modal__actions">
         <button class="btn btn--outline" type="button" data-close="1">Отмена</button>
         <button class="btn btn--primary" type="button" id="saveAddr">Сохранить</button>
@@ -76,3 +66,21 @@
 </div>
 
 <script src="/js/address-modal.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Ищем шапку только если у неё есть класс прозрачности
+    const topbar = document.querySelector('.topbar--transparent');
+    if (!topbar) return; // На других страницах скрипт просто ничего не делает
+
+    const checkScroll = () => {
+      if (window.scrollY > 50) {
+        topbar.classList.add('is-scrolled');
+      } else {
+        topbar.classList.remove('is-scrolled');
+      }
+    };
+    checkScroll();
+    window.addEventListener('scroll', checkScroll);
+  });
+</script>

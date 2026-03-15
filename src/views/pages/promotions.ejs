@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+        <%= title %>
+    </title>
+    <link rel="icon" type="image/png" href="/img/favicon.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/header.css">
+
+    <style>
+        .promo-page-wrapper {
+            background: rgba(246, 245, 244, 1);
+            /* Легкий теплый оттенок фона, как на скринах */
+            padding: 60px 0 100px;
+            min-height: calc(100vh - 120px);
+        }
+
+        .promo-section-title {
+            text-align: center;
+            font-family: 'Manrope', sans-serif;
+            font-weight: 800;
+            font-size: 36px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+            color: #222;
+        }
+
+        .promo-section-subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 15px;
+            max-width: 600px;
+            margin: 0 auto 50px;
+            line-height: 1.6;
+        }
+
+        /* Волнистая линия (разделитель) */
+        .wavy-divider {
+            height: 10px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0,5 Q25,10 50,5 T100,5" fill="none" stroke="%23ddd" stroke-width="1"/></svg>') repeat-x;
+            background-size: 50px 10px;
+            margin: 80px 0;
+            opacity: 0.7;
+        }
+
+        /* Сетка карточек */
+        .promo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 40px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .promo-card {
+            text-align: center;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        .promo-card:hover {
+            transform: translateY(-8px);
+        }
+
+        .promo-card__img-box {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+            background: #fff;
+        }
+
+        .promo-card__img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 0.5s ease;
+        }
+
+        .promo-card:hover .promo-card__img {
+            transform: scale(1.05);
+        }
+
+        .promo-card__date {
+            font-size: 11px;
+            font-weight: 700;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .promo-card__title {
+            font-family: 'Manrope', sans-serif;
+            font-weight: 800;
+            font-size: 18px;
+            line-height: 1.4;
+            color: #111;
+            text-transform: uppercase;
+        }
+
+        /* Форма подписки */
+        .subscribe-block {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .subscribe-form {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-top: 24px;
+        }
+
+        .subscribe-input {
+            flex: 1;
+            max-width: 350px;
+            padding: 16px 24px;
+            border: 1px solid #ddd;
+            border-radius: 50px;
+            font-size: 14px;
+            outline: none;
+            background: #fff;
+        }
+
+        .subscribe-btn {
+            background: #E30613;
+            color: #fff;
+            border: none;
+            padding: 0 32px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .subscribe-btn:hover {
+            background: #c20511;
+        }
+
+        @media (max-width: 768px) {
+            .subscribe-form {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .subscribe-input {
+                width: 100%;
+            }
+
+            .subscribe-btn {
+                width: 100%;
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('../partials/header') %>
+
+        <main class="promo-page-wrapper">
+            <div class="container">
+
+                <% if (news && news.length> 0) { %>
+                    <div class="promo-section">
+                        <h1 class="promo-section-title">Новинки</h1>
+                        <p class="promo-section-subtitle">Попробуйте наши новые блюда и напитки. Мы постоянно
+                            обновляем
+                            меню, чтобы радовать вас новыми вкусами!</p>
+
+                        <div class="promo-grid">
+                            <% news.forEach(item=> { %>
+                                <div class="promo-card">
+                                    <div class="promo-card__img-box">
+                                        <img src="<%= item.image_url || '/img/placeholder.png' %>"
+                                            class="promo-card__img" alt="<%= item.title %>">
+                                    </div>
+                                    <div class="promo-card__title">
+                                        <%= item.title %>
+                                    </div>
+                                </div>
+                                <% }) %>
+                        </div>
+                    </div>
+
+                    <div class="wavy-divider"></div>
+                    <% } %>
+
+
+                        <% if (promotions && promotions.length> 0) { %>
+                            <div class="promo-section">
+                                <h2 class="promo-section-title">Акции</h2>
+                                <p class="promo-section-subtitle">Для вас мы постоянно проводим различные акции и
+                                    будем
+                                    очень рады, если они вам понравятся.</p>
+
+                                <div class="promo-grid">
+                                    <% promotions.forEach(promo=> { %>
+                                        <div class="promo-card">
+                                            <div class="promo-card__img-box">
+                                                <img src="<%= promo.image_url || '/img/placeholder.png' %>"
+                                                    class="promo-card__img" alt="<%= promo.title %>">
+                                            </div>
+                                            <% if (promo.date_range) { %>
+                                                <div class="promo-card__date">
+                                                    <%= promo.date_range %>
+                                                </div>
+                                                <% } %>
+                                                    <div class="promo-card__title">
+                                                        <%= promo.title %>
+                                                    </div>
+                                        </div>
+                                        <% }) %>
+                                </div>
+                            </div>
+
+                            <div class="wavy-divider"></div>
+                            <% } %>
+
+
+                                <div class="subscribe-block">
+                                    <p style="color: #666; font-size: 15px; line-height: 1.6;">
+                                        Будь в курсе последних событий, а так же новинок, акций<br>и специальных
+                                        предложений
+                                    </p>
+                                    <form class="subscribe-form" action="#" method="POST" id="subscribeForm">
+                                        <input type="email" class="subscribe-input" placeholder="ВАШ EMAIL" required>
+                                        <button type="submit" class="subscribe-btn">Подписаться</button>
+                                    </form>
+                                </div>
+
+            </div>
+        </main>
+
+        <%- include('../partials/footer') %>
+
+            <script>
+                // Заглушка для формы подписки (чтобы страница не перезагружалась при нажатии)
+                document.getElementById('subscribeForm').addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    const btn = this.querySelector('button');
+                    const originalText = btn.innerText;
+
+                    btn.innerText = '✓ ОФОРМЛЕНО';
+                    btn.style.backgroundColor = '#8CC63F'; // Зеленый цвет успеха
+                    this.querySelector('input').value = '';
+
+                    setTimeout(() => {
+                        btn.innerText = originalText;
+                        btn.style.backgroundColor = '';
+                    }, 3000);
+                });
+            </script>
+</body>
+
+</html>

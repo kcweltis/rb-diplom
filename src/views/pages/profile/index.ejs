@@ -7,6 +7,7 @@
     <title>
         <%= title %>
     </title>
+    <link rel="icon" type="image/png" href="/img/favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -14,101 +15,425 @@
         rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/header.css">
-    <link rel="stylesheet" href="/css/profile.css">
 
+    <style>
+        /* СЕТКА ПРОФИЛЯ */
+        .profile-layout {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 40px;
+            margin-top: 20px;
+            margin-bottom: 60px;
+        }
+
+        .profile-card {
+            background: #fff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            margin-bottom: 24px;
+        }
+
+        .profile-card h2 {
+            margin: 0 0 20px;
+            font-family: 'Manrope';
+            font-size: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .input-group small {
+            font-size: 11px;
+            color: #E30613;
+            margin-top: -4px;
+        }
+
+        /* СТИЛИ ИСТОРИИ ЗАКАЗОВ */
+        .order-card {
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: 0.2s;
+        }
+
+        .order-card:hover {
+            border-color: #ddd;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            border-bottom: 1px dashed #eee;
+            padding-bottom: 16px;
+        }
+
+        .order-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        /* Можно будет добавить разные цвета для статусов */
+        .status-badge {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .status-new {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-done {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        @media (max-width: 900px) {
+            .profile-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 
 <body>
     <%- include('../../partials/header') %>
 
-        <main class="container profilePage">
-            <div class="profileTop">
-                <h1 class="page-title">Личный кабинет</h1>
-                <a class="btn btn--primary btn--small" href="/logout">Выход</a>
+        <main class="container profilePage" style="padding-top: 120px;">
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h1 class="page-title" style="margin: 0;">Личный кабинет</h1>
+                <a class="btn btn--outline btn--small" href="/logout"
+                    style="color: #E30613; border-color: #E30613;">Выйти из аккаунта</a>
             </div>
 
-            <% if (ok==='profile' ) { %>
-                <div class="notice">Данные обновлены.</div>
+            <% if (typeof ok !=='undefined' && ok==='profile' ) { %>
+                <div class="notice"
+                    style="background: #d4edda; color: #155724; padding: 10px 15px; border-radius: 8px; margin-bottom: 20px;">
+                    Данные успешно обновлены.</div>
                 <% } %>
-                    <% if (ok==='pass' ) { %>
-                        <div class="notice">Пароль изменён.</div>
+                    <% if (typeof ok !=='undefined' && ok==='pass' ) { %>
+                        <div class="notice"
+                            style="background: #d4edda; color: #155724; padding: 10px 15px; border-radius: 8px; margin-bottom: 20px;">
+                            Пароль успешно изменён.</div>
                         <% } %>
-                            <% if (err==='badpass' ) { %>
-                                <div class="notice notice--err">Старый пароль неверный.</div>
+                            <% if (typeof err !=='undefined' && err==='badpass' ) { %>
+                                <div class="notice notice--err"
+                                    style="background: #f8d7da; color: #721c24; padding: 10px 15px; border-radius: 8px; margin-bottom: 20px;">
+                                    Старый пароль введен неверно.</div>
                                 <% } %>
 
-                                    <section class="cardBox">
-                                        <h2 class="secTitle">Профиль</h2>
+                                    <div class="profile-layout">
 
-                                        <div class="kv">
-                                            <div class="kv__row"><span>Email:</span><b>
-                                                    <%= u.email %>
-                                                </b></div>
-                                            <div class="kv__row"><span>Имя:</span><b>
-                                                    <%= u.username %>
-                                                </b></div>
+                                        <div>
+                                            <div class="profile-card">
+                                                <h2>Профиль</h2>
+                                                <form class="form" method="POST" action="/profile/update"
+                                                    id="profileForm">
+
+                                                    <div class="input-group">
+                                                        <label>Имя</label>
+                                                        <input class="input" name="username" value="<%= u.username %>"
+                                                            required>
+                                                    </div>
+
+                                                    <div class="input-group">
+                                                        <label>Email (Почта)</label>
+                                                        <input class="input" type="email" name="email"
+                                                            value="<%= u.email %>" required>
+                                                    </div>
+
+                                                    <div class="input-group">
+                                                        <label>Телефон</label>
+                                                        <input class="input" type="tel" id="userPhone" name="phone"
+                                                            value="<%= u.phone || '' %>"
+                                                            placeholder="+7 (___) ___-__-__" required>
+                                                    </div>
+
+                                                    <div class="input-group">
+                                                        <label>Дата рождения</label>
+                                                        <% if (u.dob) { %>
+                                                            <input class="input" type="date"
+                                                                value="<%= new Date(u.dob).toISOString().split('T')[0] %>"
+                                                                style="background: #f5f5f5; color: #888;" readonly>
+                                                            <small style="color: #8CC63F;">Указана навсегда (для
+                                                                получения подарков)</small>
+                                                            <% } else { %>
+                                                                <input class="input" type="date" name="dob"
+                                                                    id="dobInput">
+                                                                <small>Внимание: дату можно указать только один
+                                                                    раз!</small>
+                                                                <% } %>
+                                                    </div>
+
+                                                    <button class="btn btn--primary" type="submit"
+                                                        style="width: 100%; margin-top: 10px;">Сохранить данные</button>
+                                                </form>
+                                            </div>
+
+                                            <div class="profile-card">
+                                                <h2>Смена пароля</h2>
+                                                <form class="form" method="POST" action="/profile/change-password">
+                                                    <div class="input-group">
+                                                        <label>Старый пароль</label>
+                                                        <input class="input" type="password" name="old_password"
+                                                            required />
+                                                    </div>
+                                                    <div class="input-group">
+                                                        <label>Новый пароль</label>
+                                                        <input class="input" type="password" name="new_password"
+                                                            required minlength="6" />
+                                                    </div>
+                                                    <button class="btn btn--outline" type="submit"
+                                                        style="width: 100%; margin-top: 10px;">Сменить пароль</button>
+                                                </form>
+                                                <p class="muted"
+                                                    style="margin-top:20px; font-size: 12px; text-align: center;">
+                                                    В дальнейшем будет добавлена авторизация по SMS-коду.
+                                                </p>
+                                            </div>
                                         </div>
 
-                                        <form class="form" method="POST" action="/profile/update">
-                                            <label class="label">Телефон</label>
-                                            <input class="input" name="phone" value="<%= u.phone || '' %>"
-                                                placeholder="+7..." />
-                                            <button class="btn btn--outline btn--small" type="submit">Сохранить
-                                                телефон</button>
-                                        </form>
+                                        <div>
+                                            <h2 style="font-family: 'Manrope'; margin: 0 0 20px; font-size: 24px;">Мои
+                                                заказы</h2>
 
-                                        <form class="form" method="POST" action="/profile/change-password"
-                                            style="margin-top:16px;">
-                                            <label class="label">Смена пароля</label>
-                                            <input class="input" type="password" name="old_password"
-                                                placeholder="Старый пароль" required />
-                                            <input class="input" type="password" name="new_password"
-                                                placeholder="Новый пароль" required />
-                                            <button class="btn btn--outline btn--small" type="submit">Сменить
-                                                пароль</button>
-                                        </form>
-
-                                        <p class="muted" style="margin-top:14px;">
-                                            В дальнейшем будет добавлена регистрация по SMS-коду (OTP).
-                                        </p>
-                                    </section>
-
-                                    <section class="cardBox">
-                                        <h2 class="secTitle">Мои заказы</h2>
-
-                                        <% if (!orders.length) { %>
-                                            <p class="muted">У вас пока нет заказов.</p>
-                                            <% } else { %>
-                                                <div class="orders">
-                                                    <% orders.forEach(o=> { %>
-                                                        <div class="orderRow">
-                                                            <div>
-                                                                <div class="orderId">Заказ #<%= o.id %>
-                                                                </div>
-                                                                <div class="orderMeta muted">
-                                                                    <%= new Date(o.created_at).toLocaleString() %> ·
-                                                                        <%= o.order_type==='delivery' ? 'Доставка'
-                                                                            : 'Самовывоз' %>
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="orderStatus">
-                                                                <span
-                                                                    class="badge badge--<%= o.status.toLowerCase() %>">
-                                                                    <%= o.status %>
-                                                                </span>
-                                                                <div class="orderPrice">
-                                                                    <%= Number(o.total_price).toFixed(0) %> ₽
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <% }) %>
+                                            <% if (!orders || orders.length===0) { %>
+                                                <div
+                                                    style="text-align: center; padding: 40px; color: #888; background: #fff; border-radius: 16px; border: 1px solid #eee;">
+                                                    У вас пока нет заказов.
                                                 </div>
-                                                <% } %>
-                                    </section>
+                                                <% } else { %>
+                                                    <div class="order-list">
+                                                        <% orders.forEach(o=> { %>
+                                                            <div class="order-card">
+                                                                <div class="order-header">
+                                                                    <div>
+                                                                        <div style="font-weight: 800; font-size: 16px;">
+                                                                            Заказ № <%= o.id %>
+                                                                        </div>
+                                                                        <div
+                                                                            style="font-size: 12px; color: #888; margin-top: 4px;">
+                                                                            <%= new Date(o.created_at).toLocaleString()
+                                                                                %> • <%= o.order_type==='delivery'
+                                                                                    ? 'Доставка' : 'Самовывоз' %>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <% const statusNames={ 'NEW' : 'Новый' , 'CONFIRMED'
+                                                                        : 'Принят' , 'COOKING' : 'Готовится' , 'READY'
+                                                                        : 'Ожидает выдачи' , 'ON_THE_WAY' : 'В пути'
+                                                                        , 'DELIVERED' : 'Выполнен' , 'CANCELLED'
+                                                                        : 'Отменен' }; const
+                                                                        displayStatus=statusNames[o.status] || o.status;
+                                                                        const badgeClass=o.status ?
+                                                                        o.status.toLowerCase() : 'new' ; %>
+                                                                        <div
+                                                                            class="order-status badge--<%= badgeClass %>">
+                                                                            <%= displayStatus %>
+                                                                        </div>
+                                                                </div>
+
+                                                                <div
+                                                                    style="font-size: 14px; color: #555; margin-bottom: 16px; line-height: 1.4;">
+                                                                    <% let shortDesc=o.items.map(i=> `${i.name ||
+                                                                        'Товар'} (${i.quantity} шт)`).join(', ');
+                                                                        if (shortDesc.length > 50) shortDesc =
+                                                                        shortDesc.substring(0, 50) + '...';
+                                                                        %>
+                                                                        <%= shortDesc || 'Пустой заказ' %>
+                                                                </div>
+
+                                                                <div class="order-details-block"
+                                                                    id="details-<%= o.id %>"
+                                                                    style="display: none; border-top: 1px dashed #eee; padding-top: 16px; margin-bottom: 16px; font-size: 13px;">
+                                                                    <div style="font-weight: 700; margin-bottom: 8px;">
+                                                                        Состав заказа:</div>
+                                                                    <ul
+                                                                        style="padding-left: 20px; margin-top: 0; margin-bottom: 16px; color: #444; line-height: 1.5;">
+                                                                        <% o.items.forEach(item=> { %>
+                                                                            <li style="margin-bottom: 6px;">
+                                                                                <b>
+                                                                                    <%= item.name || 'Товар' %>
+                                                                                </b> × <%= item.quantity %> шт. — <%=
+                                                                                        Number(item.price_at_time) *
+                                                                                        item.quantity %> ₽
+                                                                                        <% if (item.addons &&
+                                                                                            item.addons.length> 0) { %>
+                                                                                            <div
+                                                                                                style="font-size: 11px; color: #888;">
+                                                                                                + Добавки: <%=
+                                                                                                    item.addons.map(a=>
+                                                                                                    a.name).join(', ')
+                                                                                                    %>
+                                                                                            </div>
+                                                                                            <% } %>
+                                                                            </li>
+                                                                            <% }) %>
+                                                                    </ul>
+
+                                                                    <div style="font-weight: 700; margin-bottom: 8px;">
+                                                                        Информация:</div>
+                                                                    <div
+                                                                        style="color: #555; background: #f9f9f9; padding: 12px; border-radius: 8px;">
+                                                                        <% if (o.order_type==='delivery' ) { %>
+                                                                            <b>Адрес:</b>
+                                                                            <%= o.details?.address || 'Не указан' %>
+                                                                                <br>
+                                                                                <b>Кв:</b>
+                                                                                <%= o.details?.apt || '-' %>,
+                                                                                    <b>Подъезд:</b>
+                                                                                    <%= o.details?.entrance || '-' %>
+                                                                                        <br>
+                                                                                        <% } else { %>
+                                                                                            <b>Самовывоз:</b>
+                                                                                            <%= o.details?.pickupPoint
+                                                                                                || 'Не указан' %> (<%=
+                                                                                                    o.details?.dineMode
+                                                                                                    || '' %>) <br>
+                                                                                                    <b>Время:</b>
+                                                                                                    <%= o.details?.time
+                                                                                                        || '' %> <br>
+                                                                                                        <% } %>
+                                                                                                            <b>Оплата:</b>
+                                                                                                            <%= o.payment_info?.method==='online'
+                                                                                                                ? 'Онлайн на сайте'
+                                                                                                                :
+                                                                                                                (o.payment_info?.method==='cash_courier'
+                                                                                                                ?
+                                                                                                                `Наличными
+                                                                                                                курьеру
+                                                                                                                (сдача с
+                                                                                                                ${o.payment_info?.changeFrom}
+                                                                                                                ₽)`
+                                                                                                                : 'Картой курьеру'
+                                                                                                                ) %>
+                                                                                                                <% if
+                                                                                                                    (o.comment)
+                                                                                                                    { %>
+                                                                                                                    <br><b>Комментарий:</b>
+                                                                                                                    <%= o.comment
+                                                                                                                        %>
+                                                                                                                        <% }
+                                                                                                                            %>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div
+                                                                    style="display: flex; justify-content: space-between; align-items: center; font-weight: 700;">
+                                                                    <span>Сумма: <%= Number(o.total_price).toFixed(0) %>
+                                                                            ₽</span>
+                                                                    <button type="button"
+                                                                        class="btn btn--small btn--outline toggle-details-btn"
+                                                                        data-target="details-<%= o.id %>"
+                                                                        style="padding: 4px 12px; font-size: 12px; cursor: pointer;">
+                                                                        Детали
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                            <% }) %>
+                                                    </div>
+                                                    <% } %>
+                                        </div>
+
+                                    </div>
         </main>
 
         <%- include('../../partials/footer') %>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    // МАСКА ДЛЯ ТЕЛЕФОНА
+                    const phoneInput = document.getElementById('userPhone');
+
+                    // Функция форматирования
+                    const formatPhone = (value) => {
+                        if (!value) return '';
+                        if (['7', '8', '9'].includes(value[0])) {
+                            if (value[0] === '9') value = '7' + value;
+                            let firstSymbols = (value[0] === '8') ? '8' : '+7';
+                            let formatted = firstSymbols + ' ';
+                            if (value.length > 1) formatted += '(' + value.substring(1, 4);
+                            if (value.length >= 5) formatted += ') ' + value.substring(4, 7);
+                            if (value.length >= 8) formatted += '-' + value.substring(7, 9);
+                            if (value.length >= 10) formatted += '-' + value.substring(9, 11);
+                            return formatted;
+                        }
+                        return '+' + value.substring(0, 15);
+                    };
+
+                    // Форматируем номер, который уже пришел из базы
+                    if (phoneInput.value) {
+                        phoneInput.value = formatPhone(phoneInput.value.replace(/\D/g, ''));
+                    }
+
+                    // Форматируем при вводе
+                    phoneInput.addEventListener('input', function (e) {
+                        let value = e.target.value.replace(/\D/g, '');
+                        e.target.value = formatPhone(value);
+                    });
+
+                    // ВАЛИДАЦИЯ ПЕРЕД ОТПРАВКОЙ ФОРМЫ
+                    const profileForm = document.getElementById('profileForm');
+                    profileForm.addEventListener('submit', function (e) {
+                        const rawPhone = phoneInput.value;
+                        const cleanPhone = rawPhone.replace(/\D/g, '');
+
+                        if (cleanPhone.length !== 11) {
+                            e.preventDefault();
+                            alert('Пожалуйста, введите корректный номер телефона (11 цифр).');
+                            phoneInput.focus();
+                            return;
+                        }
+
+                        const dobInput = document.getElementById('dobInput');
+                        if (dobInput && dobInput.value) {
+                            const confirmDob = confirm('Вы уверены, что хотите сохранить эту дату рождения?\n\nВнимание: Изменить её в будущем будет невозможно!');
+                            if (!confirmDob) {
+                                e.preventDefault();
+                            }
+                        }
+                    });
+                });
+
+                // ОТКРЫТИЕ/ЗАКРЫТИЕ ДЕТАЛЕЙ ЗАКАЗА
+                document.querySelectorAll('.toggle-details-btn').forEach(btn => {
+                    btn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        const targetId = this.getAttribute('data-target');
+                        const block = document.getElementById(targetId);
+
+                        if (block.style.display === 'none') {
+                            block.style.display = 'block';
+                            this.innerText = 'Скрыть';
+                            this.style.backgroundColor = '#f5f5f5'; // Подсветка активной кнопки
+                        } else {
+                            block.style.display = 'none';
+                            this.innerText = 'Детали';
+                            this.style.backgroundColor = 'transparent';
+                        }
+                    });
+                });
+            </script>
 </body>
 
 </html>

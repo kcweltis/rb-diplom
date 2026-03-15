@@ -7,123 +7,390 @@
   <title>
     <%= title %>
   </title>
+  <link rel="icon" type="image/png" href="/img/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css" />
+
+  <style>
+    /* Базовые карточки */
+    .admin-card {
+      background: #fff;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      margin-bottom: 40px;
+    }
+
+    .edit-card {
+      background: #fff;
+      padding: 24px;
+      border-radius: 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+      display: flex;
+      gap: 30px;
+      transition: opacity 0.2s ease;
+      /* Для плавного скрытия при поиске */
+    }
+
+    /* Умные сетки */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .nutri-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 10px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .input-group label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Коробка для БЖУ */
+    .nutri-box {
+      background: #fdfdfd;
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px dashed #ccc;
+      margin-bottom: 15px;
+    }
+
+    /* Вертикальный список добавок с прокруткой */
+    .addon-scroll-list {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #fdfdfd;
+      max-height: 160px;
+      overflow-y: auto;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .addon-scroll-list label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      color: #333;
+      font-weight: 500;
+    }
+
+    .addon-scroll-list label:hover {
+      background: #f0f0f0;
+    }
+
+    .addon-scroll-list input {
+      margin: 0;
+      width: 16px;
+      height: 16px;
+      accent-color: #E30613;
+      cursor: pointer;
+    }
+
+    .addon-scroll-list::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .addon-scroll-list::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 10px;
+    }
+
+    .edit-card-left {
+      width: 140px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .edit-card-right {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    /* Панель фильтров */
+    .filter-bar {
+      display: flex;
+      gap: 15px;
+      background: #fff;
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+      margin-bottom: 24px;
+      align-items: center;
+    }
+
+    @media(max-width: 900px) {
+      .edit-card {
+        flex-direction: column;
+      }
+
+      .edit-card-left {
+        width: 100%;
+        flex-direction: row;
+        align-items: center;
+      }
+
+      .edit-card-left img {
+        width: 100px;
+        height: 100px;
+      }
+
+      .filter-bar {
+        flex-direction: column;
+      }
+
+      .filter-bar .input {
+        width: 100% !important;
+      }
+    }
+  </style>
 </head>
 
 <body>
   <%- include('../../partials/header') %>
     <main class="container">
-      <h1 class="page-title">Товары</h1>
+      <%- include('../../partials/admin/breadcrumbs') %>
+        <h1 class="page-title">Управление товарами</h1>
 
-      <form class="form" method="POST" action="/admin/products" enctype="multipart/form-data">
-        <div class="grid-2">
-          <div>
-            <label class="label">Категория</label>
-            <select class="input" name="category_id" required>
-              <% categories.forEach(c=> { %>
-                <option value="<%= c.id %>">
-                  <%= c.title %>
-                </option>
+        <form class="admin-card" method="POST" action="/admin/products" enctype="multipart/form-data">
+          <h2 style="margin: 0 0 24px; font-family: 'Manrope';">Добавить новое блюдо</h2>
+
+          <div class="form-grid" style="grid-template-columns: 2fr 1fr;">
+            <div class="input-group"><label>Название блюда</label><input class="input" name="name" required></div>
+            <div class="input-group"><label>Категория</label>
+              <select class="input" name="category_id" required>
+                <% categories.forEach(c=> { %><option value="<%= c.id %>">
+                    <%= c.title %>
+                  </option>
+                  <% }) %>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="input-group"><label>Цена (₽)</label><input class="input" name="price" type="number" step="0.01"
+                required></div>
+            <div class="input-group"><label>Вес (г)</label><input class="input" name="weight_g" type="number"></div>
+            <div class="input-group"><label>Позиция в меню</label><input class="input" name="sort_order" type="number"
+                value="0"></div>
+          </div>
+
+          <div class="nutri-box">
+            <div class="input-group" style="margin-bottom: 10px;"><label>Пищевая ценность (на 100г)</label></div>
+            <div class="nutri-grid">
+              <div class="input-group"><label>Белки (г)</label><input class="input" name="proteins" type="number"
+                  step="0.1"></div>
+              <div class="input-group"><label>Жиры (г)</label><input class="input" name="fats" type="number" step="0.1">
+              </div>
+              <div class="input-group"><label>Углеводы (г)</label><input class="input" name="carbs" type="number"
+                  step="0.1"></div>
+              <div class="input-group"><label>Калории (ккал)</label><input class="input" name="calories" type="number">
+              </div>
+            </div>
+          </div>
+
+          <div class="input-group" style="margin-bottom: 15px;">
+            <label>Описание / Состав</label>
+            <textarea class="input" name="description" rows="2" placeholder="Что входит в блюдо..."></textarea>
+          </div>
+
+          <div class="input-group" style="margin-bottom: 15px;">
+            <label>Доступные добавки (список с выбором)</label>
+            <div class="addon-scroll-list">
+              <% addons.forEach(a=> { %>
+                <label><input type="checkbox" name="addons" value="<%= a.id %>">
+                  <%= a.name %> <span style="color: #888; font-size: 12px;">(+<%= Number(a.price).toFixed(0) %>₽)</span>
+                </label>
                 <% }) %>
-            </select>
+            </div>
           </div>
 
-          <div>
-            <label class="label">Цена</label>
-            <input class="input" name="price" type="number" step="0.01" min="0" required>
+          <div class="input-group" style="margin-bottom: 24px;">
+            <label>Фотография блюда</label>
+            <input class="input" type="file" name="image" accept="image/*">
           </div>
+
+          <button class="btn btn--primary" type="submit" style="font-size: 16px; padding: 14px 30px;">Добавить
+            товар</button>
+        </form>
+
+        <h2 style="margin: 0 0 16px; font-family: 'Manrope';">Список блюд</h2>
+
+        <div class="filter-bar">
+          <input type="text" id="searchInput" class="input" placeholder="🔍 Поиск по названию..." style="flex-grow: 1;">
+          <select id="categoryFilter" class="input" style="width: 250px;">
+            <option value="all">Все категории</option>
+            <% categories.forEach(c=> { %>
+              <option value="<%= c.id %>">
+                <%= c.title %>
+              </option>
+              <% }) %>
+          </select>
         </div>
 
-        <label class="label">Название</label>
-        <input class="input" name="name" required>
+        <div id="productsList">
+          <% products.forEach(p=> { %>
+            <div class="edit-card product-item <%= !p.is_active ? 'is-inactive' : '' %>"
+              style="<%= !p.is_active ? 'opacity: 0.6;' : '' %>" data-name="<%= p.name.toLowerCase() %>"
+              data-category="<%= p.category_id %>">
 
-        <label class="label">Описание</label>
-        <textarea class="input" name="description" rows="2"></textarea>
+              <div class="edit-card-left">
+                <div style="font-weight: 800; color: #ccc; font-size: 12px;">ID: <%= p.id %>
+                </div>
+                <img src="<%= p.image_url || '/img/products/placeholder.png' %>"
+                  style="width: 100%; height: 140px; object-fit: cover; border-radius: 12px;">
 
-        <label class="label">Картинка (файл)</label>
-        <input class="input" type="file" name="image" accept="image/png,image/jpeg,image/webp">
-
-        <button class="btn btn--primary" type="submit">Добавить товар</button>
-      </form>
-
-
-      <div class="table table--products" style="margin-top:18px;">
-        <div class="table__row table__head">
-          <div>ID</div>
-          <div>Фото</div>
-          <div>Название</div>
-          <div>Категория</div>
-          <div>Цена</div>
-          <div>Действия</div>
-        </div>
-
-        <% products.forEach(p=> { %>
-          <div class="table__row <%= !p.is_active ? 'is-inactive' : '' %>">
-            <div>
-              <%= p.id %>
-            </div>
-
-            <div>
-              <img class="thumb" src="<%= p.image_url || '/img/products/placeholder.png' %>" alt="">
-            </div>
-
-            <!-- INLINE FORM EDIT + ACTIONS -->
-            <div style="grid-column: span 4;">
-              <form class="inlineForm" method="POST" action="/admin/products/<%= p.id %>/edit"
-                enctype="multipart/form-data">
-
-                <input class="input input--sm" name="name" value="<%= p.name %>" required>
-
-                <select class="input input--sm" name="category_id" required>
-                  <% categories.forEach(c=> { %>
-                    <option value="<%= c.id %>" <%=c.id===p.category_id ? 'selected' : '' %>>
-                      <%= c.title %>
-                    </option>
-                    <% }) %>
-                </select>
-
-                <input class="input input--sm" name="price" type="number" step="0.01" min="0" value="<%= p.price %>"
-                  required>
-
-                <input class="input input--sm" type="file" name="image" accept="image/png,image/jpeg,image/webp">
-
-                <button class="btn btn--outline btn--small" type="submit">Сохранить</button>
-              </form>
-
-              <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:8px;">
-                <!-- Toggle active -->
-                <form method="POST" action="/admin/products/<%= p.id %>/toggle">
-                  <button class="btn btn--small <%= p.is_active ? 'btn-off' : 'btn-on' %>">
+                <form method="POST" action="/admin/products/<%= p.id %>/toggle" style="width: 100%;">
+                  <button class="btn btn--small <%= p.is_active ? 'btn-off' : 'btn-on' %>" style="width: 100%;">
                     <%= p.is_active ? 'Выключить' : 'Включить' %>
                   </button>
                 </form>
-
-
-                <!-- Delete -->
                 <form method="POST" action="/admin/products/<%= p.id %>/delete"
                   onsubmit="return confirm('Удалить товар?')">
-                  <button class="btn btn--small" style="background:#fff;border:1px solid rgba(0,0,0,.12);">
-                    Удалить
-                  </button>
+                  <button class="btn btn--small btn--outline" type="submit" style="width: 100%;">Удалить</button>
                 </form>
               </div>
 
+              <form class="edit-card-right" method="POST" action="/admin/products/<%= p.id %>/edit"
+                enctype="multipart/form-data">
+                <div class="form-grid">
+                  <div class="input-group"><label>Название</label><input class="input" name="name" value="<%= p.name %>"
+                      required></div>
+                  <div class="input-group"><label>Категория</label>
+                    <select class="input" name="category_id" required>
+                      <% categories.forEach(c=> { %><option value="<%= c.id %>" <%=c.id===p.category_id ? 'selected'
+                          : '' %>><%= c.title %>
+                        </option>
+                        <% }) %>
+                    </select>
+                  </div>
+                  <div class="input-group"><label>Цена (₽)</label><input class="input" name="price" type="number"
+                      step="0.01" value="<%= p.price %>" required></div>
+                </div>
+
+                <div class="form-grid">
+                  <div class="input-group"><label>Вес (г)</label><input class="input" name="weight_g" type="number"
+                      value="<%= p.weight_g %>"></div>
+                  <div class="input-group"><label>Позиция</label><input class="input" name="sort_order" type="number"
+                      value="<%= p.sort_order %>"></div>
+                </div>
+
+                <div class="nutri-box">
+                  <div class="nutri-grid">
+                    <div class="input-group"><label>Белки</label><input class="input input--sm" name="proteins"
+                        type="number" step="0.1" value="<%= p.proteins %>"></div>
+                    <div class="input-group"><label>Жиры</label><input class="input input--sm" name="fats" type="number"
+                        step="0.1" value="<%= p.fats %>"></div>
+                    <div class="input-group"><label>Углеводы</label><input class="input input--sm" name="carbs"
+                        type="number" step="0.1" value="<%= p.carbs %>"></div>
+                    <div class="input-group"><label>Ккал</label><input class="input input--sm" name="calories"
+                        type="number" value="<%= p.calories %>"></div>
+                  </div>
+                </div>
+
+                <div class="input-group" style="margin-bottom: 15px;">
+                  <label>Состав</label>
+                  <textarea class="input" name="description" rows="2"><%= p.description %></textarea>
+                </div>
+
+                <div class="input-group" style="margin-bottom: 15px;">
+                  <label>Добавки к блюду</label>
+                  <div class="addon-scroll-list">
+                    <% addons.forEach(a=> {
+                      const isChecked = (p.addon_ids || []).includes(a.id) ? 'checked' : '';
+                      %>
+                      <label><input type="checkbox" name="addons" value="<%= a.id %>" <%=isChecked %>> <%= a.name %>
+                      </label>
+                      <% }) %>
+                  </div>
+                </div>
+
+                <div
+                  style="display: flex; justify-content: space-between; align-items: center; padding-top: 16px; border-top: 1px solid #eee; flex-wrap: wrap; gap: 10px;">
+                  <div class="input-group">
+                    <label>Обновить фото</label>
+                    <input class="input" type="file" name="image" accept="image/*" style="max-width: 250px;">
+                  </div>
+                  <button class="btn btn--primary" type="submit" style="padding: 10px 32px;">Сохранить
+                    изменения</button>
+                </div>
+              </form>
             </div>
-          </div>
-          <% }) %>
-      </div>
+            <% }) %>
+        </div>
 
+        <div id="noResultsMsg"
+          style="display: none; text-align: center; padding: 40px; background: #fff; border-radius: 12px; color: #888;">
+          По вашему запросу ничего не найдено.
+        </div>
 
-
-
-      <a class="btn btn--outline" href="/admin">Назад</a>
     </main>
     <%- include('../../partials/footer') %>
+
+      <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          const searchInput = document.getElementById('searchInput');
+          const categoryFilter = document.getElementById('categoryFilter');
+          const productItems = document.querySelectorAll('.product-item');
+          const noResultsMsg = document.getElementById('noResultsMsg');
+
+          function filterProducts() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const selectedCategory = categoryFilter.value;
+            let visibleCount = 0;
+
+            productItems.forEach(item => {
+              const productName = item.getAttribute('data-name');
+              const productCategory = item.getAttribute('data-category');
+
+              const matchesSearch = productName.includes(searchTerm);
+              const matchesCategory = selectedCategory === 'all' || productCategory === selectedCategory;
+
+              if (matchesSearch && matchesCategory) {
+                item.style.display = 'flex'; // Показываем
+                visibleCount++;
+              } else {
+                item.style.display = 'none'; // Прячем
+              }
+            });
+
+            // Показываем сообщение, если все товары скрыты
+            noResultsMsg.style.display = visibleCount === 0 ? 'block' : 'none';
+          }
+
+          // Слушаем ввод текста и изменение выпадающего списка
+          searchInput.addEventListener('input', filterProducts);
+          categoryFilter.addEventListener('change', filterProducts);
+        });
+      </script>
 </body>
 
 </html>

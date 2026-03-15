@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+        <%= title %>
+    </title>
+    <link rel="icon" type="image/png" href="/img/favicon.png">
+    <link rel="stylesheet" href="/css/style.css" />
+</head>
+
+<body>
+    <%- include('../../partials/header') %>
+        <main class="container">
+            <%- include('../../partials/admin/breadcrumbs') %>
+                <h1 class="page-title">Баннеры на главной</h1>
+
+                <form class="form form--inline" method="POST" action="/admin/banners/add" enctype="multipart/form-data">
+                    <label class="label">Новый баннер (картинка 1920x1080):</label>
+                    <input class="input" type="file" name="image" accept="image/png,image/jpeg,image/webp" required>
+                    <button class="btn btn--primary" type="submit">Загрузить</button>
+                </form>
+
+                <div class="table" style="margin-top:20px;">
+                    <div class="table__row table__head" style="grid-template-columns: 80px 200px 1fr 150px;">
+                        <div>ID</div>
+                        <div>Превью</div>
+                        <div>Статус</div>
+                        <div>Действия</div>
+                    </div>
+
+                    <% banners.forEach(b=> { %>
+                        <div class="table__row" style="grid-template-columns: 80px 200px 1fr 150px;">
+                            <div>
+                                <%= b.id %>
+                            </div>
+                            <div>
+                                <img src="<%= b.image_url %>" alt="Баннер"
+                                    style="width: 150px; height: 80px; object-fit: cover; border-radius: 8px;">
+                            </div>
+                            <div>
+                                <form method="POST" action="/admin/banners/<%= b.id %>/toggle">
+                                    <button class="btn btn--small <%= b.is_active ? 'btn-on' : 'btn-off' %>">
+                                        <%= b.is_active ? 'Активен (Скрыть)' : 'Скрыт (Показать)' %>
+                                    </button>
+                                </form>
+                            </div>
+                            <div>
+                                <form method="POST" action="/admin/banners/<%= b.id %>/delete"
+                                    onsubmit="return confirm('Удалить баннер?')">
+                                    <button class="btn btn--outline btn--small" type="submit">Удалить</button>
+                                </form>
+                            </div>
+                        </div>
+                        <% }) %>
+                </div>
+
+                <a class="btn btn--outline" href="/admin" style="margin-top: 20px;">Назад</a>
+        </main>
+</body>
+
+</html>

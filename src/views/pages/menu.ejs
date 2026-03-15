@@ -7,11 +7,11 @@
   <title>
     <%= title %>
   </title>
-
+  <link rel="icon" type="image/png" href="/img/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Philosopher:wght@400;700&display=swap"
     rel="stylesheet">
 
   <link rel="stylesheet" href="/css/style.css">
@@ -25,8 +25,7 @@
 
     <main class="menuWrap">
       <div class="container">
-        <h1 class="menuTitle">НАШЕ МЕНЮ</h1>
-        <div class="menuOrnament" aria-hidden="true"></div>
+        <h1 class="menuTitle" style="margin-bottom: 40px;">НАШЕ МЕНЮ</h1>
 
         <div class="menuLayout">
           <aside class="menuAside">
@@ -36,13 +35,14 @@
             </form>
 
             <nav class="catNav">
-              <% categories.forEach((c, idx)=> { %>
-                <a class="catNav__link <%= idx===0 ? 'is-active' : '' %>" href="#cat-<%= c.id %>">
+              <% categories.forEach((c)=> { %>
+                <a class="catNav__link" href="#cat-<%= c.id %>" data-cat="<%= c.id %>">
                   <%= c.title %>
                 </a>
                 <% }) %>
 
-                  <a class="catNav__link catNav__link--calc" href="/calories">
+                  <a class="catNav__link catNav__link--calc" href="/calories"
+                    style="margin-top: 20px; color: #E30613; border: 1px solid #E30613; background: transparent; text-align: center;">
                     Калькулятор калорий →
                   </a>
             </nav>
@@ -60,30 +60,36 @@
 
                 <div class="itemsGrid">
                   <% list.forEach(p=> { %>
-                    <article class="itemCard">
-                      <a class="itemCard__imgBox" href="/product/<%= p.id %>">
+                    <article class="itemCard open-modal-btn" data-id="<%= p.id %>" style="cursor: pointer;">
+                      <div class="itemCard__imgBox">
                         <img class="itemCard__img" src="<%= p.image_url || '/img/products/placeholder.png' %>"
                           alt="<%= p.name %>">
-                      </a>
+                      </div>
 
                       <div class="itemCard__name">
-                        <a href="/product/<%= p.id %>">
-                          <%= p.name %>
-                        </a>
+                        <%= p.name %>
                       </div>
 
                       <div class="itemCard__meta">
-                        <% if (p.weight_g && p.kcal_100g) { %>
-                          <span>
-                            <%= p.weight_g %> г
-                          </span>
-                          <span>·</span>
-                          <span>
-                            <%= Math.round((Number(p.weight_g) * Number(p.kcal_100g)) / 100) %> ккал
-                          </span>
-                          <% } else { %>
-                            <span class="muted">ккал не указаны</span>
+                        <% if (p.weight_g || p.calories) { %>
+                          <% if (p.weight_g) { %>
+                            <span>
+                              <%= p.weight_g %> г
+                            </span>
                             <% } %>
+
+                              <% if (p.weight_g && p.calories) { %>
+                                <span>·</span>
+                                <% } %>
+
+                                  <% if (p.calories) { %>
+                                    <span>
+                                      <%= p.calories %> ккал
+                                    </span>
+                                    <% } %>
+                                      <% } else { %>
+                                        <span class="muted">нет данных</span>
+                                        <% } %>
                       </div>
 
                       <div class="itemCard__bottom">
@@ -91,10 +97,9 @@
                           <%= Number(p.price).toFixed(0) %> ₽
                         </div>
 
-                        <form method="POST" action="/cart/add">
-                          <input type="hidden" name="productId" value="<%= p.id %>">
-                          <button class="itemBtn" type="submit">Заказать</button>
-                        </form>
+                        <button class="itemBtn" type="button">
+                          Выбрать
+                        </button>
                       </div>
                     </article>
                     <% }) %>
@@ -106,8 +111,43 @@
       </div>
     </main>
 
+    <div class="prod-modal-overlay" id="prodModalOverlay">
+      <div class="prod-modal">
+        <button class="prod-modal__close" id="prodModalClose">✕</button>
+        <div class="prod-modal__content" id="prodModalContent">
+          <div style="text-align:center; padding: 40px;">Загрузка...</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="floating-cart-btn" id="floatingCartBtn">
+      🛒 Корзина
+    </button>
+
+    <div class="side-cart-overlay" id="sideCartOverlay"></div>
+    <aside class="side-cart" id="sideCart">
+      <div class="side-cart__header">
+        <h2 style="margin:0; font-size: 24px;">Ваш заказ</h2>
+        <button class="side-cart__close" id="closeSideCartBtn">✕</button>
+      </div>
+
+      <div class="side-cart__body" id="sideCartBody">
+        <div style="text-align:center; margin-top: 40px; color: #666;">Загрузка...</div>
+      </div>
+
+      <div class="side-cart__footer">
+        <div
+          style="display: flex; justify-content: space-between; font-weight: 700; font-size: 20px; margin-bottom: 16px;">
+          <span>Итого:</span>
+          <span id="sideCartTotal">0 ₽</span>
+        </div>
+        <a href="/cart" class="btn btn--primary" style="width: 100%; text-align: center;">Оформить заказ</a>
+      </div>
+    </aside>
+
     <%- include('../partials/footer') %>
 
+      <script src="/js/side-cart.js"></script>
       <script src="/js/menu.js"></script>
 </body>
 

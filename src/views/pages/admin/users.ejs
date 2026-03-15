@@ -7,6 +7,7 @@
   <title>
     <%= title %>
   </title>
+  <link rel="icon" type="image/png" href="/img/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -18,59 +19,60 @@
 <body>
   <%- include('../../partials/header') %>
     <main class="container">
-      <h1 class="page-title">Пользователи</h1>
+      <%- include('../../partials/admin/breadcrumbs') %>
+        <h1 class="page-title">Пользователи</h1>
 
-      <div class="table">
-        <div class="table__row table__head">
-          <div>ID</div>
-          <div>Имя</div>
-          <div>Email</div>
-          <div>Роль</div>
-          <div>Активен</div>
-          <div>Действия</div>
+        <div class="table">
+          <div class="table__row table__head">
+            <div>ID</div>
+            <div>Имя</div>
+            <div>Email</div>
+            <div>Роль</div>
+            <div>Активен</div>
+            <div>Действия</div>
+          </div>
+
+          <% users.forEach(u=> { %>
+            <div class="table__row">
+              <div>
+                <%= u.id %>
+              </div>
+              <div>
+                <%= u.username %>
+              </div>
+              <div>
+                <%= u.email %>
+              </div>
+              <div>
+                <form class="form form--inline" method="POST" action="/admin/users/<%= u.id %>/update">
+                  <select class="input" name="role_id">
+                    <% roles.forEach(r=> { %>
+                      <option value="<%= r.id %>" <%=r.name===u.role ? 'selected' : '' %>><%= r.name %>
+                      </option>
+                      <% }) %>
+                  </select>
+                  <select class="input" name="is_active" style="max-width:140px;">
+                    <option value="1" <%=u.is_active ? 'selected' : '' %>>Активен</option>
+                    <option value="0" <%=!u.is_active ? 'selected' : '' %>>Заблокирован</option>
+                  </select>
+                  <button class="btn btn--outline btn--small" type="submit">Сохранить</button>
+                </form>
+              </div>
+              <div>
+                <%= u.is_active ? 'Да' : 'Нет' %>
+              </div>
+              <div>
+                <form class="form form--inline" method="POST" action="/admin/users/<%= u.id %>/reset-password"
+                  onsubmit="return confirm('Сбросить пароль?')">
+                  <input class="input" name="new_password" placeholder="Новый пароль" required style="max-width:160px;">
+                  <button class="btn btn--outline btn--small" type="submit">Сброс</button>
+                </form>
+              </div>
+            </div>
+            <% }) %>
         </div>
 
-        <% users.forEach(u=> { %>
-          <div class="table__row">
-            <div>
-              <%= u.id %>
-            </div>
-            <div>
-              <%= u.username %>
-            </div>
-            <div>
-              <%= u.email %>
-            </div>
-            <div>
-              <form class="form form--inline" method="POST" action="/admin/users/<%= u.id %>/update">
-                <select class="input" name="role_id">
-                  <% roles.forEach(r=> { %>
-                    <option value="<%= r.id %>" <%=r.name===u.role ? 'selected' : '' %>><%= r.name %>
-                    </option>
-                    <% }) %>
-                </select>
-                <select class="input" name="is_active" style="max-width:140px;">
-                  <option value="1" <%=u.is_active ? 'selected' : '' %>>Активен</option>
-                  <option value="0" <%=!u.is_active ? 'selected' : '' %>>Заблокирован</option>
-                </select>
-                <button class="btn btn--outline btn--small" type="submit">Сохранить</button>
-              </form>
-            </div>
-            <div>
-              <%= u.is_active ? 'Да' : 'Нет' %>
-            </div>
-            <div>
-              <form class="form form--inline" method="POST" action="/admin/users/<%= u.id %>/reset-password"
-                onsubmit="return confirm('Сбросить пароль?')">
-                <input class="input" name="new_password" placeholder="Новый пароль" required style="max-width:160px;">
-                <button class="btn btn--outline btn--small" type="submit">Сброс</button>
-              </form>
-            </div>
-          </div>
-          <% }) %>
-      </div>
-
-      <a class="btn btn--outline" href="/admin">Назад</a>
+        <a class="btn btn--outline" href="/admin">Назад</a>
     </main>
     <%- include('../../partials/footer') %>
 </body>

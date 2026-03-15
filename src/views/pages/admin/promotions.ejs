@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Админка: <%= title %>
+    </title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/header.css">
+    <style>
+        .admin-wrap {
+            padding: 40px 0 80px;
+            background: #f9f9f9;
+            min-height: 100vh;
+        }
+
+        .admin-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            margin-bottom: 40px;
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        .admin-table th,
+        .admin-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .admin-table th {
+            color: #888;
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+
+        .admin-img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .badge-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-hidden {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .btn-action {
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-hide {
+            background: #ffc107;
+            color: #856404;
+        }
+
+        .btn-show {
+            background: #8CC63F;
+            color: #fff;
+        }
+
+        .btn-del {
+            background: #E30613;
+            color: #fff;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('../../partials/header') %>
+
+        <main class="admin-wrap" style="padding-top: 120px;">
+            <div class="container">
+                <%- include('../../partials/admin/breadcrumbs') %>
+                    <h1 style="font-family: 'Manrope'; margin-bottom: 30px;">Управление Акциями и Новинками</h1>
+
+                    <div class="admin-card">
+                        <h2 style="margin-top: 0;">Добавить запись</h2>
+                        <form action="/admin/promotions/add" method="POST" enctype="multipart/form-data"
+                            style="margin-top: 20px;">
+                            <div class="form-grid">
+                                <div>
+                                    <label class="label">Тип</label>
+                                    <select name="type" class="input" style="width: 100%;" required id="typeSelect">
+                                        <option value="news">Новинка (без дат)</option>
+                                        <option value="promo">Акция (нужны даты)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="label">Картинка (Желательно квадратная)</label>
+                                    <input type="file" name="image" class="input" accept="image/*" style="width: 100%;"
+                                        required>
+                                </div>
+                                <div style="grid-column: 1 / -1;">
+                                    <label class="label">Заголовок</label>
+                                    <input type="text" name="title" class="input" style="width: 100%;"
+                                        placeholder="Например: ФЕСТИВАЛЬ КРЕВЕТОК" required>
+                                </div>
+                                <div style="grid-column: 1 / -1; display: none;" id="dateRangeBlock">
+                                    <label class="label">Даты проведения (только для акций)</label>
+                                    <input type="text" name="date_range" class="input" style="width: 100%;"
+                                        placeholder="Например: С 26.11 ПО 26.03.2026">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn--primary"
+                                style="margin-top: 20px; background: #E30613;">Загрузить и опубликовать</button>
+                        </form>
+                    </div>
+
+                    <div class="admin-card">
+                        <h2 style="margin-top: 0;">Текущие Новинки</h2>
+                        <table class="admin-table">
+                            <tr>
+                                <th>Фото</th>
+                                <th>Заголовок</th>
+                                <th>Статус</th>
+                                <th>Действия</th>
+                            </tr>
+                            <% if (news && news.length> 0) { %>
+                                <% news.forEach(item=> { %>
+                                    <tr>
+                                        <td><img src="<%= item.image_url %>" class="admin-img"></td>
+                                        <td style="font-weight: bold;">
+                                            <%= item.title %>
+                                        </td>
+                                        <td><span class="badge <%= item.is_active ? 'badge-active' : 'badge-hidden' %>">
+                                                <%= item.is_active ? 'На сайте' : 'Скрыто' %>
+                                            </span></td>
+                                        <td>
+                                            <form action="/admin/promotions/toggle/news/<%= item.id %>" method="POST"
+                                                style="display:inline;">
+                                                <button type="submit"
+                                                    class="btn-action <%= item.is_active ? 'btn-hide' : 'btn-show' %>">
+                                                    <%= item.is_active ? 'Скрыть' : 'Показать' %>
+                                                </button>
+                                            </form>
+                                            <form action="/admin/promotions/delete/news/<%= item.id %>" method="POST"
+                                                style="display:inline;" onsubmit="return confirm('Точно удалить?');">
+                                                <button type="submit" class="btn-action btn-del">Удалить</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                                        <% } else { %>
+                                            <tr>
+                                                <td colspan="4" style="text-align: center; padding: 20px; color: #999;">
+                                                    Новинок пока нет</td>
+                                            </tr>
+                                            <% } %>
+                        </table>
+                    </div>
+
+                    <div class="admin-card">
+                        <h2 style="margin-top: 0;">Текущие Акции</h2>
+                        <table class="admin-table">
+                            <tr>
+                                <th>Фото</th>
+                                <th>Заголовок</th>
+                                <th>Даты</th>
+                                <th>Статус</th>
+                                <th>Действия</th>
+                            </tr>
+                            <% if (promotions && promotions.length> 0) { %>
+                                <% promotions.forEach(promo=> { %>
+                                    <tr>
+                                        <td><img src="<%= promo.image_url %>" class="admin-img"></td>
+                                        <td style="font-weight: bold;">
+                                            <%= promo.title %>
+                                        </td>
+                                        <td style="font-size: 13px; color: #666;">
+                                            <%= promo.date_range %>
+                                        </td>
+                                        <td><span
+                                                class="badge <%= promo.is_active ? 'badge-active' : 'badge-hidden' %>">
+                                                <%= promo.is_active ? 'На сайте' : 'Скрыто' %>
+                                            </span></td>
+                                        <td>
+                                            <form action="/admin/promotions/toggle/promotions/<%= promo.id %>"
+                                                method="POST" style="display:inline;">
+                                                <button type="submit"
+                                                    class="btn-action <%= promo.is_active ? 'btn-hide' : 'btn-show' %>">
+                                                    <%= promo.is_active ? 'Скрыть' : 'Показать' %>
+                                                </button>
+                                            </form>
+                                            <form action="/admin/promotions/delete/promotions/<%= promo.id %>"
+                                                method="POST" style="display:inline;"
+                                                onsubmit="return confirm('Точно удалить?');">
+                                                <button type="submit" class="btn-action btn-del">Удалить</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                                        <% } else { %>
+                                            <tr>
+                                                <td colspan="5" style="text-align: center; padding: 20px; color: #999;">
+                                                    Акций пока нет</td>
+                                            </tr>
+                                            <% } %>
+                        </table>
+                    </div>
+
+            </div>
+        </main>
+
+        <script>
+            // JS скрипт: скрывает/показывает поле с датами в зависимости от того, Акция это или Новинка
+            document.getElementById('typeSelect').addEventListener('change', function () {
+                const dateBlock = document.getElementById('dateRangeBlock');
+                if (this.value === 'promo') {
+                    dateBlock.style.display = 'block';
+                    dateBlock.querySelector('input').required = true;
+                } else {
+                    dateBlock.style.display = 'none';
+                    dateBlock.querySelector('input').required = false;
+                }
+            });
+        </script>
+</body>
+
+</html>

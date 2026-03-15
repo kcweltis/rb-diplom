@@ -1,0 +1,134 @@
+/* public/css/contacts.css */
+
+/* Вкладки на странице контактов */
+.tabs-container {
+    max-width: 400px;
+    margin: 0 auto 32px;
+}
+
+.toggle--contacts {
+    margin: 0;
+}
+
+/* Сетка контактов */
+.contacts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 60px;
+}
+
+.contacts-phone {
+    font-family: var(--font-heading);
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--brand);
+    margin: 8px 0;
+}
+
+.address-list {
+    list-style: none;
+    padding: 0;
+    margin: 12px 0 0;
+}
+
+.address-list li {
+    margin-bottom: 12px;
+    padding-left: 24px;
+    position: relative;
+}
+
+.address-list li::before {
+    content: "📍";
+    position: absolute;
+    left: 0;
+}
+
+/* Форма обратной связи */
+.feedback-wrapper {
+    max-width: 700px;
+    margin: 0 auto 60px;
+    background: #fff;
+    padding: 40px;
+    border-radius: var(--radius);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.feedback-header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+/* Делаем плашку "ВАШЕ МНЕНИЕ" похожей на ленту со скриншота */
+.feedback-title {
+    display: inline-block;
+    background: var(--brand);
+    color: #fff;
+    padding: 12px 40px;
+    font-family: var(--font-heading);
+    font-size: 24px;
+    position: relative;
+    margin: 0;
+}
+
+.feedback-title::before,
+.feedback-title::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 0;
+    height: 0;
+    border-top: 26px solid transparent;
+    border-bottom: 26px solid transparent;
+}
+
+.feedback-title::before {
+    left: -15px;
+    border-right: 15px solid var(--brand);
+}
+
+.feedback-title::after {
+    right: -15px;
+    border-left: 15px solid var(--brand);
+}
+
+.feedback-desc {
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 32px;
+}
+
+.feedback-form {
+    max-width: 100%;
+}
+
+.form-group {
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.file-upload {
+    margin: 24px 0;
+    display: flex;
+    align-items: center;
+}
+
+.consent-group {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+@media (max-width: 768px) {
+    .contacts-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .feedback-wrapper {
+        padding: 20px;
+    }
+}

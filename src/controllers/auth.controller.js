@@ -9,7 +9,7 @@ async function postLogin(req, res) {
   const user = await verifyUser(email, password);
   if (!user) return res.status(401).render("pages/login", { title: "Вход", error: "Неверные данные" });
   req.session.userId = user.id;
-  res.redirect("/");
+  res.redirect("/profile");
 }
 
 function getRegister(req, res) {

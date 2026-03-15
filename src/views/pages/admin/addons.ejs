@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <title>
+        <%= title %>
+    </title>
+    <link rel="icon" type="image/png" href="/img/favicon.png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css" />
+</head>
+
+<body>
+    <%- include('../../partials/header') %>
+        <main class="container">
+            <%- include('../../partials/admin/breadcrumbs') %>
+                <h1 class="page-title">Добавки к блюдам</h1>
+
+                <form class="form form--inline" method="POST" action="/admin/addons"
+                    style="background: #fff; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                    <input class="input" name="name" placeholder="Название (например: Сметана)" required
+                        style="flex-grow: 1;">
+                    <input class="input" name="price" type="number" step="1" min="0" placeholder="Цена (₽)" required
+                        style="width: 150px;">
+                    <button class="btn btn--primary" type="submit">Добавить</button>
+                </form>
+
+                <div class="table">
+                    <div class="table__row table__head" style="grid-template-columns: 80px 1fr 150px 100px;">
+                        <div>ID</div>
+                        <div>Название</div>
+                        <div>Цена</div>
+                        <div>Действия</div>
+                    </div>
+                    <% addons.forEach(a=> { %>
+                        <div class="table__row" style="grid-template-columns: 80px 1fr 150px 100px;">
+                            <div style="color: #999;">
+                                <%= a.id %>
+                            </div>
+                            <div style="font-weight: 500;">
+                                <%= a.name %>
+                            </div>
+                            <div>
+                                <%= Number(a.price).toFixed(0) %> ₽
+                            </div>
+                            <div>
+                                <form method="POST" action="/admin/addons/<%= a.id %>/delete"
+                                    onsubmit="return confirm('Точно удалить добавку?')">
+                                    <button class="btn btn--outline btn--small" type="submit">Удалить</button>
+                                </form>
+                            </div>
+                        </div>
+                        <% }) %>
+                </div>
+
+                <a class="btn btn--outline" href="/admin" style="margin-top: 20px;">Назад к панели</a>
+        </main>
+        <%- include('../../partials/footer') %>
+</body>
+
+</html>

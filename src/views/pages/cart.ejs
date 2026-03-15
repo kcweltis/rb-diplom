@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+        <%= title %>
+    </title>
+    <link rel="icon" type="image/png" href="/img/favicon.png">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/header.css">
+    <link rel="stylesheet" href="/css/cart.css">
+</head>
+
+<body>
+    <%- include('../partials/header') %>
+
+        <main class="container page-cart">
+            <h1 class="page-title">Оформление заказа</h1>
+
+            <div class="cart-layout" id="cartLayout">
+
+                <div class="cart-left">
+
+                    <section class="cart-section">
+                        <h2>Ваш заказ</h2>
+                        <div id="mainCartBody">
+                            <div style="text-align: center; color: #999; padding: 40px 0;">Загружаем корзину...</div>
+                        </div>
+                    </section>
+
+                    <div id="checkoutForms" style="display: none;">
+
+                        <section class="cart-section" style="margin-top: 30px;">
+                            <h2>Ваши данные</h2>
+                            <div class="form-grid">
+                                <div class="form-full">
+                                    <label class="label">Имя *</label>
+                                    <input class="input" id="userName" style="width: 100%; max-width: 400px;"
+                                        value="<%= locals.user ? user.username : '' %>"
+                                        placeholder="Как к вам обращаться?" required>
+                                </div>
+                                <div class="form-full">
+                                    <label class="label">Телефон *</label>
+                                    <input class="input" id="userPhone" type="tel"
+                                        style="width: 100%; max-width: 400px;"
+                                        value="<%= locals.user ? user.phone : '' %>" placeholder="+7 (___) ___-__-__"
+                                        required>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="cart-section" style="margin-top: 30px;">
+                            <h2>Способ получения</h2>
+
+                            <div class="checkout-toggle">
+                                <button type="button" class="btn is-active" id="btnDelivery">Доставка</button>
+                                <button type="button" class="btn" id="btnPickup">Самовывоз</button>
+                            </div>
+
+                            <div id="deliveryBlockMain">
+                                <div class="form-grid">
+                                    <div class="form-full">
+                                        <label class="label">Город</label>
+                                        <select class="input" style="width: 100%;">
+                                            <option>Оренбург</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-full">
+                                        <label class="label">Улица и дом *</label>
+                                        <input class="input" id="delStreet" style="width: 100%;"
+                                            placeholder="Например: ул. Ленина, д. 10" required>
+                                    </div>
+                                    <div>
+                                        <label class="label">Квартира</label>
+                                        <input class="input" id="delApt" style="width: 100%;">
+                                    </div>
+                                    <div>
+                                        <label class="label">Подъезд</label>
+                                        <input class="input" id="delEntrance" style="width: 100%;">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="pickupBlockMain" style="display: none;">
+                                <div class="form-full">
+                                    <label class="label">Выберите точку самовывоза *</label>
+                                    <select class="input" id="checkoutPickupSelect" style="width: 100%;"></select>
+                                </div>
+
+                                <div class="form-full" style="margin-top: 20px;">
+                                    <label class="label" style="margin-bottom: 8px; display: block;">Где будете кушать?
+                                        *</label>
+                                    <div class="checkout-toggle toggle-sm">
+                                        <button type="button" class="btn is-active" id="btnTakeaway">С собой</button>
+                                        <button type="button" class="btn" id="btnDineIn">В зале</button>
+                                    </div>
+                                </div>
+
+                                <div class="form-full" style="margin-top: 20px;">
+                                    <label class="label" style="margin-bottom: 8px; display: block;">Когда приготовить?
+                                        *</label>
+                                    <div class="checkout-toggle toggle-sm">
+                                        <button type="button" class="btn is-active" id="btnTimeAsap">Как можно
+                                            скорее</button>
+                                        <button type="button" class="btn" id="btnTimeSpecific">Ко времени</button>
+                                    </div>
+                                    <div id="specificTimeBlock" style="display: none; margin-top: 12px;">
+                                        <input type="time" class="input" id="pickupTimeInput"
+                                            style="width: 100%; max-width: 200px;">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-grid"
+                                style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #eee;">
+                                <div class="form-full"
+                                    style="display: flex; align-items: center; justify-content: space-between; max-width: 400px;">
+                                    <label class="label" style="margin: 0;">Количество приборов</label>
+                                    <div class="qty-control" style="width: 110px; border: 1px solid #ddd;">
+                                        <button type="button" class="qty-btn" id="utensilsMinus">-</button>
+                                        <span class="qty-num" id="utensilsCount">1</span>
+                                        <button type="button" class="qty-btn" id="utensilsPlus">+</button>
+                                    </div>
+                                </div>
+                                <div class="form-full" style="margin-top: 10px;">
+                                    <label class="label">Комментарий к заказу</label>
+                                    <input class="input" id="globalComment" style="width: 100%;"
+                                        placeholder="Пожелания, домофон или другая информация...">
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="cart-section" style="margin-top: 30px;">
+                            <h2>Способ оплаты</h2>
+
+                            <div id="paymentDelivery">
+                                <label
+                                    style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px; cursor: pointer; font-size: 16px;">
+                                    <input type="radio" name="pay_method" value="online" checked
+                                        style="accent-color: #E30613; width: 20px; height: 20px;">
+                                    <span>💳 Онлайн на сайте</span>
+                                </label>
+                                <label
+                                    style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px; cursor: pointer; font-size: 16px;">
+                                    <input type="radio" name="pay_method" value="card_courier"
+                                        style="accent-color: #E30613; width: 20px; height: 20px;">
+                                    <span>📱 Картой курьеру</span>
+                                </label>
+                                <label
+                                    style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px; cursor: pointer; font-size: 16px;">
+                                    <input type="radio" name="pay_method" value="cash_courier"
+                                        style="accent-color: #E30613; width: 20px; height: 20px;">
+                                    <span>💵 Наличными курьеру</span>
+                                </label>
+
+                                <div id="cashChangeBlock" style="display: none; margin-left: 32px; margin-top: -4px;">
+                                    <input type="number" class="input" id="cashChangeInput"
+                                        placeholder="С какой суммы нужна сдача?" style="width: 100%; max-width: 300px;">
+                                </div>
+                            </div>
+
+                            <div id="paymentPickup" style="display: none;">
+                                <label
+                                    style="display: flex; align-items: center; gap: 12px; cursor: pointer; font-size: 16px;">
+                                    <input type="radio" name="pay_method_pickup" value="online" checked
+                                        style="accent-color: #E30613; width: 20px; height: 20px;">
+                                    <span>💳 Онлайн оплата</span>
+                                </label>
+                                <p class="muted" style="margin-left: 32px; margin-top: 8px; font-size: 14px;">
+                                    При самовывозе заказ готовится только после онлайн-оплаты.
+                                </p>
+                            </div>
+                        </section>
+
+                    </div>
+                </div>
+
+                <div class="cart-right">
+                    <div class="summary-box">
+                        <h2 style="font-family: 'Manrope'; margin: 0 0 20px; font-size: 24px;">Итого</h2>
+                        <div class="summary-row">
+                            <span id="summaryItemsCount">Товары (0)</span>
+                            <span id="summaryItemsPrice">0 ₽</span>
+                        </div>
+                        <div class="summary-row" id="summaryDeliveryRow">
+                            <span>Доставка</span>
+                            <span style="color: #E30613; font-weight: bold;">150 ₽</span>
+                        </div>
+                        <div class="summary-total">
+                            <span>К оплате:</span>
+                            <span id="summaryTotalPrice">0 ₽</span>
+                        </div>
+                        <button class="btn btn--primary" style="width: 100%; font-size: 18px; padding: 16px;"
+                            id="submitOrderBtn" disabled>
+                            Оформить заказ
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <%- include('../partials/footer') %>
+
+            <script>
+                const orenburgAddresses = [
+                    "ул. Салмышская, 49", "ул. Чкалова 26/1", "ул. Володарского, 14", "ул. Аксакова, 8",
+                    "ул. Пролетарская, 294", "пр-т Победы, 20", "Загородное шоссе, 36/2 стр. 1",
+                    "ул. 8 марта, д. 42 ТРЦ ВОСХОД", "ул. Берёзовая Ростошь, 2а", "ул. Новая, 4 ТРК Гулливер",
+                    "Нежинское шоссе, 2а ТРЦ Армада 2", "пр-т Дзержинского 23 ТРЦ Север",
+                    "ул. Салмышская, 41 ТРЦ Новый Мир", "ул. Беляевская, 19/1",
+                    "Шарлыкское шоссе, 1/2 Мегамолл Мармелад", "ул. Советская, 13", "ул. Советская, 44"
+                ];
+
+                document.addEventListener('DOMContentLoaded', () => {
+
+                    // --- МАСКА ДЛЯ ТЕЛЕФОНА ---
+                    const phoneInput = document.getElementById('userPhone');
+                    phoneInput.addEventListener('input', function (e) {
+                        let input = e.target;
+                        let value = input.value.replace(/\D/g, '');
+
+                        if (!value) { input.value = ''; return; }
+
+                        if (['7', '8', '9'].includes(value[0])) {
+                            if (value[0] === '9') value = '7' + value;
+                            let firstSymbols = (value[0] === '8') ? '8' : '+7';
+                            let formatted = firstSymbols + ' ';
+
+                            if (value.length > 1) formatted += '(' + value.substring(1, 4);
+                            if (value.length >= 5) formatted += ') ' + value.substring(4, 7);
+                            if (value.length >= 8) formatted += '-' + value.substring(7, 9);
+                            if (value.length >= 10) formatted += '-' + value.substring(9, 11);
+
+                            input.value = formatted;
+                        } else {
+                            input.value = '+' + value.substring(0, 15);
+                        }
+                    });
+
+                    // Элементы
+                    const body = document.getElementById('mainCartBody');
+                    const checkoutForms = document.getElementById('checkoutForms');
+                    const submitBtn = document.getElementById('submitOrderBtn');
+
+                    let cartTotal = 0;
+                    let deliveryFee = 150;
+                    let isDelivery = true;
+
+                    // Элементы Доставки/Самовывоза
+                    const btnDelivery = document.getElementById('btnDelivery');
+                    const btnPickup = document.getElementById('btnPickup');
+                    const deliveryBlock = document.getElementById('deliveryBlockMain');
+                    const pickupBlock = document.getElementById('pickupBlockMain');
+                    const pickupSelect = document.getElementById('checkoutPickupSelect');
+                    const paymentDelivery = document.getElementById('paymentDelivery');
+                    const paymentPickup = document.getElementById('paymentPickup');
+
+                    // Инициализация адресов
+                    pickupSelect.innerHTML = '<option value="" disabled selected>Выберите адрес ресторана...</option>' +
+                        orenburgAddresses.map(addr => `<option value="${addr}">${addr}</option>`).join('');
+
+                    // Переключение Доставка/Самовывоз
+                    function switchMode(mode) {
+                        isDelivery = (mode === 'delivery');
+
+                        btnDelivery.classList.toggle('is-active', isDelivery);
+                        btnPickup.classList.toggle('is-active', !isDelivery);
+
+                        deliveryBlock.style.display = isDelivery ? 'block' : 'none';
+                        pickupBlock.style.display = isDelivery ? 'none' : 'block';
+
+                        paymentDelivery.style.display = isDelivery ? 'block' : 'none';
+                        paymentPickup.style.display = isDelivery ? 'none' : 'block';
+
+                        document.getElementById('summaryDeliveryRow').style.display = isDelivery ? 'flex' : 'none';
+                        updateSummary();
+                    }
+
+                    btnDelivery.addEventListener('click', () => switchMode('delivery'));
+                    btnPickup.addEventListener('click', () => switchMode('pickup'));
+
+                    // === СИНХРОНИЗАЦИЯ С ШАПКОЙ ===
+                    const savedDataStr = localStorage.getItem('rb_addr');
+                    if (savedDataStr) {
+                        try {
+                            const savedData = JSON.parse(savedDataStr);
+                            if (savedData.mode === 'pickup') {
+                                switchMode('pickup');
+                                if (savedData.pickup_point) pickupSelect.value = savedData.pickup_point;
+                            } else if (savedData.mode === 'delivery') {
+                                switchMode('delivery');
+                                if (savedData.address) document.getElementById('delStreet').value = savedData.address;
+                            }
+                        } catch (e) {
+                            console.error("Ошибка синхронизации адреса:", e);
+                        }
+                    }
+                    // =================================
+
+                    // Опции самовывоза
+                    let dineMode = 'С собой';
+                    let timeMode = 'asap';
+
+                    const btnTakeaway = document.getElementById('btnTakeaway');
+                    const btnDineIn = document.getElementById('btnDineIn');
+                    btnTakeaway.addEventListener('click', () => { dineMode = 'С собой'; btnTakeaway.classList.add('is-active'); btnDineIn.classList.remove('is-active'); });
+                    btnDineIn.addEventListener('click', () => { dineMode = 'В зале'; btnDineIn.classList.add('is-active'); btnTakeaway.classList.remove('is-active'); });
+
+                    const btnTimeAsap = document.getElementById('btnTimeAsap');
+                    const btnTimeSpecific = document.getElementById('btnTimeSpecific');
+                    const specificTimeBlock = document.getElementById('specificTimeBlock');
+                    btnTimeAsap.addEventListener('click', () => { timeMode = 'asap'; btnTimeAsap.classList.add('is-active'); btnTimeSpecific.classList.remove('is-active'); specificTimeBlock.style.display = 'none'; });
+                    btnTimeSpecific.addEventListener('click', () => { timeMode = 'specific'; btnTimeSpecific.classList.add('is-active'); btnTimeAsap.classList.remove('is-active'); specificTimeBlock.style.display = 'block'; });
+
+                    // Приборы
+                    let utensils = 1;
+                    document.getElementById('utensilsPlus').addEventListener('click', () => {
+                        utensils++; document.getElementById('utensilsCount').innerText = utensils;
+                    });
+                    document.getElementById('utensilsMinus').addEventListener('click', () => {
+                        if (utensils > 0) { utensils--; document.getElementById('utensilsCount').innerText = utensils; }
+                    });
+
+                    // Логика отображения сдачи
+                    const paymentRadios = document.querySelectorAll('input[name="pay_method"]');
+                    const cashChangeBlock = document.getElementById('cashChangeBlock');
+                    paymentRadios.forEach(r => {
+                        r.addEventListener('change', (e) => {
+                            cashChangeBlock.style.display = (e.target.value === 'cash_courier') ? 'block' : 'none';
+                        });
+                    });
+
+                    // Обновление суммы
+                    function updateSummary(itemsCount = 0) {
+                        let total = cartTotal;
+                        if (isDelivery) total += deliveryFee;
+
+                        if (itemsCount > 0) document.getElementById('summaryItemsCount').innerText = `Товары (${itemsCount})`;
+                        document.getElementById('summaryItemsPrice').innerText = cartTotal + ' ₽';
+                        document.getElementById('summaryTotalPrice').innerText = total + ' ₽';
+                    }
+
+                    // Загрузка корзины
+                    async function loadMainCart() {
+                        try {
+                            const res = await fetch('/api/cart');
+                            const data = await res.json();
+
+                            if (!data.success || data.items.length === 0) {
+                                body.innerHTML = '<div style="text-align:center; padding: 40px;"><h3 style="margin-bottom:20px;">Ваша корзина пуста</h3><a href="/menu" class="btn btn--primary">Перейти в меню</a></div>';
+                                checkoutForms.style.display = 'none';
+                                submitBtn.disabled = true;
+                                cartTotal = 0; updateSummary(0); return;
+                            }
+
+                            checkoutForms.style.display = 'block';
+                            submitBtn.disabled = false;
+                            cartTotal = data.total;
+
+                            let html = ''; let totalItems = 0;
+                            data.items.forEach(item => {
+                                totalItems += item.quantity;
+                                let addonsHtml = '';
+                                if (item.addons && item.addons.length > 0) {
+                                    item.addons.forEach(a => { addonsHtml += `<div>+ ${a.name}</div>`; });
+                                }
+                                html += `
+                        <div class="main-cart-item">
+                            <img src="${item.image_url || '/img/products/placeholder.png'}" class="mc-img">
+                            <div><div class="mc-title">${item.name}</div><div class="mc-addons">${addonsHtml}</div></div>
+                            <div class="qty-control">
+                                <button class="qty-btn" data-action="decrease" data-id="${item.cart_item_id}">-</button>
+                                <span class="qty-num">${item.quantity}</span>
+                                <button class="qty-btn" data-action="increase" data-id="${item.cart_item_id}">+</button>
+                            </div>
+                            <div class="mc-price">${item.quantity * item.final_price} ₽</div>
+                            <button class="mc-remove" data-id="${item.cart_item_id}">✕</button>
+                        </div>`;
+                            });
+
+                            body.innerHTML = html;
+                            updateSummary(totalItems);
+                            if (typeof loadSideCart === 'function') loadSideCart();
+                        } catch (err) { body.innerHTML = '<div style="color:red; text-align:center;">Ошибка загрузки</div>'; }
+                    }
+
+                    body.addEventListener('click', async (e) => {
+                        const qtyBtn = e.target.closest('.qty-btn');
+                        const removeBtn = e.target.closest('.mc-remove');
+
+                        if (qtyBtn) {
+                            const id = qtyBtn.getAttribute('data-id');
+                            qtyBtn.style.opacity = '0.5';
+                            await fetch('/api/cart/update', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ item_id: id, action: qtyBtn.getAttribute('data-action') }) });
+                            loadMainCart();
+                        }
+                        if (removeBtn) {
+                            const id = removeBtn.getAttribute('data-id');
+                            removeBtn.innerHTML = '...';
+                            await fetch(`/api/cart/remove/${id}`, { method: 'DELETE' });
+                            loadMainCart();
+                        }
+                    });
+
+                    // СБОР ДАННЫХ И ОФОРМЛЕНИЕ ЗАКАЗА
+                    submitBtn.addEventListener('click', async () => {
+                        const userName = document.getElementById('userName').value.trim();
+                        const rawPhone = document.getElementById('userPhone').value;
+                        const cleanPhone = rawPhone.replace(/\D/g, '');
+
+                        if (!userName) return alert('Пожалуйста, укажите ваше имя!');
+                        if (cleanPhone.length !== 11) return alert('Пожалуйста, введите корректный номер телефона (должно быть ровно 11 цифр)!');
+
+                        const finalOrderData = {
+                            customer: { name: userName, phone: rawPhone },
+                            type: isDelivery ? 'Доставка' : 'Самовывоз',
+                            utensils: utensils,
+                            comment: document.getElementById('globalComment').value.trim(),
+                            totalSum: document.getElementById('summaryTotalPrice').innerText,
+                            payment: {},
+                            details: {}
+                        };
+
+                        if (isDelivery) {
+                            const street = document.getElementById('delStreet').value.trim();
+                            if (!street) return alert('Пожалуйста, укажите улицу и дом!');
+
+                            finalOrderData.details = { address: street, apt: document.getElementById('delApt').value, entrance: document.getElementById('delEntrance').value };
+                            const payMethod = document.querySelector('input[name="pay_method"]:checked').value;
+                            finalOrderData.payment.method = payMethod;
+
+                            if (payMethod === 'cash_courier') {
+                                const change = document.getElementById('cashChangeInput').value;
+                                if (!change) return alert('Пожалуйста, укажите с какой суммы нужна сдача!');
+                                finalOrderData.payment.changeFrom = change;
+                            }
+                        } else {
+                            const point = pickupSelect.value;
+                            if (!point) return alert('Пожалуйста, выберите точку самовывоза!');
+
+                            const timeStr = document.getElementById('pickupTimeInput').value;
+                            if (timeMode === 'specific' && !timeStr) return alert('Пожалуйста, укажите время!');
+
+                            finalOrderData.details = { pickupPoint: point, dineMode: dineMode, time: timeMode === 'asap' ? 'Как можно скорее' : timeStr };
+                            finalOrderData.payment.method = 'online';
+                        }
+
+                        // Отправка данных
+                        submitBtn.innerText = 'Оформляем...';
+                        submitBtn.disabled = true;
+
+                        try {
+                            const response = await fetch('/api/orders', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(finalOrderData)
+                            });
+
+                            const result = await response.json();
+
+                            if (result.success) {
+                                alert('Заказ №' + result.orderId + ' успешно оформлен!');
+                                window.location.href = '/profile';
+                            } else {
+                                alert('Ошибка: ' + result.message);
+                                submitBtn.innerText = 'Оформить заказ';
+                                submitBtn.disabled = false;
+                            }
+                        } catch (err) {
+                            console.error(err);
+                            alert('Ошибка сети при оформлении заказа');
+                            submitBtn.innerText = 'Оформить заказ';
+                            submitBtn.disabled = false;
+                        }
+                    });
+
+                    loadMainCart();
+                });
+            </script>
+</body>
+
+</html>

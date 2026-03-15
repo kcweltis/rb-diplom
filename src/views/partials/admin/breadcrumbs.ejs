@@ -1,0 +1,17 @@
+<nav class="breadcrumbs" style="margin-bottom: 20px; font-size: 14px; color: #666;">
+    <a href="/admin" style="color: #E30613; font-weight: 600;">Админ-панель</a>
+    <% if (locals.breadcrumbs) { %>
+        <% breadcrumbs.forEach(crumb=> { %>
+            <span style="margin: 0 8px;">/</span>
+            <% if (crumb.url) { %>
+                <a href="<%= crumb.url %>" style="color: #666;">
+                    <%= crumb.name %>
+                </a>
+                <% } else { %>
+                    <span style="font-weight: 800; color: #2B2B2B;">
+                        <%= crumb.name %>
+                    </span>
+                    <% } %>
+                        <% }) %>
+                            <% } %>
+</nav>

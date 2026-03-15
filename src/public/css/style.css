@@ -21,6 +21,15 @@ body {
   background: rgba(246, 245, 244, 1);
 }
 
+/* Отступ для всех страниц, КРОМЕ главной, чтобы контент не прятался под фиксированную шапку */
+main:not(.page-home),
+.page:not(.page-home),
+.menuWrap,
+.page-product,
+.prodWrap {
+  padding-top: 100px;
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -32,6 +41,7 @@ a {
   padding: 0 24px;
 }
 
+/* Старый класс шапки (на всякий случай оставил, если где-то используется) */
 .site-header {
   position: sticky;
   top: 0;
@@ -139,72 +149,94 @@ a {
   color: var(--muted);
 }
 
-/* Hero */
-.hero {
-  padding: 28px 0;
-}
-
-.hero__inner {
-  display: grid;
-  grid-template-columns: 1.1fr 1fr;
-  gap: 28px;
-  align-items: center;
-}
-
-.hero__title {
-  font-family: "Manrope", system-ui, sans-serif;
-  font-weight: 800;
-  font-size: 56px;
-  line-height: 60px;
-  margin: 0 0 18px;
-}
-
-.hero__accent {
-  color: var(--brand);
-}
-
-.hero__actions {
-  display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
-}
-
-.hero__right {
+/* --- СЛАЙДЕР НА ГЛАВНОЙ --- */
+.hero-slider-section {
   position: relative;
-  min-height: 360px;
-  border-radius: var(--radius);
+  width: 100%;
+  height: 100vh;
+  /* Возвращаем на всю высоту экрана! */
+  min-height: 600px;
+  display: flex;
+  align-items: center;
   overflow: hidden;
+  margin-top: -100px;
+  padding-top: 100px;
 }
 
-.hero__bg {
+.hero-slider {
   position: absolute;
-  inset: 1;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 1), rgba(237, 28, 36, 1));
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
 }
 
-.hero__img {
+.slide {
   position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 1.5s ease-in-out;
+}
+
+.slide.active {
+  opacity: 1;
+}
+
+.slide::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.2) 100%);
+}
+
+.hero-content {
+  position: relative;
   z-index: 2;
-  height: auto;
-  filter: drop-shadow(0 14px 22px rgba(0, 0, 0, .18));
+  color: #fff;
+  width: 100%;
+  text-align: center;
+  /* Центрируем текст по горизонтали для красоты */
 }
 
-.hero__img--top {
-  top: 18px;
-  left: 50px;
-  width: 250px;
+.hero-title {
+  font-size: 64px;
+  font-family: var(--font-heading, 'Philosopher', sans-serif);
+  line-height: 1.1;
+  margin: 0 auto 30px;
+  text-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
 }
 
-.hero__img--mid {
-  top: 92px;
-  right: 24px;
-  width: 240px;
+.hero-title .text-brand {
+  color: #E30613;
 }
 
-.hero__img--bot {
-  bottom: -18px;
-  left: 18px;
-  width: 300px;
+.hero-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  /* Центрируем кнопки */
+}
+
+/* Адаптация под телефоны */
+@media (max-width: 768px) {
+  .hero-slider-section {
+    height: 100vh;
+    /* На мобилках тоже на весь экран */
+  }
+
+  .hero-title {
+    font-size: 42px;
+  }
+
+  .slide::after {
+    background: rgba(0, 0, 0, 0.5);
+  }
 }
 
 /* Sections */
@@ -388,9 +420,21 @@ a {
   border: 1px solid rgba(231, 76, 60, .25);
 }
 
-/* ===== Topbar ===== */
+/* =========================================
+   ===== НОВАЯ ФИКСИРОВАННАЯ ШАПКА =====
+   ========================================= */
+
+/* 1. БАЗОВАЯ ШАПКА (Для Меню, Корзины, Админки) */
 .topbar {
-  background: #fff;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  background-color: #fff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: 10px 0;
+  transition: all 0.3s ease;
 }
 
 .topbar__inner {
@@ -398,13 +442,13 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: 18px;
-  padding: 14px 0;
 }
 
 .topbar__logo {
   height: 36px;
   width: auto;
   display: block;
+  transition: filter 0.3s ease;
 }
 
 .topbar__nav {
@@ -418,13 +462,14 @@ a {
   font-weight: 600;
   font-size: 12px;
   letter-spacing: .4px;
-  color: var(--text);
+  color: #2B2B2B;
   padding: 8px 10px;
   border-radius: 12px;
+  transition: 0.3s ease;
 }
 
 .topbar__link:hover {
-  background: rgba(0, 0, 0, .04);
+  background: rgba(0, 0, 0, 0.04);
 }
 
 .topbar__link--admin {
@@ -443,43 +488,69 @@ a {
   cursor: pointer;
   padding: 8px 10px;
   border-radius: 12px;
+  color: #2B2B2B;
+  transition: 0.3s ease;
 }
 
 .addrBtn:hover {
-  background: rgba(0, 0, 0, .04);
+  background: rgba(0, 0, 0, 0.04);
 }
 
 .pin {
   width: 16px;
   height: 16px;
   display: inline-block;
-  background: var(--red);
+  background: var(--brand);
   border-radius: 50%;
 }
 
-.hero__subtitle {
-  font-family: "Inter", sans-serif;
-  font-size: 20px;
-  line-height: 28px;
-  color: var(--muted);
-  margin: 0 0 16px;
+/* 2. ПРОЗРАЧНАЯ ШАПКА (ТОЛЬКО ДЛЯ ГЛАВНОЙ СТРАНИЦЫ НА ВЕРХУ) */
+.topbar--transparent {
+  background-color: transparent;
+  box-shadow: none;
+  padding: 24px 0;
 }
 
-.hero__title {
-  font-family: "Inter", sans-serif;
-
+.topbar--transparent .topbar__logo {
+  filter: brightness(0) invert(1);
 }
 
-.hero__actions .btn {
-  font-family: "Manrope", sans-serif;
+.topbar--transparent .topbar__link,
+.topbar--transparent .addrBtn {
+  color: #fff;
 }
 
-/* фото-блоки в hero */
+.topbar--transparent .topbar__link:hover,
+.topbar--transparent .addrBtn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* 3. КОГДА ПРОЗРАЧНУЮ ШАПКУ ПРОСКРОЛЛИЛИ ВНИЗ */
+.topbar--transparent.is-scrolled {
+  background-color: #fff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: 10px 0;
+}
+
+.topbar--transparent.is-scrolled .topbar__logo {
+  filter: none;
+}
+
+.topbar--transparent.is-scrolled .topbar__link,
+.topbar--transparent.is-scrolled .addrBtn {
+  color: #2B2B2B;
+}
+
+.topbar--transparent.is-scrolled .topbar__link:hover,
+.topbar--transparent.is-scrolled .addrBtn:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+/* фото-блоки в hero (старый код, оставляем если где-то используется) */
 .heroShot {
   position: absolute;
   z-index: 2;
   border-radius: 14px;
-
 }
 
 .heroShot img {
@@ -531,7 +602,8 @@ a {
 .modal__panel {
   position: relative;
   width: min(560px, calc(100% - 24px));
-  margin: 70px auto;
+  margin: 40px auto;
+  /* Уменьшили отступ сверху, чтобы окно лучше помещалось */
   background: #fff;
   border-radius: 18px;
   box-shadow: 0 24px 60px rgba(0, 0, 0, .25);
@@ -596,6 +668,27 @@ a {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  max-height: 40vh;
+  /* Ограничиваем высоту списка (40% от высоты экрана) */
+  overflow-y: auto;
+  /* Добавляем вертикальную прокрутку */
+  padding-right: 8px;
+  /* Даем место для ползунка скролла */
+}
+
+/* Красивый фирменный ползунок скролла для списка */
+.addrList::-webkit-scrollbar {
+  width: 6px;
+}
+
+.addrList::-webkit-scrollbar-thumb {
+  background: rgba(227, 6, 19, 0.4);
+  /* Полупрозрачный красный в стиле бренда */
+  border-radius: 10px;
+}
+
+.addrList::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .addrItem {
@@ -705,7 +798,6 @@ a {
   border: 1px solid rgba(0, 0, 0, .12);
   color: #CC0F0F;
 }
-
 
 /* Responsive */
 @media (max-width: 980px) {
