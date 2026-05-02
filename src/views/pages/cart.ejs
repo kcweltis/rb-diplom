@@ -140,19 +140,19 @@
                                     style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px; cursor: pointer; font-size: 16px;">
                                     <input type="radio" name="pay_method" value="online" checked
                                         style="accent-color: #E30613; width: 20px; height: 20px;">
-                                    <span>💳 Онлайн на сайте</span>
+                                    <span>Онлайн на сайте</span>
                                 </label>
                                 <label
                                     style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px; cursor: pointer; font-size: 16px;">
                                     <input type="radio" name="pay_method" value="card_courier"
                                         style="accent-color: #E30613; width: 20px; height: 20px;">
-                                    <span>📱 Картой курьеру</span>
+                                    <span>Картой курьеру</span>
                                 </label>
                                 <label
                                     style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px; cursor: pointer; font-size: 16px;">
                                     <input type="radio" name="pay_method" value="cash_courier"
                                         style="accent-color: #E30613; width: 20px; height: 20px;">
-                                    <span>💵 Наличными курьеру</span>
+                                    <span>Наличными курьеру</span>
                                 </label>
 
                                 <div id="cashChangeBlock" style="display: none; margin-left: 32px; margin-top: -4px;">
@@ -166,7 +166,7 @@
                                     style="display: flex; align-items: center; gap: 12px; cursor: pointer; font-size: 16px;">
                                     <input type="radio" name="pay_method_pickup" value="online" checked
                                         style="accent-color: #E30613; width: 20px; height: 20px;">
-                                    <span>💳 Онлайн оплата</span>
+                                    <span>Онлайн оплата</span>
                                 </label>
                                 <p class="muted" style="margin-left: 32px; margin-top: 8px; font-size: 14px;">
                                     При самовывозе заказ готовится только после онлайн-оплаты.
@@ -282,7 +282,7 @@
                     btnPickup.addEventListener('click', () => switchMode('pickup'));
 
                     // === СИНХРОНИЗАЦИЯ С ШАПКОЙ ===
-                    const savedDataStr = localStorage.getItem('rb_addr');
+                    const savedDataStr = localStorage.getItem('userAddress'); // Обновлено имя переменной на актуальное
                     if (savedDataStr) {
                         try {
                             const savedData = JSON.parse(savedDataStr);
@@ -291,7 +291,9 @@
                                 if (savedData.pickup_point) pickupSelect.value = savedData.pickup_point;
                             } else if (savedData.mode === 'delivery') {
                                 switchMode('delivery');
-                                if (savedData.address) document.getElementById('delStreet').value = savedData.address;
+                                if (savedData.street) document.getElementById('delStreet').value = `${savedData.street}, д. ${savedData.house}`;
+                                if (savedData.apt) document.getElementById('delApt').value = savedData.apt;
+                                if (savedData.entrance) document.getElementById('delEntrance').value = savedData.entrance;
                             }
                         } catch (e) {
                             console.error("Ошибка синхронизации адреса:", e);
@@ -362,14 +364,29 @@
                             let html = ''; let totalItems = 0;
                             data.items.forEach(item => {
                                 totalItems += item.quantity;
+
+                                // === ВЫВОДИМ РАЗМЕР ===
+                                let sizeHtml = '';
+                                if (item.sizeLabel) {
+                                    sizeHtml = `<div style="font-size: 13px; color: #888; margin-top: 4px;">Размер: <span style="color: #2b2b2b;">${item.sizeLabel}</span></div>`;
+                                }
+
+                                // === ВЫВОДИМ ДОБАВКИ ===
                                 let addonsHtml = '';
                                 if (item.addons && item.addons.length > 0) {
-                                    item.addons.forEach(a => { addonsHtml += `<div>+ ${a.name}</div>`; });
+                                    item.addons.forEach(a => {
+                                        addonsHtml += `<div style="font-size: 13px; color: #888; margin-top: 4px;">+ ${a.name}</div>`;
+                                    });
                                 }
+
                                 html += `
                         <div class="main-cart-item">
                             <img src="${item.image_url || '/img/products/placeholder.png'}" class="mc-img">
-                            <div><div class="mc-title">${item.name}</div><div class="mc-addons">${addonsHtml}</div></div>
+                            <div>
+                                <div class="mc-title">${item.name}</div>
+                                ${sizeHtml}
+                                <div class="mc-addons">${addonsHtml}</div>
+                            </div>
                             <div class="qty-control">
                                 <button class="qty-btn" data-action="decrease" data-id="${item.cart_item_id}">-</button>
                                 <span class="qty-num">${item.quantity}</span>

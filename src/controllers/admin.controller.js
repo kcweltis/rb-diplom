@@ -60,13 +60,47 @@ async function productsPage(req, res) {
 
 async function createProduct(req, res) {
   const { category_id, name, description, price, weight_g, proteins, fats, carbs, calories, sort_order } = req.body;
-  // 🟢 Путь для базы данных теперь /img/products/
   const image_url = req.file ? `/img/products/${req.file.filename}` : (req.body.image_url || null);
 
+  // --- ЛОГИКА ДЛЯ НАПИТКОВ (Сборка объемов и БЖУ) ---
+  let sizesJson = [];
+  if (req.body.size_name && req.body.size_price) {
+    const names = [].concat(req.body.size_name);
+    const prices = [].concat(req.body.size_price);
+    const prots = [].concat(req.body.size_prot);
+    const fatList = [].concat(req.body.size_fats);
+    const carbsList = [].concat(req.body.size_carbs);
+    const cals = [].concat(req.body.size_cal);
+
+    for (let i = 0; i < names.length; i++) {
+      if (names[i].trim() !== '') {
+        sizesJson.push({
+          name: names[i].trim(),
+          price: Number(prices[i]),
+          prot: prots[i] || 0,
+          fat: fatList[i] || 0,
+          carb: carbsList[i] || 0,
+          cal: cals[i] || 0
+        });
+      }
+    }
+  }
+
+  // --- ЛОГИКА ДЛЯ ОБЕДОВ (Сборка вариантов блинчиков) ---
+  let optionsJson = [];
+  if (req.body.option_name) {
+    const optNames = [].concat(req.body.option_name);
+    for (let i = 0; i < optNames.length; i++) {
+      if (optNames[i].trim() !== '') {
+        optionsJson.push({ name: optNames[i].trim() });
+      }
+    }
+  }
+
   const { rows } = await pool.query(
-    `INSERT INTO products (category_id, name, description, price, image_url, weight_g, proteins, fats, carbs, calories, sort_order)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id`,
-    [category_id, name, description || null, price, image_url, weight_g || null, proteins || 0, fats || 0, carbs || 0, calories || 0, sort_order || 0]
+    `INSERT INTO products (category_id, name, description, price, image_url, weight_g, proteins, fats, carbs, calories, sort_order, sizes, options)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12::jsonb, $13::jsonb) RETURNING id`,
+    [category_id, name, description || null, price, image_url, weight_g || null, proteins || 0, fats || 0, carbs || 0, calories || 0, sort_order || 0, JSON.stringify(sizesJson), JSON.stringify(optionsJson)]
   );
 
   let selectedAddons = [].concat(req.body.addons || []);
@@ -81,12 +115,46 @@ async function editProduct(req, res) {
   const productId = req.params.id;
 
   const { rows } = await pool.query("SELECT image_url FROM products WHERE id=$1", [productId]);
-  // 🟢 Путь для базы данных теперь /img/products/
   const image_url = req.file ? `/img/products/${req.file.filename}` : (rows[0]?.image_url || null);
 
+  // --- ЛОГИКА ДЛЯ НАПИТКОВ (Сборка объемов и БЖУ) ---
+  let sizesJson = [];
+  if (req.body.size_name && req.body.size_price) {
+    const names = [].concat(req.body.size_name);
+    const prices = [].concat(req.body.size_price);
+    const prots = [].concat(req.body.size_prot);
+    const fatList = [].concat(req.body.size_fats);
+    const carbsList = [].concat(req.body.size_carbs);
+    const cals = [].concat(req.body.size_cal);
+
+    for (let i = 0; i < names.length; i++) {
+      if (names[i].trim() !== '') {
+        sizesJson.push({
+          name: names[i].trim(),
+          price: Number(prices[i]),
+          prot: prots[i] || 0,
+          fat: fatList[i] || 0,
+          carb: carbsList[i] || 0,
+          cal: cals[i] || 0
+        });
+      }
+    }
+  }
+
+  // --- ЛОГИКА ДЛЯ ОБЕДОВ (Сборка вариантов блинчиков) ---
+  let optionsJson = [];
+  if (req.body.option_name) {
+    const optNames = [].concat(req.body.option_name);
+    for (let i = 0; i < optNames.length; i++) {
+      if (optNames[i].trim() !== '') {
+        optionsJson.push({ name: optNames[i].trim() });
+      }
+    }
+  }
+
   await pool.query(
-    `UPDATE products SET category_id=$1, name=$2, description=$3, price=$4, image_url=$5, weight_g=$6, proteins=$7, fats=$8, carbs=$9, calories=$10, sort_order=$11 WHERE id=$12`,
-    [category_id, name, description || null, price, image_url, weight_g || null, proteins || 0, fats || 0, carbs || 0, calories || 0, sort_order || 0, productId]
+    `UPDATE products SET category_id=$1, name=$2, description=$3, price=$4, image_url=$5, weight_g=$6, proteins=$7, fats=$8, carbs=$9, calories=$10, sort_order=$11, sizes=$12::jsonb, options=$13::jsonb WHERE id=$14`,
+    [category_id, name, description || null, price, image_url, weight_g || null, proteins || 0, fats || 0, carbs || 0, calories || 0, sort_order || 0, JSON.stringify(sizesJson), JSON.stringify(optionsJson), productId]
   );
 
   await pool.query("DELETE FROM product_add_ons WHERE product_id=$1", [productId]);
@@ -110,7 +178,7 @@ async function toggleProductActive(req, res) {
 async function featuredPage(req, res) {
   const { rows: featured } = await pool.query(`SELECT fp.id, fp.sort_order, p.id AS product_id, p.name, p.price FROM featured_products fp JOIN products p ON p.id=fp.product_id ORDER BY fp.sort_order ASC, fp.id DESC`);
   const { rows: products } = await pool.query(`SELECT id, name FROM products WHERE is_active=TRUE ORDER BY name ASC`);
-  res.render("pages/admin/featured", { title: "Популярные блюда", featured, products, breadcrumbs: getCrumbs("Популярные блюда") });
+  res.render("pages/admin/featured", { title: "Новинки", featured, products, breadcrumbs: getCrumbs("Новинки") });
 }
 
 async function addFeatured(req, res) {
@@ -146,7 +214,6 @@ async function bannersPage(req, res) {
 }
 
 async function createBanner(req, res) {
-  // 🟢 Путь для базы данных теперь /img/banners/
   const image_url = req.file ? `/img/banners/${req.file.filename}` : null;
   if (image_url) {
     await pool.query("INSERT INTO banners (image_url) VALUES ($1)", [image_url]);
@@ -191,7 +258,6 @@ async function promoPage(req, res) {
 
 async function addPromo(req, res) {
   const { type, title, date_range } = req.body;
-  // 🟢 Путь для базы данных теперь /img/promo/
   const imageUrl = req.file ? `/img/promo/${req.file.filename}` : '/img/placeholder.png';
 
   if (type === 'news') {

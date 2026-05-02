@@ -70,7 +70,7 @@ router.post("/admin/promotions/toggle/:type/:id", adminController.togglePromo);
 router.post("/admin/promotions/delete/:type/:id", adminController.deletePromo);
 
 // --- Управление Баннерами (Слайдер на главной) ---
-// 🟢 ИСПРАВЛЕНИЕ: Добавили пути для баннеров с правильным загрузчиком (uploadBannerImage)
+
 router.get("/admin/banners", adminController.bannersPage);
 router.post("/admin/banners/add", uploadBannerImage, adminController.createBanner);
 router.post("/admin/banners/toggle/:id", adminController.toggleBanner);

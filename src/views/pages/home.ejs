@@ -48,7 +48,7 @@
 
       <section class="section container">
         <div class="section__head">
-          <h2 class="section__title">Популярные блюда</h2>
+          <h2 class="section__title">Новинки</h2>
         </div>
 
         <div class="cards">
@@ -64,14 +64,13 @@
                     <span class="card__price">
                       <%= Number(p.price).toFixed(0) %> руб.
                     </span>
-                    <a class="btn btn--pill" href="/menu">В корзину</a>
+                    <a class="btn btn--pill" href="/menu?openProductId=<%= p.id %>">В корзину</a>
                   </div>
                 </div>
               </article>
               <% }) %>
                 <% } else { %>
-                  <p class="muted">Администратор ещё не выбрал популярные блюда. Добавь их в админке → «Популярные
-                    блюда».</p>
+                  <p class="muted">Новинок нету в наличии</p>
                   <% } %>
         </div>
 
@@ -80,36 +79,60 @@
         </div>
       </section>
 
-      <section class="delivery-block">
+      <section class="delivery-block" id="deliverySection">
         <div class="container delivery-block__inner">
-          <div class="delivery-block__text">
+          <div class="delivery-block__text" id="deliveryText">
             <h2 class="section__title">Собственная доставка</h2>
             <p class="muted">Мы доставляем заказы собственной курьерской службой — без посредников и дополнительных
               комиссий.</p>
           </div>
-          <img class="delivery-block__icon" src="/img/icons/courier.png" alt="">
+          <img class="delivery-block__icon" id="deliveryScooter" src="/img/icons/courier.png" alt="Курьер">
         </div>
       </section>
 
-      <section class="section container">
+      <section class="section container" id="stepsSection">
         <h2 class="section__title section__title--center">Как сделать заказ</h2>
 
-        <div class="steps">
-          <div class="step">
-            <div class="step__icon">🛒</div>
-            <div class="step__text">Выберите блюда</div>
+        <div class="route-wrapper">
+          <svg class="route-svg" viewBox="0 0 400 600" preserveAspectRatio="xMidYMid meet"
+            xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <mask id="draw-mask">
+                <path id="maskPath"
+                  d="M 120 80 C 250 80, 280 150, 280 230 C 280 310, 120 300, 120 380 C 120 460, 280 450, 280 530"
+                  fill="none" stroke="white" stroke-width="10" stroke-linecap="round" />
+              </mask>
+            </defs>
+            <path d="M 120 80 C 250 80, 280 150, 280 230 C 280 310, 120 300, 120 380 C 120 460, 280 450, 280 530"
+              fill="none" stroke="#7A1818" stroke-width="2" stroke-dasharray="10 10" mask="url(#draw-mask)" />
+          </svg>
+
+          <div class="route-step step-1">
+            <div class="route-step__icon">
+              <img src="/img/icons/step1.svg" alt="Выберите блюда">
+            </div>
+            <div class="route-step__text">Выберите<br>блюда</div>
           </div>
-          <div class="step">
-            <div class="step__icon">🧾</div>
-            <div class="step__text">Оформите заказ</div>
+
+          <div class="route-step step-2">
+            <div class="route-step__icon">
+              <img src="/img/icons/step2.svg" alt="Оформите заказ">
+            </div>
+            <div class="route-step__text">Оформите<br>заказ</div>
           </div>
-          <div class="step">
-            <div class="step__icon">👨‍🍳</div>
-            <div class="step__text">Мы приготовим</div>
+
+          <div class="route-step step-3">
+            <div class="route-step__icon">
+              <img src="/img/icons/step3.svg" alt="Мы приготовим">
+            </div>
+            <div class="route-step__text">Мы<br>приготовим</div>
           </div>
-          <div class="step">
-            <div class="step__icon">🚴</div>
-            <div class="step__text">Курьер доставит</div>
+
+          <div class="route-step step-4">
+            <div class="route-step__icon">
+              <img src="/img/icons/step4.svg" alt="Курьер доставит">
+            </div>
+            <div class="route-step__text">Курьер<br>доставит</div>
           </div>
         </div>
       </section>
@@ -122,18 +145,93 @@
 
       <script>
         document.addEventListener('DOMContentLoaded', () => {
+
+          // ==========================================
+          // 1. АНИМАЦИЯ СЛАЙДЕРА
+          // ==========================================
           const slides = document.querySelectorAll('.hero-slider .slide');
-          if (slides.length === 0) return;
+          if (slides.length > 0) {
+            let currentSlide = 0;
+            const slideInterval = 4000;
 
-          let currentSlide = 0;
-          const slideInterval = 4000;
+            setInterval(() => {
+              slides[currentSlide].classList.remove('active');
+              currentSlide = (currentSlide + 1) % slides.length;
+              slides[currentSlide].classList.add('active');
+            }, slideInterval);
+          }
 
-          setInterval(() => {
-            slides[currentSlide].classList.remove('active');
-            currentSlide = (currentSlide + 1) % slides.length;
-            slides[currentSlide].classList.add('active');
-          }, slideInterval);
-        });
+          // ==========================================
+          // 2. АНИМАЦИЯ КУРЬЕРА (ОДИН РАЗ ПРИ ПОЯВЛЕНИИ)
+          // ==========================================
+          const observerOptions = {
+            threshold: 0.3 // Анимация начнется, когда 30% блока покажется на экране
+          };
+
+          const scrollObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-animated'); // Добавляем класс, запускающий CSS
+                scrollObserver.unobserve(entry.target);    // Отписываемся, чтобы анимация была 1 раз
+              }
+            });
+          }, observerOptions);
+
+          const deliverySec = document.getElementById('deliverySection');
+          if (deliverySec) scrollObserver.observe(deliverySec);
+
+          // ==========================================
+          // 3. АНИМАЦИЯ ШАГОВ ЗАКАЗА (ПРИВЯЗКА К СКРОЛЛУ)
+          // ==========================================
+          const section = document.getElementById('stepsSection');
+          const maskPath = document.getElementById('maskPath');
+          const steps = document.querySelectorAll('.route-step');
+
+          if (section && maskPath) {
+            // ИСПРАВЛЕНИЕ 1: Если браузер не может посчитать скрытую линию и выдает 0, 
+            // мы ставим жесткое значение 1000 (этого с запасом хватит для нашего SVG)
+            let pathLength = maskPath.getTotalLength();
+            if (!pathLength || pathLength === 0) {
+              pathLength = 1000;
+            }
+
+            // ИСПРАВЛЕНИЕ 2: Используем setAttribute вместо style для работы внутри <defs>
+            maskPath.setAttribute('stroke-dasharray', pathLength);
+            maskPath.setAttribute('stroke-dashoffset', pathLength);
+
+            // Слушаем скролл
+            window.addEventListener('scroll', () => {
+              const rect = section.getBoundingClientRect();
+              const windowHeight = window.innerHeight;
+
+              // Определяем, когда начинать и заканчивать анимацию
+              const start = windowHeight * 0.8;
+              const end = windowHeight * 0.1;
+
+              // Вычисляем прогресс от 0 до 1
+              let progress = (start - rect.top) / (start - end);
+              progress = Math.max(0, Math.min(1, progress));
+
+              // Рисуем/стираем линию (через setAttribute)
+              const currentOffset = pathLength - (pathLength * progress);
+              maskPath.setAttribute('stroke-dashoffset', currentOffset);
+
+              // Показываем/прячем шаги
+              steps.forEach((step, index) => {
+                const threshold = (index + 1) * 0.22;
+                if (progress >= threshold) {
+                  step.classList.add('is-visible');
+                } else {
+                  step.classList.remove('is-visible');
+                }
+              });
+            });
+
+            // Вызываем один раз при загрузке
+            window.dispatchEvent(new Event('scroll'));
+          }
+
+        }); 
       </script>
 </body>
 

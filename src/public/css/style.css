@@ -590,7 +590,8 @@ a {
   display: block;
   position: fixed;
   inset: 0;
-  z-index: 200;
+  z-index: 2000;
+  /* БЫЛО 200. Ставим 2000, чтобы 100% перекрыть шапку */
 }
 
 .modal__overlay {
@@ -603,11 +604,15 @@ a {
   position: relative;
   width: min(560px, calc(100% - 24px));
   margin: 40px auto;
-  /* Уменьшили отступ сверху, чтобы окно лучше помещалось */
+  max-height: 90vh;
+  /* Ограничиваем высоту экрана */
+  display: flex;
+  flex-direction: column;
   background: #fff;
   border-radius: 18px;
   box-shadow: 0 24px 60px rgba(0, 0, 0, .25);
   overflow: hidden;
+  /* Скрываем то, что вылезает за скругленные углы */
   font-family: "Inter", sans-serif;
 }
 
@@ -622,24 +627,43 @@ a {
 .modal__title {
   font-family: "Manrope", sans-serif;
   font-weight: 800;
+  font-size: 18px;
 }
 
 .modal__close {
   border: none;
   background: transparent;
-  font-size: 18px;
+  font-size: 20px;
   cursor: pointer;
+  color: #666;
+  padding: 5px;
 }
 
 .modal__body {
-  padding: 16px 18px;
+  padding: 20px 18px;
+  overflow-y: auto;
+  /* Добавляем скролл внутри формы, если экран телефона маленький */
 }
 
 .modal__actions {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  margin-top: 14px;
+  margin-top: 24px;
+}
+
+/* Новая сетка на 3 колонки для Этажа/Подъезда/Домофона */
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+/* Адаптив для маленьких экранов: перестраиваем 3 колонки в 1 */
+@media (max-width: 480px) {
+  .grid-3 {
+    grid-template-columns: 1fr;
+  }
 }
 
 .toggle {
@@ -799,25 +823,841 @@ a {
   color: #CC0F0F;
 }
 
-/* Responsive */
-@media (max-width: 980px) {
-  .hero__inner {
-    grid-template-columns: 1fr;
+
+
+/* =========================================
+   АНИМАЦИЯ: БЛОК ДОСТАВКИ
+   ========================================= */
+#deliverySection {
+  overflow: hidden;
+  /* Чтобы курьер не создавал гориз. прокрутку, пока он за экраном */
+}
+
+/* Исходное состояние: текст прозрачный, курьер далеко слева за экраном */
+#deliveryText {
+  opacity: 0;
+  transform: translateX(-50px);
+  transition: all 1s ease 0.6s;
+  /* Текст появится с задержкой 0.6с (пока едет курьер) */
+}
+
+#deliveryScooter {
+  transform: translateX(-150vw);
+  transition: transform 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+  /* Плавный выезд */
+}
+
+/* Состояние, когда блок попал в зону видимости (добавляется через JS) */
+#deliverySection.is-animated #deliveryText {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+#deliverySection.is-animated #deliveryScooter {
+  transform: translateX(0);
+}
+
+/* =========================================
+   АНИМАЦИЯ: ВЕРТИКАЛЬНЫЕ ШАГИ (SCROLL-LINKED)
+   ========================================= */
+.route-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  height: 600px;
+  margin: 20px auto 0;
+}
+
+.route-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* Стили самих блоков с иконками */
+.route-step {
+  position: absolute;
+  z-index: 2;
+  text-align: center;
+  width: 120px;
+  /* Изначально скрыты и чуть смещены вверх для красивого появления */
+  transform: translate(-50%, -40%) scale(0.9);
+  opacity: 0;
+  /* Оставляем легкий transition только для появления иконок */
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  background: transparent;
+}
+
+/* Класс, который JS будет добавлять для показа шага */
+.route-step.is-visible {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.route-step__icon img {
+  width: 60px;
+  /* Размер картинок */
+  height: auto;
+  margin-bottom: 10px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.route-step__text {
+  font-size: 14px;
+  line-height: 1.3;
+  font-weight: 500;
+}
+
+/* Координаты шагов */
+.step-1 {
+  top: 13.3%;
+  left: 30%;
+}
+
+.step-2 {
+  top: 38.3%;
+  left: 70%;
+}
+
+.step-3 {
+  top: 63.3%;
+  left: 30%;
+}
+
+.step-4 {
+  top: 88.3%;
+  left: 70%;
+}
+
+@media (max-width: 480px) {
+  .route-wrapper {
+    transform: scale(0.9);
+    transform-origin: top center;
+  }
+}
+
+/* =========================================
+   МОБИЛЬНОЕ НИЖНЕЕ МЕНЮ (BOTTOM NAV)
+   ========================================= */
+.mobile-bottom-nav {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-bottom-nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background-color: #ffffff;
+    border-top: 1px solid #e0e0e0;
+    z-index: 1000;
+    padding-bottom: env(safe-area-inset-bottom);
   }
 
-  .hero__title {
-    font-size: 44px;
-    line-height: 48px;
+  body {
+    padding-bottom: 70px;
   }
 
-  .hero__right {
-    min-height: 420px;
+  #floatingCartBtn {
+    display: none !important;
+  }
+}
+
+.mobile-nav__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: #8c8c8c;
+  flex: 1;
+  height: 100%;
+  transition: color 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-nav__icon {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-nav__icon svg {
+  width: 100%;
+  height: 100%;
+  stroke: currentColor;
+}
+
+.mobile-nav__text {
+  font-size: 11px;
+  font-weight: 500;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.mobile-nav__item.is-active {
+  color: #8A4F9E;
+  /* Фиолетовый цвет как на твоем скриншоте. Можешь заменить на #E30613, если хочешь красный */
+}
+
+.mobile-nav__badge {
+  position: absolute;
+  top: -6px;
+  right: -10px;
+  background-color: #1a1a1a;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #fff;
+}
+
+/* =========================================
+   АДАПТИВ ШАПКИ И БУРГЕР-МЕНЮ
+   ========================================= */
+
+/* 1. Изначально (на ПК) скрываем бургер и мобильное меню */
+.burger-btn {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 26px;
+  height: 18px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 1010;
+}
+
+.burger-btn span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background-color: #2B2B2B;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+/* Цвет бургера на прозрачной шапке главной страницы */
+.topbar--transparent .burger-btn span {
+  background-color: #ffffff;
+}
+
+.topbar--transparent.is-scrolled .burger-btn span {
+  background-color: #2B2B2B;
+}
+
+.mobile-side-menu,
+.mobile-menu-overlay {
+  display: none;
+}
+
+/* 2. ПРАВИЛА ДЛЯ ТЕЛЕФОНОВ (экраны 768px и меньше) */
+@media (max-width: 768px) {
+
+  /* Прячем длинное меню ссылок */
+  .desktop-nav {
+    display: none !important;
   }
 
+  /* Показываем бургер */
+  .burger-btn {
+    display: flex;
+  }
+
+  /* Прячем слово "Выберите адрес", оставляем только пин-иконку, чтобы сэкономить место */
+  .addr-text-mobile-hide {
+    display: none;
+  }
+
+  /* Затемнение фона */
+  .mobile-menu-overlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .mobile-menu-overlay.is-visible {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* Белая панель справа */
+  .mobile-side-menu {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    right: -100%;
+    /* Спрятано за экраном */
+    width: 85%;
+    max-width: 320px;
+    height: 100vh;
+    background: #ffffff;
+    z-index: 2010;
+    box-shadow: -10px 0 25px rgba(0, 0, 0, 0.15);
+    transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 24px;
+  }
+
+  .mobile-side-menu.is-open {
+    right: 0;
+  }
+
+  /* Внутренности выезжающего меню */
+  .mobile-side-menu__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+  }
+
+  .close-menu-btn {
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #666;
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  .mobile-side-menu__nav {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    flex-grow: 1;
+  }
+
+  .mobile-side-menu__link {
+    font-family: 'Manrope', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: #2B2B2B;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .mobile-side-menu__footer {
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+    margin-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* =========================================
+   ОБЩИЙ АДАПТИВ ГЛАВНОЙ СТРАНИЦЫ
+   ========================================= */
+
+@media (max-width: 768px) {
+
+  /* 1. Уменьшаем глобальные переменные и отступы */
+  :root {
+    --radius: 12px;
+    /* Меньше скругление на мобилках */
+  }
+
+  .container {
+    padding: 0 16px;
+    /* Сужаем боковые поля */
+  }
+
+  .section {
+    padding: 32px 0;
+    /* Уменьшаем вертикальные отступы между секциями */
+  }
+
+  /* 2. Шрифты и заголовки */
+  .section__title {
+    font-size: 24px;
+    /* Было 32px */
+    line-height: 1.2;
+  }
+
+  .section__title--center {
+    margin-bottom: 20px;
+  }
+
+  /* 3. Карточки товаров на главной */
   .cards {
     grid-template-columns: 1fr;
+    /* Выстраиваем в одну колонку */
+    gap: 12px;
   }
 
+  .card {
+    padding: 12px;
+    display: flex;
+    /* Сделаем карточку горизонтальной на мобилке для экономии места */
+    align-items: center;
+    gap: 15px;
+    text-align: left;
+  }
+
+  .card__img {
+    width: 80px;
+    /* Сильно уменьшаем картинку */
+    height: 80px;
+    margin: 0;
+    /* Убираем центрирование */
+  }
+
+  .card__body {
+    flex: 1;
+  }
+
+  .card__title {
+    text-align: left;
+    font-size: 16px;
+    margin-bottom: 5px;
+  }
+
+  .card__bottom {
+    justify-content: space-between;
+  }
+
+  /* 4. Блок доставки (красная полоса) */
+  .delivery-block {
+    padding: 24px 0;
+  }
+
+  .delivery-block__inner {
+    flex-direction: column;
+    /* Иконка и текст друг под другом */
+    text-align: center;
+    gap: 12px;
+  }
+
+  .delivery-block__text .section__title {
+    font-size: 20px;
+  }
+
+  .delivery-block__icon {
+    width: 60px;
+    height: 60px;
+  }
+
+  /* 5. Блок "Как сделать заказ" (если не используется S-кривая) */
+  .steps {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* По два в ряд */
+    gap: 10px;
+  }
+
+  .step {
+    padding: 8px;
+    flex: none;
+  }
+
+  .step__icon {
+    font-size: 28px;
+  }
+
+  .step__text {
+    font-size: 13px;
+  }
+}
+
+/* =========================================
+   ИСПРАВЛЕНИЕ ЗАГОЛОВКОВ НА ГЛАВНОЙ
+   ========================================= */
+@media (max-width: 768px) {
+  .section__head {
+    justify-content: center;
+    /* Ставит заголовок "Новинки" по центру экрана */
+    text-align: center;
+    padding: 0 10px;
+    /* На всякий случай даем безопасные отступы по бокам */
+  }
+}
+
+/* =========================================
+   АДАПТИВ ФУТЕРА (Улучшенная версия)
+   ========================================= */
+@media (max-width: 768px) {
+  .rb-footer__top {
+    padding: 40px 0 20px;
+  }
+
+  /* Используем Grid, чтобы разбить меню на 2 колонки */
+  .rb-footer__main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px 15px;
+    text-align: left;
+    /* Выравниваем списки по левому краю для читаемости */
+  }
+
+  /* Логотип, описание и соцсети растягиваем на всю ширину и центрируем */
+
+  .rb-footer__brand {
+    grid-column: 1 / -1;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .rb-footer__logo {
+    max-width: 160px;
+    /* Сужаем саму картинку логотипа */
+    height: auto;
+    margin-bottom: 10px;
+  }
+
+  .rb-footer__text {
+    font-size: 11px;
+    /* Делаем текст мельче */
+    line-height: 1.3;
+    padding: 0 15px;
+    /* Защита от прилипания к краям экрана */
+  }
+
+  .rb-footer__social {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 15px;
+  }
+
+  /* Ссылки в двух колонках */
+  .rb-footer__nav {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .rb-footer__title {
+    font-size: 16px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    font-weight: 700;
+    opacity: 0.6;
+    /* Делаем заголовки колонок чуть приглушенными */
+  }
+
+  .rb-footer__link {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  /* Кнопки Google Play и App Store */
+  .rb-footer__apps {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+    /* ВАЖНО: разрешаем перенос на новую строку, если не влезают */
+    gap: 10px;
+    margin-top: 10px;
+    width: 100%;
+    padding: 0 10px;
+    box-sizing: border-box;
+    /* Чтобы padding не увеличивал ширину */
+  }
+
+  .rb-store-badge {
+    flex: 1 1 130px;
+    /* Гибкая ширина, но не меньше 130px */
+    max-width: 150px;
+    /* Ограничиваем максимальную ширину */
+    padding: 8px 10px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+    /* Защита от вылезания текста */
+  }
+
+  /* Самый низ футера (копирайт и карты) */
+  .rb-footer__bottom-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 24px 0 30px;
+    /* Отступ снизу, чтобы не перекрывалось нижним мобильным меню */
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    /* Изящная полупрозрачная линия-разделитель */
+    text-align: center;
+  }
+
+  .rb-footer__copy {
+    font-size: 12px;
+    /* Уменьшили текст (c) 2026 */
+    color: #999;
+    /* Сделали его чуть менее ярким */
+  }
+
+  .rb-footer__payments {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    /* Карты стоят ближе друг к другу */
+    font-size: 14px;
+    /* Уменьшили размер самих названий карт */
+    font-weight: 700;
+  }
+}
+
+/* =========================================
+   АДАПТИВ ДЛЯ ПЛАНШЕТОВ (до 1024px)
+   ========================================= */
+@media (max-width: 1024px) {
+
+  /* 1. Шапка: Прячем ссылки, показываем бургер */
+  .desktop-nav {
+    display: none !important;
+  }
+
+  .burger-btn {
+    display: flex;
+  }
+
+  .addr-text-mobile-hide {
+    display: none;
+  }
+
+  /* 2. БОКОВОЕ ВЫЕЗЖАЮЩЕЕ МЕНЮ (Теперь работает и на планшетах, и на телефонах) */
+  .mobile-menu-overlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .mobile-menu-overlay.is-visible {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .mobile-side-menu {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 85%;
+    max-width: 320px;
+    height: 100vh;
+    background: #ffffff;
+    z-index: 2010;
+    box-shadow: -10px 0 25px rgba(0, 0, 0, 0.15);
+    transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 24px;
+  }
+
+  .mobile-side-menu.is-open {
+    right: 0;
+  }
+
+  .mobile-side-menu__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+  }
+
+  .close-menu-btn {
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #666;
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  .mobile-side-menu__nav {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    flex-grow: 1;
+  }
+
+  .mobile-side-menu__link {
+    font-family: 'Manrope', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: #2B2B2B;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .mobile-side-menu__footer {
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+    margin-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* 3. Центрируем заголовки */
+  .section__head {
+    justify-content: center;
+    text-align: center;
+  }
+
+  /* 4. Карточки и шаги */
+  .cards {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 20px;
+  }
+
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+  }
+
+  /* 5. ФУТЕР ДЛЯ ПЛАНШЕТА */
+  .rb-footer__top {
+    padding: 50px 0 30px;
+  }
+
+  .rb-footer__main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px 20px;
+    text-align: left;
+  }
+
+  .rb-footer__brand {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .rb-footer__logo {
+    max-width: 200px;
+    height: auto;
+    margin-bottom: 15px;
+  }
+
+  .rb-footer__text {
+    font-size: 13px;
+    line-height: 1.4;
+    max-width: 500px;
+  }
+
+  .rb-footer__social {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+  }
+
+  .rb-footer__nav {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .rb-footer__title {
+    font-size: 18px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    font-weight: 700;
+    opacity: 0.6;
+  }
+
+  .rb-footer__link {
+    font-size: 15px;
+  }
+
+  .rb-footer__apps {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 20px;
+    width: 100%;
+  }
+
+  .rb-store-badge {
+    flex: 1 1 150px;
+    max-width: 180px;
+    padding: 10px 14px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .rb-store-badge__top {
+    font-size: 10px;
+    white-space: nowrap;
+  }
+
+  .rb-store-badge__name {
+    font-size: 15px;
+    white-space: nowrap;
+  }
+
+  .rb-footer__bottom-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 24px 0 30px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+  }
+
+  .rb-footer__copy {
+    font-size: 14px;
+    color: #999;
+  }
+
+  .rb-footer__payments {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  /* Админка на планшетах */
   .stats {
     grid-template-columns: 1fr;
   }
@@ -829,4 +1669,43 @@ a {
   .table__row {
     grid-template-columns: 70px 1fr;
   }
+}
+
+/* =========================================
+   ИКОНКИ СОЦСЕТЕЙ В ФУТЕРЕ
+   ========================================= */
+
+/* Стили для самой ссылки (делаем красивый кружочек) */
+.rb-footer__social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  /* Общий размер кружка */
+  height: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  /* Полупрозрачная белая обводка */
+  border-radius: 50%;
+  /* Скругляем до идеального круга */
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+/* Эффект при наведении курсора */
+.rb-footer__social-link:hover {
+  border-color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.1);
+  /* Легкая подсветка фона */
+  transform: translateY(-2px);
+  /* Легкое "подпрыгивание" при наведении */
+}
+
+/* Стили для картинки внутри ссылки (ограничиваем размер) */
+.rb-footer__social-link img {
+  width: 24px;
+  /* Размер самой иконки ВК внутри кружка */
+  height: 24px;
+  object-fit: contain;
+  /* Защита от сплющивания или растягивания */
+  display: block;
 }

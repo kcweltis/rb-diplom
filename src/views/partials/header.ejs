@@ -6,7 +6,7 @@
 
     <% const isAdmin=user && user.role_name==='ADMIN' ; %>
 
-      <nav class="topbar__nav">
+      <nav class="topbar__nav desktop-nav">
         <a class="topbar__link" href="/menu">МЕНЮ</a>
         <a class="topbar__link" href="/cart" id="openSideCartBtn">КОРЗИНА</a>
         <a class="topbar__link" href="/promotions">АКЦИИ</a>
@@ -23,45 +23,128 @@
               <% } %>
       </nav>
 
-      <button class="addrBtn" type="button" id="addrBtn">
-        <span class="pin"></span>
-        <span id="addrText">Выберите адрес</span>
-      </button>
+      <div class="header__actions" style="display: flex; align-items: center; gap: 16px;">
+        <button class="addrBtn" type="button" id="addrBtn">
+          <span class="pin"></span>
+          <span id="addrText" class="addr-text-mobile-hide">Выберите адрес</span>
+        </button>
+
+        <button class="burger-btn" id="burgerBtn" aria-label="Открыть меню">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
   </div>
 </header>
+
+<div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+<div class="mobile-side-menu" id="mobileSideMenu">
+  <div class="mobile-side-menu__header">
+    <img src="/img/logo.png" alt="Русские блины" style="height: 30px;">
+    <button class="close-menu-btn" id="closeMenuBtn">✕</button>
+  </div>
+
+  <nav class="mobile-side-menu__nav">
+    <a href="/promotions" class="mobile-side-menu__link">Акции</a>
+    <a href="/contacts" class="mobile-side-menu__link">Контакты</a>
+    <a href="/delivery" class="mobile-side-menu__link">Доставка</a>
+    <a href="/about" class="mobile-side-menu__link">ℹО компании</a>
+
+    <div style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px;">
+      <% if (isAdmin) { %>
+        <a href="/admin" class="mobile-side-menu__link">Админ-панель</a>
+        <a href="/logout" class="mobile-side-menu__link" style="color:#E30613;">Выход</a>
+        <% } else if (user) { %>
+          <a href="/profile" class="mobile-side-menu__link">👤 Мой профиль</a>
+          <a href="/logout" class="mobile-side-menu__link" style="color:#E30613;">Выход</a>
+          <% } else { %>
+            <a href="/login" class="mobile-side-menu__link">Войти</a>
+            <% } %>
+    </div>
+  </nav>
+
+  <div class="mobile-side-menu__footer">
+    <div style="font-size: 14px; color: #888; margin-bottom: 10px;">Ежедневно с 10:00 до 22:00</div>
+    <a href="tel:+78005008005" style="font-weight: 800; font-size: 18px; font-family: 'Manrope', sans-serif;">+7 (800)
+      500-80-05</a>
+  </div>
+</div>
 
 <div class="modal" id="addrModal" aria-hidden="true">
   <div class="modal__overlay" data-close="1"></div>
   <div class="modal__panel" role="dialog" aria-modal="true" aria-labelledby="addrTitle">
+
     <div class="modal__head">
       <div class="modal__title" id="addrTitle">Выбор адреса</div>
       <button class="modal__close" type="button" data-close="1">✕</button>
     </div>
+
     <div class="modal__body">
-      <label class="label">Город</label>
-      <select class="input" id="citySelect">
-        <option value="Оренбург">Оренбург</option>
-        <option value="Тула">Тула</option>
-        <option value="Москва">Москва</option>
-      </select>
+      <div style="margin-bottom: 15px;">
+        <label class="label" style="display:block; margin-bottom: 6px;">Город</label>
+        <select class="input" id="citySelect" style="width: 100%; cursor: pointer;">
+          <option value="Оренбург">Оренбург</option>
+        </select>
+      </div>
+
       <div class="toggle">
         <button class="toggle__btn is-active" type="button" data-mode="pickup">Самовывоз</button>
         <button class="toggle__btn" type="button" data-mode="delivery">Доставка</button>
       </div>
+
       <div id="pickupBlock">
-        <div class="muted" style="margin:8px 0 10px;">Выберите точку</div>
-        <div class="addrList" id="pickupList"></div>
+        <div class="muted" style="margin: 12px 0 10px; font-size: 14px;">Выберите точку:</div>
+        <div class="addrList" id="pickupList">
+        </div>
       </div>
-      <div id="deliveryBlock" style="display:none;">
-        <label class="label">Адрес доставки</label>
-        <input class="input" id="deliveryInput" placeholder="Улица, дом, квартира (если есть)">
-        <input class="input" id="deliveryComment" placeholder="Подъезд, этаж, домофон...">
+
+      <div id="deliveryBlock" style="display:none; margin-top: 15px;">
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+
+          <div>
+            <label class="label" style="font-size: 12px; color: #666; margin-bottom:4px; display:block;">Улица</label>
+            <input class="input" id="delivStreet" placeholder="Например: ул. Салмышская" style="width: 100%;">
+          </div>
+
+          <div class="grid-2">
+            <div>
+              <label class="label" style="font-size: 12px; color: #666; margin-bottom:4px; display:block;">Дом</label>
+              <input class="input" id="delivHouse" placeholder="Дом" style="width: 100%;">
+            </div>
+            <div>
+              <label class="label" style="font-size: 12px; color: #666; margin-bottom:4px; display:block;">Квартира /
+                Офис</label>
+              <input class="input" id="delivApt" placeholder="Кв." style="width: 100%;">
+            </div>
+          </div>
+
+          <div class="grid-3">
+            <div>
+              <label class="label"
+                style="font-size: 12px; color: #666; margin-bottom:4px; display:block;">Подъезд</label>
+              <input class="input" id="delivEntrance" placeholder="№" style="width: 100%;">
+            </div>
+            <div>
+              <label class="label" style="font-size: 12px; color: #666; margin-bottom:4px; display:block;">Этаж</label>
+              <input class="input" id="delivFloor" placeholder="№" style="width: 100%;">
+            </div>
+            <div>
+              <label class="label"
+                style="font-size: 12px; color: #666; margin-bottom:4px; display:block;">Домофон</label>
+              <input class="input" id="delivIntercom" placeholder="Код" style="width: 100%;">
+            </div>
+          </div>
+
+        </div>
       </div>
+
       <div class="modal__actions">
         <button class="btn btn--outline" type="button" data-close="1">Отмена</button>
         <button class="btn btn--primary" type="button" id="saveAddr">Сохранить</button>
       </div>
     </div>
+
   </div>
 </div>
 
@@ -69,18 +152,186 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    // Ищем шапку только если у неё есть класс прозрачности
-    const topbar = document.querySelector('.topbar--transparent');
-    if (!topbar) return; // На других страницах скрипт просто ничего не делает
+    // --- 1. ЭЛЕМЕНТЫ ---
+    const addrModal = document.getElementById('addrModal');
+    const openAddrBtn = document.getElementById('addrBtn');
+    const closeBtns = document.querySelectorAll('[data-close="1"]');
+    const saveBtn = document.getElementById('saveAddr');
+    const addrText = document.getElementById('addrText');
+    const toggleBtns = document.querySelectorAll('.toggle__btn');
 
-    const checkScroll = () => {
-      if (window.scrollY > 50) {
-        topbar.classList.add('is-scrolled');
-      } else {
-        topbar.classList.remove('is-scrolled');
+    const pickupBlock = document.getElementById('pickupBlock');
+    const deliveryBlock = document.getElementById('deliveryBlock');
+
+    // Поля доставки
+    const fieldStreet = document.getElementById('delivStreet');
+    const fieldHouse = document.getElementById('delivHouse');
+    const fieldApt = document.getElementById('delivApt');
+    const fieldEntrance = document.getElementById('delivEntrance');
+    const fieldFloor = document.getElementById('delivFloor');
+    const fieldIntercom = document.getElementById('delivIntercom');
+
+    // --- 2. ФУНКЦИЯ ЗАГРУЗКИ АДРЕСА ИЗ ПАМЯТИ ---
+    function loadSavedAddress() {
+      const saved = localStorage.getItem('userAddress');
+      if (!saved) return;
+
+      const data = JSON.parse(saved);
+
+      // Обновляем текст в шапке
+      if (data.fullString) {
+        addrText.innerText = data.fullString;
       }
-    };
-    checkScroll();
-    window.addEventListener('scroll', checkScroll);
-  });
+
+      // Если режим - доставка, заполняем поля в модалке заранее
+      if (data.mode === 'delivery') {
+        if (fieldStreet) fieldStreet.value = data.street || '';
+        if (fieldHouse) fieldHouse.value = data.house || '';
+        if (fieldApt) fieldApt.value = data.apt || '';
+        if (fieldEntrance) fieldEntrance.value = data.entrance || '';
+        if (fieldFloor) fieldFloor.value = data.floor || '';
+        if (fieldIntercom) fieldIntercom.value = data.intercom || '';
+
+        // Переключаем вкладку на "Доставка"
+        toggleBtns.forEach(b => b.classList.remove('is-active'));
+        const delivBtn = document.querySelector('[data-mode="delivery"]');
+        if (delivBtn) {
+          delivBtn.classList.add('is-active');
+          pickupBlock.style.display = 'none';
+          deliveryBlock.style.display = 'block';
+        }
+      }
+    }
+
+    // Запускаем загрузку сразу при открытии сайта
+    loadSavedAddress();
+
+    // --- 3. ОТКРЫТИЕ / ЗАКРЫТИЕ ---
+    if (openAddrBtn) {
+      openAddrBtn.addEventListener('click', () => {
+        addrModal.classList.add('is-open');
+        document.body.style.overflow = 'hidden';
+      });
+    }
+
+    closeBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        addrModal.classList.remove('is-open');
+        document.body.style.overflow = '';
+      });
+    });
+
+    // Переключение вкладок
+    toggleBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        toggleBtns.forEach(b => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        if (btn.dataset.mode === 'pickup') {
+          pickupBlock.style.display = 'block';
+          deliveryBlock.style.display = 'none';
+        } else {
+          pickupBlock.style.display = 'none';
+          deliveryBlock.style.display = 'block';
+        }
+      });
+    });
+
+    // --- 4. СОХРАНЕНИЕ ---
+    if (saveBtn) {
+      saveBtn.addEventListener('click', () => {
+        const activeBtn = document.querySelector('.toggle__btn.is-active');
+        const mode = activeBtn.dataset.mode;
+
+        if (mode === 'pickup') {
+          const selected = document.querySelector('.addrItem.is-selected');
+          if (selected) {
+            const val = selected.innerText.trim();
+            addrText.innerText = val;
+
+            // Сохраняем самовывоз
+            localStorage.setItem('userAddress', JSON.stringify({
+              mode: 'pickup',
+              fullString: val
+            }));
+
+            addrModal.classList.remove('is-open');
+            document.body.style.overflow = '';
+          } else {
+            alert('Выберите пункт выдачи');
+          }
+        } else {
+          // Доставка: собираем все 6 полей
+          const street = fieldStreet.value.trim();
+          const house = fieldHouse.value.trim();
+          const apt = fieldApt.value.trim();
+          const entrance = fieldEntrance.value.trim();
+          const floor = fieldFloor.value.trim();
+          const intercom = fieldIntercom.value.trim();
+
+          if (!street || !house) {
+            alert('Укажите хотя бы улицу и дом');
+            return;
+          }
+
+          let fullAddr = `Доставка: ${street}, д. ${house}`;
+          if (apt) fullAddr += `, кв. ${apt}`;
+
+          // Обновляем шапку
+          addrText.innerText = fullAddr;
+
+          // СОХРАНЯЕМ ВСЁ В ПАМЯТЬ
+          localStorage.setItem('userAddress', JSON.stringify({
+            mode: 'delivery',
+            street, house, apt, entrance, floor, intercom,
+            fullString: fullAddr
+          }));
+
+          addrModal.classList.remove('is-open');
+          document.body.style.overflow = '';
+        }
+      });
+    }
+
+    // --- 5. ПРОЧЕЕ (Scroll & Burger) ---
+    // --- 5. ПРОЧЕЕ (Scroll & Burger) ---
+    const topbar = document.querySelector('.topbar--transparent');
+    if (topbar) {
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 50) topbar.classList.add('is-scrolled');
+        else topbar.classList.remove('is-scrolled');
+      });
+    }
+
+    const burgerBtn = document.getElementById('burgerBtn');
+    const closeMenuBtn = document.getElementById('closeMenuBtn'); // ВОТ ЭТО БЫЛО ПОТЕРЯНО
+    const sideMenu = document.getElementById('mobileSideMenu');
+    const menuOverlay = document.getElementById('mobileMenuOverlay');
+
+    // Открытие меню
+    if (burgerBtn) {
+      burgerBtn.addEventListener('click', () => {
+        sideMenu.classList.add('is-open');
+        menuOverlay.classList.add('is-visible');
+        document.body.style.overflow = 'hidden'; // Запрещаем крутить сайт на фоне
+      });
+    }
+
+    // Закрытие по крестику
+    if (closeMenuBtn) {
+      closeMenuBtn.addEventListener('click', () => {
+        sideMenu.classList.remove('is-open');
+        menuOverlay.classList.remove('is-visible');
+        document.body.style.overflow = ''; // Возвращаем скролл
+      });
+    }
+
+    // Закрытие по клику на темный фон
+    if (menuOverlay) {
+      menuOverlay.addEventListener('click', () => {
+        sideMenu.classList.remove('is-open');
+        menuOverlay.classList.remove('is-visible');
+        document.body.style.overflow = '';
+      });
+    }
+  }); // Конец DOMContentLoaded
 </script>

@@ -68,6 +68,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await res.json();
 
             if (data.success) {
+                const badge = document.getElementById('mobileCartBadge');
+                if (badge) {
+                    const totalItems = data.items.reduce((sum, item) => sum + item.quantity, 0);
+                    if (totalItems > 0) {
+                        badge.innerText = totalItems;
+                        badge.style.display = 'flex';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                }
+
                 if (data.items.length === 0) {
                     body.innerHTML = '<div style="text-align:center; margin-top: 40px; color: #666;">Ваша корзина пуста 😔</div>';
                     totalEl.innerText = '0 ₽';
@@ -76,6 +87,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 let html = '';
                 data.items.forEach(item => {
+                    // 1. Формируем HTML для размера (НОВЫЙ БЛОК)
+                    let sizeHtml = '';
+                    if (item.sizeLabel) {
+                        sizeHtml = `<div style="font-size: 13px; color: #888; margin-top: 4px;">Размер: <span style="color: #2b2b2b;">${item.sizeLabel}</span></div>`;
+                    }
+
+                    // 2. Формируем HTML для добавок
                     let addonsHtml = '';
                     if (item.addons && item.addons.length > 0) {
                         addonsHtml = `<div style="font-size: 12px; color: #888; margin-top: 4px; line-height: 1.4;">`;
@@ -83,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         addonsHtml += `</div>`;
                     }
 
-                    // Отрисовка товара с новыми кнопками
+                    // 3. Отрисовка товара с новыми элементами
                     html += `
                     <div class="sc-item" style="border-bottom: 1px dashed #eee; padding-bottom: 15px; margin-bottom: 15px; position: relative;">
                         
@@ -91,9 +109,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         <img src="${item.image_url || '/img/products/placeholder.png'}" class="sc-item__img" alt="${item.name}">
                         <div class="sc-item__info" style="padding-right: 20px;">
-                            <div class="sc-item__name" style="font-size: 16px;">${item.name}</div>
-                            ${addonsHtml}
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                            
+                            <div class="sc-item__name" style="font-size: 16px; font-weight: 600;">${item.name}</div>
+                            
+                            ${sizeHtml}   ${addonsHtml} <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
                                 
                                 <div style="display: flex; align-items: center; gap: 10px; border: 1px solid #eee; border-radius: 8px; padding: 4px;">
                                     <button class="sc-qty-btn" data-action="decrease" data-id="${item.cart_item_id}" style="background: none; border: none; font-size: 16px; cursor: pointer; padding: 0 8px;">-</button>

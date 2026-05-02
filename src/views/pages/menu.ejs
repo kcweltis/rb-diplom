@@ -72,24 +72,28 @@
 
                       <div class="itemCard__meta">
                         <% if (p.weight_g || p.calories) { %>
+
                           <% if (p.weight_g) { %>
-                            <span>
-                              <%= p.weight_g %> г
-                            </span>
-                            <% } %>
+                            <% let wStr=String(p.weight_g).trim(); let finalWeight=wStr; if (wStr &&
+                              !/[а-яА-Яa-zA-Z]/.test(wStr)) { finalWeight +=wStr.includes('/') ? ' мл' : ' г' ; } %>
+                              <span>
+                                <%= finalWeight %>
+                              </span>
+                              <% } %>
 
-                              <% if (p.weight_g && p.calories) { %>
-                                <span>·</span>
-                                <% } %>
+                                <% if (p.weight_g && p.calories) { %>
+                                  <span>·</span>
+                                  <% } %>
 
-                                  <% if (p.calories) { %>
-                                    <span>
-                                      <%= p.calories %> ккал
-                                    </span>
-                                    <% } %>
-                                      <% } else { %>
-                                        <span class="muted">нет данных</span>
-                                        <% } %>
+                                    <% if (p.calories) { %>
+                                      <span>
+                                        <%= p.calories %> ккал
+                                      </span>
+                                      <% } %>
+
+                                        <% } else { %>
+                                          <span class="muted">нет данных</span>
+                                          <% } %>
                       </div>
 
                       <div class="itemCard__bottom">
@@ -121,7 +125,7 @@
     </div>
 
     <button class="floating-cart-btn" id="floatingCartBtn">
-      🛒 Корзина
+      Корзина
     </button>
 
     <div class="side-cart-overlay" id="sideCartOverlay"></div>

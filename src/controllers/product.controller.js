@@ -4,10 +4,10 @@ async function page(req, res) {
     try {
         const id = Number(req.params.id);
 
-        // ОБНОВЛЕНО: Достаем новые поля БЖУ и Калории вместо старого kcal_100g
+        // ОБНОВЛЕНО: Добавлено поле p.sizes
         const { rows } = await pool.query(
             `SELECT p.id, p.name, p.description, p.price, p.image_url,
-                p.weight_g, p.proteins, p.fats, p.carbs, p.calories, 
+                p.weight_g, p.proteins, p.fats, p.carbs, p.calories, p.sizes,
                 c.title AS category_title, p.category_id
              FROM products p
              JOIN categories c ON c.id = p.category_id
@@ -18,7 +18,7 @@ async function page(req, res) {
         const product = rows[0];
         if (!product) return res.status(404).render("pages/404", { title: "Не найдено" });
 
-        // Похожие товары (из той же категории)
+        // Похожие товары
         const { rows: related } = await pool.query(
             `SELECT id, name, image_url, price, calories
              FROM products
@@ -28,7 +28,7 @@ async function page(req, res) {
             [product.category_id, product.id]
         );
 
-        // Достаем добавки для этого товара
+        // Добавки
         const { rows: addons } = await pool.query(
             `SELECT a.id, a.name, a.price 
              FROM add_ons a
@@ -55,12 +55,12 @@ async function getApiProduct(req, res) {
     try {
         const id = Number(req.params.id);
 
-        // Достаем товар (SELECT * автоматически подтянет новые поля БЖУ)
+        // SELECT * автоматически подтянет новое поле sizes
         const { rows } = await pool.query("SELECT * FROM products WHERE id = $1 AND is_active = TRUE", [id]);
         if (rows.length === 0) return res.status(404).json({ success: false, message: "Товар не найден" });
         const product = rows[0];
 
-        // Достаем добавки
+        // Добавки
         const { rows: addons } = await pool.query(
             `SELECT a.id, a.name, a.price 
              FROM add_ons a

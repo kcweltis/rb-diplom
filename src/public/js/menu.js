@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // ==========================================
-    // 1. НАВИГАЦИЯ ПО КАТЕГОРИЯМ (КРАСНЫЙ ЦВЕТ)
+    // 1. НАВИГАЦИЯ ПО КАТЕГОРИЯМ
     // ==========================================
     const observerOptions = {
         root: null,
@@ -35,16 +35,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const prodContent = document.getElementById('prodModalContent');
     const prodClose = document.getElementById('prodModalClose');
 
-    // Закрытие окна
     if (prodClose) prodClose.addEventListener('click', () => prodOverlay.classList.remove('is-open'));
     if (prodOverlay) prodOverlay.addEventListener('click', (e) => {
         if (e.target === prodOverlay) prodOverlay.classList.remove('is-open');
     });
 
-    // Открытие окна и загрузка данных
     document.querySelectorAll('.open-modal-btn').forEach(card => {
         card.addEventListener('click', async function (e) {
-            // Если кликнули по кнопке "Выбрать", чтобы она не мешала открытию
             if (e.target.classList.contains('itemBtn')) e.preventDefault();
 
             const productId = this.getAttribute('data-id');
@@ -66,9 +63,57 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Функция отрисовки внутренностей окна
+    // --- ФУНКЦИЯ ОТРИСОВКИ ОКНА ---
     function renderProductModal(product, addons) {
-        // 1. Формируем список добавок
+
+        let sizesHtml = '';
+        const hasSizes = product.sizes && product.sizes.length > 0;
+
+        if (hasSizes) {
+            sizesHtml = `
+            <div class="pm-sizes">
+                <div class="pm-sizes__title" style="font-size: 14px; font-weight: 600; margin-bottom: 10px; color: #2B2B2B;">Объем:</div>
+                <div class="pm-sizes__list" style="display: flex; gap: 10px; margin-bottom: 15px;">`;
+
+            product.sizes.forEach((s, idx) => {
+                sizesHtml += `
+                    <div class="size-option" style="flex: 1; position: relative;">
+                        <input type="radio" name="product-size" id="size-${idx}" 
+                               value="${s.name}" 
+                               data-price="${s.price}"
+                               data-prot="${s.prot || 0}"
+                               data-fat="${s.fat || 0}"
+                               data-carb="${s.carb || 0}"
+                               data-cal="${s.cal || 0}"
+                               ${idx === 0 ? 'checked' : ''} 
+                               style="position: absolute; opacity: 0; cursor: pointer;">
+                        <label for="size-${idx}" style="display: block; padding: 10px; text-align: center; border: 1px solid #ddd; border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; background: #fff;">
+                            ${s.name}
+                        </label>
+                    </div>`;
+            });
+            sizesHtml += `</div></div>`;
+        }
+
+        let optionsHtml = '';
+        const hasOptions = product.options && product.options.length > 0;
+
+        if (hasOptions) {
+            optionsHtml = `
+            <div class="pm-options" style="margin: 20px 0;">
+                <div style="font-size: 16px; font-weight: 800; margin-bottom: 10px;">Выберите блин:</div>
+                <div style="display: flex; flex-direction: column; gap: 8px;">`;
+
+            product.options.forEach((opt, idx) => {
+                optionsHtml += `
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 12px; border: 1px solid ${idx === 0 ? '#E30613' : '#ddd'}; border-radius: 12px; ${idx === 0 ? 'box-shadow: 0 0 0 1px #E30613;' : ''}">
+                        <input type="radio" name="product-option" value="${opt.name}" ${idx === 0 ? 'checked' : ''} style="accent-color: #E30613; width: 18px; height: 18px;">
+                        <span style="font-size: 14px; font-weight: 500;">${opt.name}</span>
+                    </label>`;
+            });
+            optionsHtml += `</div></div>`;
+        }
+
         let addonsHtml = '';
         if (addons && addons.length > 0) {
             addonsHtml = `<div class="pm-addons"><h4 style="margin:0 0 10px;">Добавить к блюду:</h4>`;
@@ -85,21 +130,40 @@ document.addEventListener('DOMContentLoaded', () => {
             addonsHtml += `</div>`;
         }
 
-        // 2. Формируем красивый блок БЖУ и Калорий
+        // ==========================================
+        // ИСПРАВЛЕННЫЙ БЛОК БЖУ
+        // ==========================================
         let nutriHtml = '';
-        if (product.calories && product.calories > 0) {
+
+        // Проверяем: есть ли основные калории ИЛИ есть ли калории хотя бы у первого объема напитка
+        const hasBaseMacros = product.calories && product.calories > 0;
+        const hasSizeMacros = hasSizes && product.sizes[0] && product.sizes[0].cal && product.sizes[0].cal > 0;
+
+        if (hasBaseMacros || hasSizeMacros) {
+            // Если это напиток - берем стартовые данные из первого объема. Если обычное блюдо - из базы.
+            const initProt = hasSizeMacros ? (product.sizes[0].prot || 0) : (product.proteins || 0);
+            const initFats = hasSizeMacros ? (product.sizes[0].fat || 0) : (product.fats || 0);
+            const initCarbs = hasSizeMacros ? (product.sizes[0].carb || 0) : (product.carbs || 0);
+            const initCal = hasSizeMacros ? (product.sizes[0].cal || 0) : (product.calories || 0);
+
             nutriHtml = `
             <div style="display: flex; gap: 10px; margin: 15px 0; background: #f9f9f9; padding: 12px; border-radius: 12px; font-size: 13px; text-align: center; border: 1px solid #eee;">
-                <div style="flex: 1;"><div style="color: #888; font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">Белки</div><b style="font-size: 15px;">${product.proteins || 0} г</b></div>
-                <div style="flex: 1;"><div style="color: #888; font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">Жиры</div><b style="font-size: 15px;">${product.fats || 0} г</b></div>
-                <div style="flex: 1;"><div style="color: #888; font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">Углеводы</div><b style="font-size: 15px;">${product.carbs || 0} г</b></div>
-                <div style="flex: 1; border-left: 1px solid #ddd;"><div style="color: #E30613; font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">Ккал</div><b style="color: #E30613; font-size: 16px;">${product.calories}</b></div>
+                <div style="flex: 1;"><div style="color: #888; font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">Белки</div><b style="font-size: 15px;" id="modal-prot">${initProt} г</b></div>
+                <div style="flex: 1;"><div style="color: #888; font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">Жиры</div><b style="font-size: 15px;" id="modal-fats">${initFats} г</b></div>
+                <div style="flex: 1;"><div style="color: #888; font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">Углеводы</div><b style="font-size: 15px;" id="modal-carbs">${initCarbs} г</b></div>
+                <div style="flex: 1; border-left: 1px solid #ddd;"><div style="color: #E30613; font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">Ккал</div><b style="color: #E30613; font-size: 16px;" id="modal-cal">${initCal}</b></div>
             </div>`;
         }
 
-        const weightText = product.weight_g ? `<div style="margin-top: 10px; color: #666; font-size: 14px;"><b>Вес:</b> ${product.weight_g} г</div>` : '';
+        // Умное форматирование веса/объема
+        let displayWeight = product.weight_g ? String(product.weight_g).trim() : '';
+        if (displayWeight && !/[а-яА-Яa-zA-Z]/.test(displayWeight)) {
+            displayWeight += displayWeight.includes('/') ? ' мл' : ' г';
+        }
+        const weightText = displayWeight ? `<div style="margin-top: 10px; color: #666; font-size: 14px;"><b>Вес/Объем:</b> ${displayWeight}</div>` : '';
 
-        // 3. Собираем весь HTML модального окна
+        const initialBasePrice = hasSizes ? product.sizes[0].price : product.price;
+
         prodContent.innerHTML = `
             <div class="pm-layout">
                 <div class="pm-img-box">
@@ -111,36 +175,77 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     ${weightText}
                     ${nutriHtml}
+                    ${sizesHtml}
+                    ${optionsHtml}
                     ${addonsHtml}
                     
                     <div class="pm-footer" style="margin-top: auto; padding-top: 20px; display: flex; justify-content: space-between; align-items: center;">
-                        <div class="pm-price" style="font-size: 24px; font-weight: 800;"><span id="modalFinalPrice" data-base="${product.price}">${Number(product.price).toFixed(0)}</span> ₽</div>
+                        <div class="pm-price" style="font-size: 24px; font-weight: 800;">
+                            <span id="modalFinalPrice" data-base="${initialBasePrice}">${Number(initialBasePrice).toFixed(0)}</span> ₽
+                        </div>
                         <button class="btn btn--primary" id="modalAddToCartBtn" style="padding: 12px 30px; font-size: 16px;">Добавить</button>
                     </div>
                 </div>
             </div>
         `;
 
-        // 4. Логика пересчета цены внутри модалки
+        // --- ЛОГИКА ДИНАМИЧЕСКОГО ПЕРЕСЧЕТА ЦЕНЫ И БЖУ ---
         const priceEl = document.getElementById('modalFinalPrice');
-        const basePrice = parseFloat(priceEl.getAttribute('data-base'));
-        const checkboxes = document.querySelectorAll('.modal-addon-cb');
 
-        checkboxes.forEach(cb => {
-            cb.addEventListener('change', () => {
-                let total = basePrice;
-                document.querySelectorAll('.modal-addon-cb:checked').forEach(checked => {
-                    total += parseFloat(checked.getAttribute('data-price'));
+        const updateDynamicData = () => {
+            let basePrice = parseFloat(priceEl.getAttribute('data-base'));
+
+            const selectedSize = document.querySelector('input[name="product-size"]:checked');
+            if (selectedSize) {
+                basePrice = parseFloat(selectedSize.getAttribute('data-price'));
+
+                const pProt = document.getElementById('modal-prot');
+                const pFats = document.getElementById('modal-fats');
+                const pCarbs = document.getElementById('modal-carbs');
+                const pCal = document.getElementById('modal-cal');
+
+                if (pProt) pProt.innerText = selectedSize.getAttribute('data-prot') + ' г';
+                if (pFats) pFats.innerText = selectedSize.getAttribute('data-fat') + ' г';
+                if (pCarbs) pCarbs.innerText = selectedSize.getAttribute('data-carb') + ' г';
+                if (pCal) pCal.innerText = selectedSize.getAttribute('data-cal');
+            }
+
+            let addonsSum = 0;
+            document.querySelectorAll('.modal-addon-cb:checked').forEach(checked => {
+                addonsSum += parseFloat(checked.getAttribute('data-price'));
+            });
+
+            priceEl.innerText = (basePrice + addonsSum).toFixed(0);
+        };
+
+        // Запускаем при старте
+        if (hasSizes) updateDynamicData();
+
+        // Слушатели на все переключатели и чекбоксы
+        document.querySelectorAll('input[name="product-size"], .modal-addon-cb').forEach(el => {
+            el.addEventListener('change', updateDynamicData);
+        });
+
+        // Окрашиваем обводку радиокнопок при выборе
+        document.querySelectorAll('input[name="product-option"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                document.querySelectorAll('input[name="product-option"]').forEach(r => {
+                    r.parentElement.style.borderColor = '#ddd';
+                    r.parentElement.style.boxShadow = 'none';
                 });
-                priceEl.innerText = total.toFixed(0);
+                e.target.parentElement.style.borderColor = '#E30613';
+                e.target.parentElement.style.boxShadow = '0 0 0 1px #E30613';
             });
         });
 
-        // 5. Логика добавления в корзину из модалки
+        // --- ДОБАВЛЕНИЕ В КОРЗИНУ ---
         document.getElementById('modalAddToCartBtn').addEventListener('click', async (e) => {
             const btn = e.target;
             const originalText = btn.innerText;
+
             const selectedAddons = Array.from(document.querySelectorAll('.modal-addon-cb:checked')).map(cb => Number(cb.value));
+            const selectedSize = document.querySelector('input[name="product-size"]:checked')?.value || null;
+            const selectedOption = document.querySelector('input[name="product-option"]:checked')?.value || null;
 
             btn.innerText = 'Добавляем...';
             btn.disabled = true;
@@ -149,7 +254,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const response = await fetch('/api/cart/add', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ product_id: product.id, addons: selectedAddons })
+                    body: JSON.stringify({
+                        product_id: product.id,
+                        addons: selectedAddons,
+                        size: selectedSize,
+                        option: selectedOption
+                    })
                 });
                 const result = await response.json();
 
@@ -173,4 +283,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Автооткрытие товара из URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const openProductId = urlParams.get('openProductId');
+
+    if (openProductId) {
+        const targetCard = document.querySelector(`.open-modal-btn[data-id="${openProductId}"]`);
+        if (targetCard) {
+            targetCard.click();
+            const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+            window.history.replaceState({ path: newUrl }, '', newUrl);
+        }
+    }
 });

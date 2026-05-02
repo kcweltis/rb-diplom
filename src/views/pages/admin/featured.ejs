@@ -20,7 +20,7 @@
   <%- include('../../partials/header') %>
     <main class="container">
       <%- include('../../partials/admin/breadcrumbs') %>
-        <h1 class="page-title">Популярные блюда (главная)</h1>
+        <h1 class="page-title">Новинки (главная)</h1>
 
         <form class="form form--inline" method="POST" action="/admin/featured">
           <select class="input" name="product_id" required>
@@ -60,7 +60,7 @@
               </div>
               <div>
                 <form method="POST" action="/admin/featured/<%= f.id %>/delete"
-                  onsubmit="return confirm('Убрать из популярных?')">
+                  onsubmit="return confirm('Убрать из новинок?')">
                   <button class="btn btn--outline btn--small" type="submit">Удалить</button>
                 </form>
               </div>
