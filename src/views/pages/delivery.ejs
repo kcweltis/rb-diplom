@@ -11,17 +11,158 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;800&family=Philosopher:wght@400;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    .delivery-page {
+      padding: 60px 0;
+      background: #fcfaf8;
+      min-height: 80vh;
+    }
+
+    .delivery-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-top: 40px;
+    }
+
+    .delivery-card {
+      background: #fff;
+      padding: 40px;
+      border-radius: 24px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .delivery-card__icon {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+
+    .delivery-card__title {
+      font-family: 'Philosopher', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 15px;
+      color: #2b2b2b;
+    }
+
+    .delivery-card__price {
+      font-size: 32px;
+      font-weight: 800;
+      color: #E30613;
+      margin-bottom: 10px;
+    }
+
+    .delivery-card__desc {
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 25px;
+    }
+
+    .partners-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      width: 100%;
+    }
+
+    .partner-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 15px;
+      border-radius: 12px;
+      background: #f8f8f8;
+      text-decoration: none;
+      color: #333;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    .partner-item:hover {
+      background: #eee;
+      transform: translateY(-2px);
+    }
+
+    .partner-item img {
+      height: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .delivery-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .delivery-card {
+        padding: 30px 20px;
+      }
+    }
+  </style>
 </head>
 
 <body>
   <%- include('../partials/header') %>
-    <main class="container">
-      <h1 class="page-title">Доставка</h1>
-      <p class="muted">Условия доставки РБ.</p>
-    </main> <%- include('../partials/footer') %>
+
+    <main class="delivery-page">
+      <div class="container">
+        <h1 class="page-title" style="text-align: center;">Доставка и оплата</h1>
+        <p style="text-align: center; color: #888; max-width: 600px; margin: 0 auto;">
+          Мы заботимся о том, чтобы ваши любимые блины приехали к вам горячими и вовремя. Выберите удобный способ
+          доставки:
+        </p>
+
+        <div class="delivery-grid">
+          <div class="delivery-card">
+            <div class="delivery-card__icon">🚗</div>
+            <h2 class="delivery-card__title">Наша курьерская служба</h2>
+            <div class="delivery-card__price">150 ₽</div>
+            <p class="delivery-card__desc">
+              Фиксированная стоимость доставки по городу. <br>
+              Привезем быстро, бережно и в термосумках.
+            </p>
+            <a href="/menu" class="btn btn--primary" style="width: 100%;">Перейти в меню</a>
+          </div>
+
+          <div class="delivery-card">
+            <div class="delivery-card__icon">📱</div>
+            <h2 class="delivery-card__title">Сервисы доставки</h2>
+            <p class="delivery-card__desc">
+              Вы также можете заказать наши блюда через популярные приложения партнеров:
+            </p>
+            <div class="partners-list">
+              <a href="#" class="partner-item" target="_blank">
+                <img src="/img/yandex_eda.png" alt="Яндекс.Доставка">
+              </a>
+              <a href="#" class="partner-item" target="_blank">
+                <img src="/img/delivery.png" alt="Маркет Деливери">
+              </a>
+              <a href="#" class="partner-item" target="_blank">
+                <img src="/img/kuper.png" alt="Купер">
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top: 60px; text-align: center;">
+          <h3 style="font-family: 'Philosopher'; margin-bottom: 15px;">Оплата</h3>
+          <p style="color: #666;">Принимаем оплату картой на сайте, либо картой/наличными курьеру при получении.</p>
+          <div style="display: flex; justify-content: center; gap: 20px; margin-top: 20px; opacity: 0.5;">
+            <img src="/img/visa-logo.png" height="20" alt="Visa">
+            <img src="/img/mastercard-logo.png" height="20" alt="Mastercard">
+            <img src="/img/mir-logo.png" height="20" alt="Мир">
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <%- include('../partials/footer') %>
 </body>
 
 </html>

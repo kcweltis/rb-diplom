@@ -3,63 +3,62 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     // 1. НАВИГАЦИЯ ПО КАТЕГОРИЯМ
     // ==========================================
-    const observerOptions = {
-        root: null,
-        rootMargin: '-20% 0px -70% 0px',
-        threshold: 0
-    };
-
+    const observerOptions = { root: null, rootMargin: '-20% 0px -70% 0px', threshold: 0 };
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 const catId = entry.target.id.replace('cat-', '');
-                document.querySelectorAll('.catNav__link').forEach(link => {
-                    link.classList.remove('is-active');
-                });
+                document.querySelectorAll('.catNav__link').forEach(link => link.classList.remove('is-active'));
                 const activeLink = document.querySelector(`.catNav__link[data-cat="${catId}"]`);
-                if (activeLink) {
-                    activeLink.classList.add('is-active');
-                }
+                if (activeLink) activeLink.classList.add('is-active');
             }
         });
     }, observerOptions);
 
-    document.querySelectorAll('.catBlock').forEach(block => {
-        observer.observe(block);
-    });
+    document.querySelectorAll('.catBlock').forEach(block => observer.observe(block));
 
     // ==========================================
-    // 2. МОДАЛЬНОЕ ОКНО ТОВАРА
+    // 2. МОДАЛЬНОЕ ОКНО ТОВАРА СО СТРЕЛОЧКАМИ
     // ==========================================
     const prodOverlay = document.getElementById('prodModalOverlay');
     const prodContent = document.getElementById('prodModalContent');
     const prodClose = document.getElementById('prodModalClose');
+
+    // Массив всех ID товаров на странице для навигации
+    const allProductCards = Array.from(document.querySelectorAll('.open-modal-btn'));
+    const allProductIds = allProductCards.map(card => card.getAttribute('data-id'));
+    let currentProductId = null; // Текущий открытый товар
 
     if (prodClose) prodClose.addEventListener('click', () => prodOverlay.classList.remove('is-open'));
     if (prodOverlay) prodOverlay.addEventListener('click', (e) => {
         if (e.target === prodOverlay) prodOverlay.classList.remove('is-open');
     });
 
-    document.querySelectorAll('.open-modal-btn').forEach(card => {
-        card.addEventListener('click', async function (e) {
-            if (e.target.classList.contains('itemBtn')) e.preventDefault();
+    // Функция загрузки данных товара (вынесена отдельно, чтобы стрелочки могли её вызывать)
+    async function loadAndOpenModal(productId) {
+        currentProductId = productId;
+        prodOverlay.classList.add('is-open');
+        prodContent.innerHTML = '<div style="text-align:center; padding: 50px;">Загружаем...</div>';
 
-            const productId = this.getAttribute('data-id');
-            prodOverlay.classList.add('is-open');
-            prodContent.innerHTML = '<div style="text-align:center; padding: 50px;">Загружаем...</div>';
+        try {
+            const res = await fetch(`/api/products/${productId}`);
+            const data = await res.json();
 
-            try {
-                const res = await fetch(`/api/products/${productId}`);
-                const data = await res.json();
-
-                if (data.success) {
-                    renderProductModal(data.product, data.addons);
-                } else {
-                    prodContent.innerHTML = `<div style="text-align:center; padding: 50px; color: red;">Ошибка: ${data.message}</div>`;
-                }
-            } catch (err) {
-                prodContent.innerHTML = '<div style="text-align:center; padding: 50px;">Ошибка сети</div>';
+            if (data.success) {
+                renderProductModal(data.product, data.addons);
+            } else {
+                prodContent.innerHTML = `<div style="text-align:center; padding: 50px; color: red;">Ошибка: ${data.message}</div>`;
             }
+        } catch (err) {
+            prodContent.innerHTML = '<div style="text-align:center; padding: 50px;">Ошибка сети</div>';
+        }
+    }
+
+    // Слушатель на клик по карточке товара
+    allProductCards.forEach(card => {
+        card.addEventListener('click', function (e) {
+            if (e.target.classList.contains('itemBtn')) e.preventDefault();
+            loadAndOpenModal(this.getAttribute('data-id'));
         });
     });
 
@@ -101,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (hasOptions) {
             optionsHtml = `
             <div class="pm-options" style="margin: 20px 0;">
-                <div style="font-size: 16px; font-weight: 800; margin-bottom: 10px;">Выберите блин:</div>
+                <div style="font-size: 16px; font-weight: 800; margin-bottom: 10px;">Выберите опцию:</div>
                 <div style="display: flex; flex-direction: column; gap: 8px;">`;
 
             product.options.forEach((opt, idx) => {
@@ -130,17 +129,11 @@ document.addEventListener('DOMContentLoaded', () => {
             addonsHtml += `</div>`;
         }
 
-        // ==========================================
-        // ИСПРАВЛЕННЫЙ БЛОК БЖУ
-        // ==========================================
         let nutriHtml = '';
-
-        // Проверяем: есть ли основные калории ИЛИ есть ли калории хотя бы у первого объема напитка
         const hasBaseMacros = product.calories && product.calories > 0;
         const hasSizeMacros = hasSizes && product.sizes[0] && product.sizes[0].cal && product.sizes[0].cal > 0;
 
         if (hasBaseMacros || hasSizeMacros) {
-            // Если это напиток - берем стартовые данные из первого объема. Если обычное блюдо - из базы.
             const initProt = hasSizeMacros ? (product.sizes[0].prot || 0) : (product.proteins || 0);
             const initFats = hasSizeMacros ? (product.sizes[0].fat || 0) : (product.fats || 0);
             const initCarbs = hasSizeMacros ? (product.sizes[0].carb || 0) : (product.carbs || 0);
@@ -155,7 +148,6 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
         }
 
-        // Умное форматирование веса/объема
         let displayWeight = product.weight_g ? String(product.weight_g).trim() : '';
         if (displayWeight && !/[а-яА-Яa-zA-Z]/.test(displayWeight)) {
             displayWeight += displayWeight.includes('/') ? ' мл' : ' г';
@@ -166,8 +158,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         prodContent.innerHTML = `
             <div class="pm-layout">
-                <div class="pm-img-box">
+                <div class="pm-img-box" style="position: relative;">
+                    <button id="modalPrevBtn" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.9); border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.2); color: #333;">❮</button>
+                    
                     <img src="${product.image_url || '/img/products/placeholder.png'}" class="pm-img" style="width: 100%; border-radius: 16px; object-fit: cover;">
+                    
+                    <button id="modalNextBtn" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.9); border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.2); color: #333;">❯</button>
                 </div>
                 <div class="pm-info" style="display: flex; flex-direction: column;">
                     <h2 class="pm-title" style="margin: 0 0 10px; font-family: 'Manrope', sans-serif; font-size: 24px;">${product.name}</h2>
@@ -188,6 +184,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
         `;
+
+        // --- ЛОГИКА НАВИГАЦИИ (СТРЕЛОЧКИ) ---
+        document.getElementById('modalPrevBtn').addEventListener('click', () => {
+            let currentIndex = allProductIds.indexOf(String(currentProductId));
+            if (currentIndex !== -1) {
+                let prevIndex = (currentIndex - 1 + allProductIds.length) % allProductIds.length;
+                loadAndOpenModal(allProductIds[prevIndex]);
+            }
+        });
+
+        document.getElementById('modalNextBtn').addEventListener('click', () => {
+            let currentIndex = allProductIds.indexOf(String(currentProductId));
+            if (currentIndex !== -1) {
+                let nextIndex = (currentIndex + 1) % allProductIds.length;
+                loadAndOpenModal(allProductIds[nextIndex]);
+            }
+        });
 
         // --- ЛОГИКА ДИНАМИЧЕСКОГО ПЕРЕСЧЕТА ЦЕНЫ И БЖУ ---
         const priceEl = document.getElementById('modalFinalPrice');
@@ -218,15 +231,12 @@ document.addEventListener('DOMContentLoaded', () => {
             priceEl.innerText = (basePrice + addonsSum).toFixed(0);
         };
 
-        // Запускаем при старте
         if (hasSizes) updateDynamicData();
 
-        // Слушатели на все переключатели и чекбоксы
         document.querySelectorAll('input[name="product-size"], .modal-addon-cb').forEach(el => {
             el.addEventListener('change', updateDynamicData);
         });
 
-        // Окрашиваем обводку радиокнопок при выборе
         document.querySelectorAll('input[name="product-option"]').forEach(radio => {
             radio.addEventListener('change', (e) => {
                 document.querySelectorAll('input[name="product-option"]').forEach(r => {
@@ -258,7 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         product_id: product.id,
                         addons: selectedAddons,
                         size: selectedSize,
-                        option: selectedOption
+                        option: selectedOption // Сохраняем температуру (или блинчик)
                     })
                 });
                 const result = await response.json();
@@ -283,7 +293,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Автооткрытие товара из URL
     const urlParams = new URLSearchParams(window.location.search);
     const openProductId = urlParams.get('openProductId');
 

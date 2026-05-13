@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Заявки на работу</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <style>
+        .app-card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            border: 1px solid #eee;
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .status-select {
+            padding: 6px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('../../partials/header') %>
+        <main class="container" style="padding: 40px 0; min-height: 70vh;">
+            <h1 class="page-title">Заявки на работу</h1>
+
+            <% if (applications.length===0) { %>
+                <div style="text-align: center; color: #888; padding: 40px;">Заявок пока нет.</div>
+                <% } %>
+
+                    <% applications.forEach(app=> { %>
+                        <div class="app-card">
+                            <div class="app-header">
+                                <b style="font-size: 18px;">
+                                    <%= app.name %>
+                                </b>
+                                <div style="display: flex; gap: 15px; align-items: center;">
+                                    <span style="color: #888; font-size: 13px;">
+                                        <%= new Date(app.created_at).toLocaleString('ru-RU') %>
+                                    </span>
+                                    <form action="/panel/vacancies/<%= app.id %>/status" method="POST">
+                                        <select name="status" class="status-select" onchange="this.form.submit()">
+                                            <option value="Новая" <%=app.status==='Новая' ? 'selected' : '' %>>Новая 🔵
+                                            </option>
+                                            <option value="В работе" <%=app.status==='В работе' ? 'selected' : '' %>>В
+                                                работе 🟡</option>
+                                            <option value="Принят" <%=app.status==='Принят' ? 'selected' : '' %>>Принят
+                                                ✅</option>
+                                            <option value="Отказ" <%=app.status==='Отказ' ? 'selected' : '' %>>Отказ ❌
+                                            </option>
+                                        </select>
+                                    </form>
+                                </div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; font-size: 14px;">
+                                <div><b style="color:#666;">Телефон:</b><br><a href="tel:<%= app.phone %>">
+                                        <%= app.phone %>
+                                    </a></div>
+                                <div><b style="color:#666;">Email:</b><br><a href="mailto:<%= app.email %>">
+                                        <%= app.email %>
+                                    </a></div>
+                                <div><b style="color:#666;">Желаемый ресторан:</b><br>
+                                    <%= app.restaurant %>
+                                </div>
+                            </div>
+                        </div>
+                        <% }) %>
+        </main>
+</body>
+
+</html>

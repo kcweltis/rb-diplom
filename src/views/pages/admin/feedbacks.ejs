@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+        <%= title %>
+    </title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <style>
+        .feedback-card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .feedback-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .badge.bg-red {
+            background: #ffe5e5;
+            color: #E30613;
+        }
+
+        .badge.bg-green {
+            background: #e5ffe5;
+            color: #28a745;
+        }
+
+        .badge.bg-blue {
+            background: #e5f0ff;
+            color: #007bff;
+        }
+
+        .badge.bg-yellow {
+            background: #fffae5;
+            color: #ffc107;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 15px;
+            background: #fff;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            flex-wrap: wrap;
+        }
+
+        .status-select {
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-weight: 600;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('../../partials/header') %>
+        <main class="container">
+            <h1 class="page-title">Обращения клиентов</h1>
+
+            <div class="filter-bar">
+                <select id="filterTopic" class="input" style="width: 200px;">
+                    <option value="all">Все темы</option>
+                    <option value="жалоба">Жалобы</option>
+                    <option value="благодарность">Благодарности</option>
+                    <option value="вопрос">Вопросы</option>
+                    <option value="предложение">Предложения</option>
+                </select>
+                <select id="filterStatus" class="input" style="width: 200px;">
+                    <option value="all">Все статусы</option>
+                    <option value="новый">Новые</option>
+                    <option value="в работе">В работе</option>
+                    <option value="решен">Решенные</option>
+                </select>
+            </div>
+
+            <div id="feedbacksList">
+                <% if (feedbacks.length===0) { %>
+                    <div style="text-align: center; color: #888; padding: 40px;">Обращений пока нет.</div>
+                    <% } %>
+
+                        <% feedbacks.forEach(fb=> {
+                            let badgeClass = 'bg-blue';
+                            if (fb.topic === 'Жалоба') badgeClass = 'bg-red';
+                            if (fb.topic === 'Благодарность') badgeClass = 'bg-green';
+                            if (fb.topic === 'Предложение') badgeClass = 'bg-yellow';
+
+                            const cleanTopic = fb.topic ? fb.topic.trim().toLowerCase() : '';
+                            const cleanStatus = fb.status ? fb.status.trim().toLowerCase() : 'новый';
+                            %>
+                            <div class="feedback-card" data-topic="<%= cleanTopic %>" data-status="<%= cleanStatus %>">
+
+                                <div class="feedback-header">
+                                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                                        <span class="badge <%= badgeClass %>">
+                                            <%= fb.topic %>
+                                        </span>
+                                        <span style="color: #888; font-size: 13px;">#<%= fb.id %> • <%= new
+                                                    Date(fb.created_at).toLocaleString('ru-RU') %></span>
+                                    </div>
+
+                                    <form action="/panel/feedbacks/<%= fb.id %>/status" method="POST"
+                                        style="display: flex; gap: 10px; align-items: center;">
+                                        <select name="status" class="status-select" onchange="this.form.submit()">
+                                            <option value="Новый" <%=fb.status==='Новый' ? 'selected' : '' %>>Новый
+                                            </option>
+                                            <option value="В работе" <%=fb.status==='В работе' ? 'selected' : '' %>>В
+                                                работе</option>
+                                            <option value="Решен" <%=fb.status==='Решен' ? 'selected' : '' %>>Решен ✅
+                                            </option>
+                                        </select>
+                                    </form>
+                                </div>
+
+                                <div
+                                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; background: #fafafa; padding: 16px; border-radius: 8px; font-size: 14px; word-break: break-word;">
+                                    <div><b style="color:#666;">Клиент:</b><br>
+                                        <%= fb.name %>
+                                    </div>
+                                    <div><b style="color:#666;">Email:</b><br> <a href="mailto:<%= fb.email %>"
+                                            style="color: #007bff;">
+                                            <%= fb.email %>
+                                        </a></div>
+                                    <div><b style="color:#666;">Телефон:</b><br> <a href="tel:<%= fb.phone %>"
+                                            style="color: #007bff;">
+                                            <%= fb.phone %>
+                                        </a></div>
+                                    <div><b style="color:#666;">Ресторан:</b><br>
+                                        <%= fb.restaurant %>
+                                    </div>
+                                    <div><b style="color:#666;">Визит:</b><br>
+                                        <%= fb.visit_date ? new Date(fb.visit_date).toLocaleDateString('ru-RU')
+                                            : 'Не указана' %>
+                                            <%= fb.visit_time || '' %>
+                                    </div>
+                                </div>
+
+                                <div style="padding: 10px 0; font-size: 15px; line-height: 1.6;">
+                                    <b style="color:#666; font-size:13px; text-transform:uppercase;">Текст
+                                        сообщения:</b><br>
+                                    <%= fb.message %>
+                                </div>
+
+                                <% if (fb.file_url) { %>
+                                    <div style="border-top: 1px dashed #eee; padding-top: 15px;">
+                                        <% if (fb.file_url.match(/\.(jpg|jpeg|png|gif|webp)$/i)) { %>
+                                            <a href="<%= fb.file_url %>" target="_blank"
+                                                style="display: inline-block; margin-bottom: 10px;">
+                                                <img src="<%= fb.file_url %>" alt="Фото отзыва"
+                                                    style="max-height: 150px; border-radius: 8px; border: 1px solid #ddd; object-fit: cover;">
+                                            </a>
+                                            <br>
+                                            <% } %>
+
+                                                <a href="<%= fb.file_url %>" target="_blank"
+                                                    style="color: #E30613; font-weight: 600; text-decoration: none;">📎
+                                                    Открыть/Скачать файл</a>
+                                    </div>
+                                    <% } %>
+                            </div>
+                            <% }) %>
+            </div>
+        </main>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const topicFilter = document.getElementById('filterTopic');
+                const statusFilter = document.getElementById('filterStatus');
+                const cards = document.querySelectorAll('.feedback-card');
+
+                function filterCards() {
+                    const topic = topicFilter.value;
+                    const status = statusFilter.value;
+
+                    cards.forEach(card => {
+                        const cardTopic = card.getAttribute('data-topic');
+                        const cardStatus = card.getAttribute('data-status');
+
+                        const matchTopic = (topic === 'all' || cardTopic === topic);
+                        const matchStatus = (status === 'all' || cardStatus === status);
+
+                        if (matchTopic && matchStatus) {
+                            card.style.display = 'flex';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                }
+
+                topicFilter.addEventListener('change', filterCards);
+                statusFilter.addEventListener('change', filterCards);
+            });
+        </script>
+</body>
+
+</html>

@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+        <%= title %>
+    </title>
+    <link rel="icon" type="image/png" href="/img/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Philosopher:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css" />
+    <style>
+        .legal-page {
+            padding: 60px 0 80px;
+            background: #fcfaf8;
+            min-height: 80vh;
+        }
+
+        .legal-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            font-family: 'Philosopher', sans-serif;
+            font-size: 36px;
+            margin-bottom: 40px;
+            text-align: center;
+            color: #111;
+            text-transform: uppercase;
+        }
+
+        /* Сетка документов */
+        .docs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 50px;
+        }
+
+        .doc-card {
+            background: #fff;
+            border: 1px solid #eaeaea;
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+        }
+
+        .doc-card:hover {
+            border-color: #E30613;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(227, 6, 19, 0.1);
+        }
+
+        .doc-icon {
+            font-size: 28px;
+            background: #fff4f4;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+        }
+
+        .doc-title {
+            font-weight: 600;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+
+        /* Карточка ООО */
+        .company-card {
+            background: #fff;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            margin-bottom: 40px;
+            border-left: 5px solid #E30613;
+        }
+
+        .company-card h2 {
+            font-family: 'Philosopher', sans-serif;
+            font-size: 24px;
+            margin-bottom: 25px;
+            color: #111;
+        }
+
+        .company-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #444;
+        }
+
+        .company-details b {
+            color: #111;
+            font-weight: 600;
+        }
+
+        .company-details .col ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .company-details .col ul li {
+            margin-bottom: 8px;
+            border-bottom: 1px dashed #eee;
+            padding-bottom: 8px;
+        }
+
+        .company-details .col ul li:last-child {
+            border-bottom: none;
+        }
+
+        /* Сетка ИП */
+        .ip-section-title {
+            font-family: 'Philosopher', sans-serif;
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #111;
+        }
+
+        .ip-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .ip-card {
+            background: #fff;
+            border: 1px solid #eee;
+            padding: 20px;
+            border-radius: 16px;
+            transition: 0.3s;
+        }
+
+        .ip-card:hover {
+            border-color: #ddd;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+        }
+
+        .ip-card h3 {
+            font-size: 14px;
+            margin: 0 0 10px 0;
+            color: #111;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+
+        .ip-card p {
+            font-size: 13px;
+            color: #666;
+            margin: 0 0 4px 0;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: 600;
+        }
+
+        .ip-card p span {
+            color: #999;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+            display: inline-block;
+            width: 60px;
+        }
+
+        @media (max-width: 768px) {
+            .company-details {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .company-card {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('../partials/header') %>
+
+        <main class="legal-page">
+            <div class="container legal-container">
+                <h1 class="page-title">Юридическая информация</h1>
+
+                <div class="docs-grid">
+                    <a href="/offer" class="doc-card">
+                        <div class="doc-title">Публичная оферта</div>
+                    </a>
+                    <a href="/agreement" class="doc-card">
+                        <div class="doc-title">Пользовательское соглашение</div>
+                    </a>
+                    <a href="/privacy" class="doc-card">
+                        <div class="doc-title">Политика конфиденциальности</div>
+                    </a>
+                    <a href="/consent" class="doc-card">
+                        <div class="doc-title">Согласие на обработку ПД</div>
+                    </a>
+                </div>
+
+                <div class="company-card">
+                    <h2>ООО «Эксперт-сервис»</h2>
+                    <div class="company-details">
+                        <div class="col">
+                            <ul>
+                                <li><b>ИНН / КПП:</b> 5638075976 / 667801001</li>
+                                <li><b>ОГРН:</b> 1195658014705</li>
+                                <li><b>Адрес:</b> 620091, Свердловская область, г. Екатеринбург, пер. Полимерный, 9, кв.
+                                    237</li>
+                                <li><b>Директор:</b> Рыжухин Андрей Владимирович <br><span
+                                        style="color: #888; font-size: 12px; font-weight: normal;">(на основании
+                                        Устава)</span></li>
+                            </ul>
+                        </div>
+                        <div class="col">
+                            <div
+                                style="background: #fcfcfc; padding: 15px; border-radius: 12px; border: 1px solid #eee;">
+                                <b style="display:block; margin-bottom: 10px; color: #E30613;">Банковские реквизиты:</b>
+                                <b>Р/сч:</b> 40702810564170001328<br>
+                                <b>Банк:</b> ПАО КБ "УБРиР"<br>
+                                <b>К/сч:</b> 30101810900000000795<br>
+                                <b>БИК:</b> 046577795<br>
+                                <b>ИНН банка:</b> 6608008004<br>
+                                <b>КПП банка:</b> 027643001<br>
+                                <b>ОГРН банка:</b> 1026600000350<br>
+                                <b>ОКПО:</b> 96230302
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="ip-section-title">Реквизиты партнеров (ИП)</h2>
+                <div class="ip-grid">
+                    <div class="ip-card">
+                        <h3>ИП Кайшаева Юлия Геннадьевна</h3>
+                        <p><span>ОГРНИП</span> 319565800070370</p>
+                        <p><span>ИНН</span> 561003678944</p>
+                    </div>
+                    <div class="ip-card">
+                        <h3>ИП Нигматулина Регина Руслановна</h3>
+                        <p><span>ОГРНИП</span> 319565800071321</p>
+                        <p><span>ИНН</span> 564603797900</p>
+                    </div>
+                    <div class="ip-card">
+                        <h3>ИП Тасанова Адема Кайргалеевна</h3>
+                        <p><span>ОГРНИП</span> 321565800044721</p>
+                        <p><span>ИНН</span> 564604262953</p>
+                    </div>
+                    <div class="ip-card">
+                        <h3>ИП Зияева Василя Фаатовна</h3>
+                        <p><span>ОГРНИП</span> 319565800070912</p>
+                        <p><span>ИНН</span> 560500968088</p>
+                    </div>
+                    <div class="ip-card">
+                        <h3>ИП Чукланова Елена Александровна</h3>
+                        <p><span>ОГРНИП</span> 322565800092131</p>
+                        <p><span>ИНН</span> 560911374683</p>
+                    </div>
+                    <div class="ip-card">
+                        <h3>ИП Рыжухин Андрей Владимирович</h3>
+                        <p><span>ОГРНИП</span> 314565802200293</p>
+                        <p><span>ИНН</span> 561011695358</p>
+                    </div>
+                    <div class="ip-card">
+                        <h3>ИП Попова Анастасия Андреевна</h3>
+                        <p><span>ОГРНИП</span> 322565800076512</p>
+                        <p><span>ИНН</span> 870500113087</p>
+                    </div>
+                    <div class="ip-card">
+                        <h3>ИП Волкова Сания Габдулхаковна</h3>
+                        <p><span>ОГРНИП</span> 324565800085432</p>
+                        <p><span>ИНН</span> 561021892845</p>
+                    </div>
+                    <div class="ip-card">
+                        <h3>ИП Тисевич Евгений Валерьевич</h3>
+                        <p><span>ОГРНИП</span> 304560908200012</p>
+                        <p><span>ИНН</span> 560902354627</p>
+                    </div>
+                    <div class="ip-card">
+                        <h3>ИП Томина Ольга Владимировна</h3>
+                        <p><span>ОГРНИП</span> 321565800044602</p>
+                        <p><span>ИНН</span> 561211526357</p>
+                    </div>
+                    <div class="ip-card">
+                        <h3>ИП Журавлев Андрей Леонидович</h3>
+                        <p><span>ОГРИП</span> 325565800047432</p>
+                        <p><span>ИНН</span> 561403779947</p>
+                    </div>
+                    <div class="ip-card">
+                        <h3>ИП Соколов Игорь Владимирович</h3>
+                        <p><span>ОГРИП</span> 317565800039498</p>
+                        <p><span>ИНН</span> 561001853260</p>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+        <%- include('../partials/footer') %>
+</body>
+
+</html>

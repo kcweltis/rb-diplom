@@ -87,13 +87,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 let html = '';
                 data.items.forEach(item => {
-                    // 1. Формируем HTML для размера (НОВЫЙ БЛОК)
+                    // 1. Формируем HTML для размера
                     let sizeHtml = '';
                     if (item.sizeLabel) {
                         sizeHtml = `<div style="font-size: 13px; color: #888; margin-top: 4px;">Размер: <span style="color: #2b2b2b;">${item.sizeLabel}</span></div>`;
                     }
 
-                    // 2. Формируем HTML для добавок
+                    // 2. === НОВЫЙ БЛОК: ФОРМИРУЕМ HTML ДЛЯ ОПЦИИ ===
+                    let optionHtml = '';
+                    if (item.option) {
+                        optionHtml = `<div style="font-size: 13px; color: #888; margin-top: 4px;">Опция: <span style="color: #2b2b2b;">${item.option}</span></div>`;
+                    }
+
+                    // 3. Формируем HTML для добавок
                     let addonsHtml = '';
                     if (item.addons && item.addons.length > 0) {
                         addonsHtml = `<div style="font-size: 12px; color: #888; margin-top: 4px; line-height: 1.4;">`;
@@ -101,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         addonsHtml += `</div>`;
                     }
 
-                    // 3. Отрисовка товара с новыми элементами
+                    // Отрисовка карточки товара в боковой корзине
                     html += `
                     <div class="sc-item" style="border-bottom: 1px dashed #eee; padding-bottom: 15px; margin-bottom: 15px; position: relative;">
                         
@@ -112,7 +118,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             
                             <div class="sc-item__name" style="font-size: 16px; font-weight: 600;">${item.name}</div>
                             
-                            ${sizeHtml}   ${addonsHtml} <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                            ${sizeHtml}
+                            ${optionHtml} ${addonsHtml}
+                            
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
                                 
                                 <div style="display: flex; align-items: center; gap: 10px; border: 1px solid #eee; border-radius: 8px; padding: 4px;">
                                     <button class="sc-qty-btn" data-action="decrease" data-id="${item.cart_item_id}" style="background: none; border: none; font-size: 16px; cursor: pointer; padding: 0 8px;">-</button>

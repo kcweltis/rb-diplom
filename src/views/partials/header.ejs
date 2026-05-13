@@ -4,36 +4,44 @@
       <img class="topbar__logo" src="/img/logo.png" alt="Русские блины">
     </a>
 
-    <% const isAdmin=user && user.role_name==='ADMIN' ; %>
+    <% const isAdmin=user && (String(user.role_id)==='1' || user.role_name==='ADMIN' ); const isManager=user &&
+      (String(user.role_id)==='2' || user.role_name==='Менеджер' || user.role_name==='MANAGER' ); %>
 
       <nav class="topbar__nav desktop-nav">
-        <a class="topbar__link" href="/menu">МЕНЮ</a>
-        <a class="topbar__link" href="/cart" id="openSideCartBtn">КОРЗИНА</a>
-        <a class="topbar__link" href="/promotions">АКЦИИ</a>
-
-        <% if (!isAdmin) { %>
-          <a class="topbar__link" href="<%= user ? '/profile' : '/login' %>">ЛИЧНЫЙ КАБИНЕТ</a>
+        <% if (!isManager) { %>
+          <a class="topbar__link" href="/menu">МЕНЮ</a>
+          <a class="topbar__link" href="/cart" id="openSideCartBtn">КОРЗИНА</a>
+          <a class="topbar__link" href="/promotions">АКЦИИ</a>
           <% } %>
 
-            <a class="topbar__link" href="/contacts">КОНТАКТЫ</a>
-
-            <% if (isAdmin) { %>
-              <a class="topbar__link topbar__link--admin" href="/admin">АДМИН-ПАНЕЛЬ</a>
-              <a class="topbar__link" href="/logout" style="color:#E30613;">ВЫХОД</a>
+            <% if (!isAdmin && !isManager) { %>
+              <a class="topbar__link" href="<%= user ? '/profile' : '/login' %>">ЛИЧНЫЙ КАБИНЕТ</a>
               <% } %>
+
+                <a class="topbar__link" href="/contacts">КОНТАКТЫ</a>
+
+                <% if (isAdmin) { %>
+                  <a class="topbar__link topbar__link--admin" href="/admin">АДМИН-ПАНЕЛЬ</a>
+                  <a class="topbar__link" href="/logout" style="color:#E30613;">ВЫХОД</a>
+                  <% } else if (isManager) { %>
+                    <a class="topbar__link topbar__link--admin" href="/panel">ПАНЕЛЬ МОДЕРАТОРА</a>
+                    <a class="topbar__link" href="/logout" style="color:#E30613;">ВЫХОД</a>
+                    <% } %>
       </nav>
 
       <div class="header__actions" style="display: flex; align-items: center; gap: 16px;">
-        <button class="addrBtn" type="button" id="addrBtn">
-          <span class="pin"></span>
-          <span id="addrText" class="addr-text-mobile-hide">Выберите адрес</span>
-        </button>
+        <% if (!isManager) { %>
+          <button class="addrBtn" type="button" id="addrBtn">
+            <span class="pin"></span>
+            <span id="addrText" class="addr-text-mobile-hide">Выберите адрес</span>
+          </button>
+          <% } %>
 
-        <button class="burger-btn" id="burgerBtn" aria-label="Открыть меню">
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
+            <button class="burger-btn" id="burgerBtn" aria-label="Открыть меню">
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
       </div>
   </div>
 </header>
@@ -46,22 +54,29 @@
   </div>
 
   <nav class="mobile-side-menu__nav">
-    <a href="/promotions" class="mobile-side-menu__link">Акции</a>
-    <a href="/contacts" class="mobile-side-menu__link">Контакты</a>
-    <a href="/delivery" class="mobile-side-menu__link">Доставка</a>
-    <a href="/about" class="mobile-side-menu__link">ℹО компании</a>
+    <% if (!isManager) { %>
+      <a href="/menu" class="mobile-side-menu__link">Меню</a>
+      <a href="/promotions" class="mobile-side-menu__link">Акции</a>
+      <a href="/delivery" class="mobile-side-menu__link">Доставка</a>
+      <% } %>
 
-    <div style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px;">
-      <% if (isAdmin) { %>
-        <a href="/admin" class="mobile-side-menu__link">Админ-панель</a>
-        <a href="/logout" class="mobile-side-menu__link" style="color:#E30613;">Выход</a>
-        <% } else if (user) { %>
-          <a href="/profile" class="mobile-side-menu__link">👤 Мой профиль</a>
-          <a href="/logout" class="mobile-side-menu__link" style="color:#E30613;">Выход</a>
-          <% } else { %>
-            <a href="/login" class="mobile-side-menu__link">Войти</a>
-            <% } %>
-    </div>
+        <a href="/contacts" class="mobile-side-menu__link">Контакты</a>
+        <a href="/about" class="mobile-side-menu__link">ℹО компании</a>
+
+        <div style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px;">
+          <% if (isAdmin) { %>
+            <a href="/admin" class="mobile-side-menu__link">Админ-панель</a>
+            <a href="/logout" class="mobile-side-menu__link" style="color:#E30613;">Выход</a>
+            <% } else if (isManager) { %>
+              <a href="/panel" class="mobile-side-menu__link">Панель модератора</a>
+              <a href="/logout" class="mobile-side-menu__link" style="color:#E30613;">Выход</a>
+              <% } else if (user) { %>
+                <a href="/profile" class="mobile-side-menu__link">👤 Мой профиль</a>
+                <a href="/logout" class="mobile-side-menu__link" style="color:#E30613;">Выход</a>
+                <% } else { %>
+                  <a href="/login" class="mobile-side-menu__link">Войти</a>
+                  <% } %>
+        </div>
   </nav>
 
   <div class="mobile-side-menu__footer">
@@ -179,7 +194,7 @@
       const data = JSON.parse(saved);
 
       // Обновляем текст в шапке
-      if (data.fullString) {
+      if (data.fullString && addrText) {
         addrText.innerText = data.fullString;
       }
 
@@ -246,7 +261,7 @@
           const selected = document.querySelector('.addrItem.is-selected');
           if (selected) {
             const val = selected.innerText.trim();
-            addrText.innerText = val;
+            if (addrText) addrText.innerText = val;
 
             // Сохраняем самовывоз
             localStorage.setItem('userAddress', JSON.stringify({
@@ -277,7 +292,7 @@
           if (apt) fullAddr += `, кв. ${apt}`;
 
           // Обновляем шапку
-          addrText.innerText = fullAddr;
+          if (addrText) addrText.innerText = fullAddr;
 
           // СОХРАНЯЕМ ВСЁ В ПАМЯТЬ
           localStorage.setItem('userAddress', JSON.stringify({
@@ -293,7 +308,6 @@
     }
 
     // --- 5. ПРОЧЕЕ (Scroll & Burger) ---
-    // --- 5. ПРОЧЕЕ (Scroll & Burger) ---
     const topbar = document.querySelector('.topbar--transparent');
     if (topbar) {
       window.addEventListener('scroll', () => {
@@ -303,7 +317,7 @@
     }
 
     const burgerBtn = document.getElementById('burgerBtn');
-    const closeMenuBtn = document.getElementById('closeMenuBtn'); // ВОТ ЭТО БЫЛО ПОТЕРЯНО
+    const closeMenuBtn = document.getElementById('closeMenuBtn');
     const sideMenu = document.getElementById('mobileSideMenu');
     const menuOverlay = document.getElementById('mobileMenuOverlay');
 

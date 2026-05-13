@@ -24,9 +24,7 @@
             padding: 0;
             margin: 0;
             max-height: 350px;
-            /* Ограничиваем высоту */
             overflow-y: auto;
-            /* Добавляем прокрутку */
             padding-right: 10px;
         }
 
@@ -58,6 +56,36 @@
             left: 0;
             top: 0;
             font-size: 12px;
+        }
+
+        /* --- СТИЛИ ДЛЯ ПЛАШКИ УВЕДОМЛЕНИЯ --- */
+        .toast-notification {
+            visibility: hidden;
+            min-width: 300px;
+            background-color: #8CC63F;
+            /* Зеленый цвет успеха */
+            color: #fff;
+            text-align: center;
+            border-radius: 12px;
+            padding: 16px 24px;
+            position: fixed;
+            z-index: 9999;
+            left: 50%;
+            bottom: -100px;
+            /* Спрятано снизу */
+            transform: translateX(-50%);
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2);
+            font-size: 15px;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.4s ease, bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .toast-notification.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 40px;
+            /* Выезжает наверх */
         }
     </style>
 </head>
@@ -95,14 +123,14 @@
                             <li>ул. Пролетарская, 294</li>
                             <li>пр-т Победы, 20</li>
                             <li>Загородное шоссе, 36/2 стр. 1</li>
-                            <li>ул. 8 марта, д. 42 (ТРЦ ВОСХОД)</li>
+                            <li>ул. 8 марта, д. 42 ТРЦ ВОСХОД</li>
                             <li>ул. Берёзовая Ростошь, 2а</li>
-                            <li>ул. Новая, 4 (ТРК Гулливер)</li>
-                            <li>Нежинское шоссе, 2а (ТРЦ Армада 2)</li>
-                            <li>пр-т Дзержинского 23 (ТРЦ Север)</li>
-                            <li>ул. Салмышская, 41 (ТРЦ Новый Мир)</li>
+                            <li>ул. Новая, 4 ТРК Гулливер</li>
+                            <li>Нежинское шоссе, 2а ТРЦ Армада 2</li>
+                            <li>пр-т Дзержинского 23 ТРЦ Север</li>
+                            <li>ул. Салмышская, 41 ТРЦ Новый Мир</li>
                             <li>ул. Беляевская, 19/1</li>
-                            <li>Шарлыкское шоссе, 1/2 (Мегамолл Мармелад)</li>
+                            <li>Шарлыкское шоссе, 1/2 Мегамолл Мармелад</li>
                             <li>ул. Советская, 13</li>
                             <li>ул. Советская, 44</li>
                         </ul>
@@ -159,8 +187,27 @@
                         <div class="form-group" style="margin-top: 20px;">
                             <label class="label">Ресторан <span style="color:red">*</span></label>
                             <select class="input" name="restaurant" required>
-                                <option value="Оренбург, Аксакова, 8">Оренбург, Аксакова, 8</option>
-                                <option value="Оренбург, ТРЦ Армада">Оренбург, ТРЦ "Армада"</option>
+                                <option value="" disabled selected>Выберите ресторан...</option>
+                                <option value="ул. Салмышская, 49">ул. Салмышская, 49</option>
+                                <option value="ул. Чкалова 26/1">ул. Чкалова 26/1</option>
+                                <option value="ул. Володарского, 14">ул. Володарского, 14</option>
+                                <option value="ул. Аксакова, 8">ул. Аксакова, 8</option>
+                                <option value="ул. Пролетарская, 294">ул. Пролетарская, 294</option>
+                                <option value="пр-т Победы, 20">пр-т Победы, 20</option>
+                                <option value="Загородное шоссе, 36/2 стр. 1">Загородное шоссе, 36/2 стр. 1</option>
+                                <option value="ул. 8 марта, д. 42 ТРЦ ВОСХОД">ул. 8 марта, д. 42 ТРЦ ВОСХОД</option>
+                                <option value="ул. Берёзовая Ростошь, 2а">ул. Берёзовая Ростошь, 2а</option>
+                                <option value="ул. Новая, 4 ТРК Гулливер">ул. Новая, 4 ТРК Гулливер</option>
+                                <option value="Нежинское шоссе, 2а ТРЦ Армада 2">Нежинское шоссе, 2а ТРЦ Армада 2
+                                </option>
+                                <option value="пр-т Дзержинского 23 ТРЦ Север">пр-т Дзержинского 23 ТРЦ Север</option>
+                                <option value="ул. Салмышская, 41 ТРЦ Новый Мир">ул. Салмышская, 41 ТРЦ Новый Мир
+                                </option>
+                                <option value="ул. Беляевская, 19/1">ул. Беляевская, 19/1</option>
+                                <option value="Шарлыкское шоссе, 1/2 Мегамолл Мармелад">Шарлыкское шоссе, 1/2 Мегамолл
+                                    Мармелад</option>
+                                <option value="ул. Советская, 13">ул. Советская, 13</option>
+                                <option value="ул. Советская, 44">ул. Советская, 44</option>
                             </select>
                         </div>
 
@@ -182,9 +229,9 @@
                         </div>
 
                         <div class="file-upload">
-                            <label class="btn btn--outline" style="cursor: pointer;">
+                            <label class="btn btn--outline" id="fileLabel" style="cursor: pointer;">
                                 📎 Прикрепить файл
-                                <input type="file" name="attachment" style="display: none;"
+                                <input type="file" name="file" id="fileInput" style="display: none;"
                                     accept=".doc,.pdf,.ppt,.docx,.pptx,.xls,.jpg,.png">
                             </label>
                             <span class="muted" style="font-size: 12px; margin-left: 10px;">.doc, .pdf, .jpg, .png до
@@ -194,9 +241,9 @@
                         <div class="form-group consent-group">
                             <label style="font-size: 12px; display: flex; gap: 8px; align-items: center;">
                                 <input type="checkbox" required>
-                                <span>Даю согласие на <a href="#"
+                                <span>Даю согласие на <a href="/consent"
                                         style="color: #E30613; text-decoration: underline;">обработку персональных
-                                        данных</a> в соответствии с <a href="#"
+                                        данных</a> в соответствии с <a href="/privacy"
                                         style="color: #E30613; text-decoration: underline;">политикой
                                         конфиденциальности</a> сайта</span>
                             </label>
@@ -211,6 +258,10 @@
                 </div>
             </section>
         </main>
+
+        <div id="feedbackToast" class="toast-notification">
+            Спасибо! Ваше обращение отправлено.<br>Наш менеджер свяжется с вами в ближайшее время.
+        </div>
 
         <%- include('../partials/footer') %>
 
@@ -229,17 +280,121 @@
             </script>
 
             <script>
+                // --- 1. МАСКА ДЛЯ ТЕЛЕФОНА И ВАЛИДАЦИЯ ---
+                const phoneInput = document.querySelector('input[name="phone"]');
+                if (phoneInput) {
+                    phoneInput.addEventListener('input', function (e) {
+                        let input = e.target;
+                        let value = input.value.replace(/\D/g, '');
+
+                        if (!value) { input.value = ''; return; }
+
+                        if (['7', '8', '9'].includes(value[0])) {
+                            if (value[0] === '9') value = '7' + value;
+                            let firstSymbols = (value[0] === '8') ? '8' : '+7';
+                            let formatted = firstSymbols + ' ';
+
+                            if (value.length > 1) formatted += '(' + value.substring(1, 4);
+                            if (value.length >= 5) formatted += ') ' + value.substring(4, 7);
+                            if (value.length >= 8) formatted += '-' + value.substring(7, 9);
+                            if (value.length >= 10) formatted += '-' + value.substring(9, 11);
+
+                            input.value = formatted;
+                        } else {
+                            input.value = '+' + value.substring(0, 15);
+                        }
+                    });
+                }
+
+                // --- 2. ОТОБРАЖЕНИЕ НАЗВАНИЯ ВЫБРАННОГО ФАЙЛА ---
+                const fileInput = document.getElementById('fileInput');
+                const fileLabel = document.getElementById('fileLabel');
+                if (fileInput && fileLabel) {
+                    fileInput.addEventListener('change', function () {
+                        if (this.files && this.files.length > 0) {
+                            // Если файл выбран, меняем текст на его название
+                            fileLabel.innerHTML = '📎 ' + this.files[0].name;
+                            fileLabel.style.borderColor = '#8CC63F'; // Подсвечиваем зеленым
+                            fileLabel.style.color = '#8CC63F';
+                        } else {
+                            // Если файл отменен
+                            fileLabel.innerHTML = '📎 Прикрепить файл';
+                            fileLabel.style.borderColor = '';
+                            fileLabel.style.color = '';
+                        }
+                    });
+                }
+
+                // --- 3. AJAX ОТПРАВКА ФОРМЫ (БЕЗ ПЕРЕЗАГРУЗКИ СТРАНИЦЫ) ---
+                const feedbackForm = document.querySelector('.feedback-form');
+                const toast = document.getElementById('feedbackToast');
+
+                if (feedbackForm) {
+                    feedbackForm.addEventListener('submit', async function (e) {
+                        e.preventDefault(); // Останавливаем стандартную отправку
+
+                        // Валидация телефона (должно быть 11 цифр)
+                        const phoneVal = phoneInput.value.replace(/\D/g, '');
+                        if (phoneVal.length !== 11) {
+                            alert('Пожалуйста, введите корректный номер телефона (состоящий из 11 цифр)');
+                            return;
+                        }
+
+                        // Меняем состояние кнопки на "Загрузка..."
+                        const submitBtn = feedbackForm.querySelector('button[type="submit"]');
+                        const originalText = submitBtn.innerText;
+                        submitBtn.innerText = 'Отправляем...';
+                        submitBtn.disabled = true;
+
+                        try {
+                            const formData = new FormData(feedbackForm);
+
+                            const response = await fetch('/api/feedback', {
+                                method: 'POST',
+                                body: formData
+                            });
+
+                            if (response.ok) {
+                                // Показываем нашу красивую плашку
+                                toast.classList.add('show');
+
+                                // Сбрасываем форму и кнопку файла
+                                feedbackForm.reset();
+                                if (fileLabel) {
+                                    fileLabel.innerHTML = '📎 Прикрепить файл';
+                                    fileLabel.style.borderColor = '';
+                                    fileLabel.style.color = '';
+                                }
+
+                                // Прячем плашку через 5 секунд
+                                setTimeout(() => {
+                                    toast.classList.remove('show');
+                                }, 5000);
+                            } else {
+                                alert('Произошла ошибка при отправке. Попробуйте позже.');
+                            }
+                        } catch (error) {
+                            console.error(error);
+                            alert('Ошибка сети. Проверьте подключение к интернету.');
+                        } finally {
+                            // Возвращаем кнопку в исходное состояние
+                            submitBtn.innerText = originalText;
+                            submitBtn.disabled = false;
+                        }
+                    });
+                }
+            </script>
+
+            <script>
                 ymaps.ready(initMap);
 
                 function initMap() {
-                    // Создаем карту, центрируем на Оренбурге
                     var myMap = new ymaps.Map("map", {
-                        center: [51.768199, 55.096955], // Координаты Оренбурга
+                        center: [51.768199, 55.096955],
                         zoom: 12,
                         controls: ['zoomControl', 'fullscreenControl']
                     });
 
-                    // Все адреса для поиска на карте
                     var addresses = [
                         "Оренбург, ул. Салмышская, 49", "Оренбург, ул. Чкалова 26/1",
                         "Оренбург, ул. Володарского, 14", "Оренбург, ул. Аксакова, 8",
@@ -252,7 +407,6 @@
                         "Оренбург, ул. Советская, 44"
                     ];
 
-                    // Ищем координаты и ставим метки
                     addresses.forEach(function (address) {
                         ymaps.geocode(address, {
                             results: 1
@@ -263,7 +417,7 @@
                                     balloonContent: '<b>Русские Блины</b><br>' + address,
                                     hintContent: 'Русские Блины'
                                 }, {
-                                    preset: 'islands#redFoodIcon' // Красная иконка еды
+                                    preset: 'islands#redFoodIcon'
                                 });
                                 myMap.geoObjects.add(placemark);
                             }

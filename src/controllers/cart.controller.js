@@ -14,8 +14,9 @@ async function getCartPage(req, res) {
         if (cartRes.rows.length > 0) {
             const cartId = cartRes.rows[0].id;
 
+            // ДОБАВЛЕНО ci.option
             const itemsRes = await pool.query(`
-                SELECT ci.id as cart_item_id, ci.product_id, ci.quantity, ci.selected_add_ons, ci.size,
+                SELECT ci.id as cart_item_id, ci.product_id, ci.quantity, ci.selected_add_ons, ci.size, ci.option,
                        p.name, p.price, p.image_url, p.sizes
                 FROM cart_items ci
                 JOIN products p ON p.id = ci.product_id
@@ -31,9 +32,8 @@ async function getCartPage(req, res) {
 
             const formattedItems = itemsRes.rows.map(item => {
                 let itemFinalPrice = parseFloat(item.price);
-                let sizeLabel = null; // Новая переменная для красивого размера
+                let sizeLabel = null;
 
-                // Умное определение размера: Маленький / Средний / Большой
                 if (item.size && item.sizes) {
                     const sizesArray = typeof item.sizes === 'string' ? JSON.parse(item.sizes) : item.sizes;
                     const matchedSize = sizesArray.find(s => s.name === item.size);
@@ -44,6 +44,7 @@ async function getCartPage(req, res) {
                             const index = sizesArray.findIndex(s => s.name === item.size);
                             if (index === 0) sizeLabel = "Маленький";
                             else if (index === sizesArray.length - 1) sizeLabel = "Большой";
+                            else sizeLabel = "Средний";
                         } else {
                             sizeLabel = item.size;
                         }
@@ -65,7 +66,8 @@ async function getCartPage(req, res) {
 
                 item.final_price = itemFinalPrice;
                 item.addonsList = addonsList;
-                item.sizeLabel = sizeLabel; // Передаем на фронтенд
+                item.sizeLabel = sizeLabel;
+                // item.option уже внутри объекта благодаря обновленному SQL-запросу
 
                 return item;
             });
@@ -81,12 +83,12 @@ async function getCartPage(req, res) {
 }
 
 // ==========================================
-// 2. ДОБАВЛЕНИЕ В КОРЗИНУ (УМНОЕ И БЕЗОПАСНОЕ)
+// 2. ДОБАВЛЕНИЕ В КОРЗИНУ
 // ==========================================
 async function addToCart(req, res) {
     try {
-        // ОБНОВЛЕНО: Принимаем параметр size
-        const { product_id, size } = req.body;
+        // ДОБАВЛЕНО option
+        const { product_id, size, option } = req.body;
 
         if (!product_id) {
             return res.status(400).json({ success: false, message: "Не указан ID товара" });
@@ -123,15 +125,15 @@ async function addToCart(req, res) {
 
         cartId = cartRes.rows[0].id;
 
-        // ОБНОВЛЕНО: Теперь группируем товары в корзине не только по добавкам, но и по размеру (size)
-        // COALESCE позволяет сравнивать NULL безопасно
+        // Ищем такой же товар, чтобы плюсовать количество (теперь учитываем и option)
         const itemRes = await pool.query(
             `SELECT id, quantity FROM cart_items 
              WHERE cart_id = $1 
                AND product_id = $2 
                AND COALESCE(selected_add_ons, '[]'::jsonb)::jsonb = $3::jsonb 
-               AND COALESCE(size, '') = COALESCE($4, '')`,
-            [cartId, product_id, addonsJson, size || null]
+               AND COALESCE(size, '') = COALESCE($4, '')
+               AND COALESCE(option, '') = COALESCE($5, '')`, // ДОБАВЛЕНО СРАВНЕНИЕ ОПЦИИ
+            [cartId, product_id, addonsJson, size || null, option || null] // ДОБАВЛЕН option
         );
 
         if (itemRes.rows.length > 0) {
@@ -140,17 +142,17 @@ async function addToCart(req, res) {
                 [itemRes.rows[0].id]
             );
         } else {
-            // ОБНОВЛЕНО: Сохраняем size при создании новой записи
+            // Сохраняем опцию при создании новой записи
             await pool.query(
-                "INSERT INTO cart_items (cart_id, product_id, quantity, selected_add_ons, size) VALUES ($1, $2, 1, $3::jsonb, $4)",
-                [cartId, product_id, addonsJson, size || null]
+                "INSERT INTO cart_items (cart_id, product_id, quantity, selected_add_ons, size, option) VALUES ($1, $2, 1, $3::jsonb, $4, $5)", // ДОБАВЛЕН option
+                [cartId, product_id, addonsJson, size || null, option || null] // ДОБАВЛЕН option
             );
         }
 
         res.json({ success: true, message: "Товар успешно добавлен в корзину" });
 
     } catch (error) {
-        console.error("КРИТИЧЕСКАЯ ОШИБКА ПРИ ДОБАВЛЕНИИ В КОРЗИНУ:", error);
+        console.error("ОШИБКА ПРИ ДОБАВЛЕНИИ В КОРЗИНУ:", error);
         res.status(500).json({ success: false, message: "Внутренняя ошибка сервера. Посмотрите консоль." });
     }
 }
@@ -168,8 +170,9 @@ async function getCartApi(req, res) {
 
         const cartId = cartRes.rows[0].id;
 
+        // ДОБАВЛЕНО ci.option
         const itemsRes = await pool.query(`
-            SELECT ci.id as cart_item_id, ci.product_id, ci.quantity, ci.selected_add_ons, ci.size,
+            SELECT ci.id as cart_item_id, ci.product_id, ci.quantity, ci.selected_add_ons, ci.size, ci.option,
                    p.name, p.price, p.image_url, p.sizes
             FROM cart_items ci
             JOIN products p ON p.id = ci.product_id
@@ -219,8 +222,9 @@ async function getCartApi(req, res) {
 
             return {
                 cart_item_id: item.cart_item_id,
-                name: item.name,          // Имя теперь чистое (без 250мл)
-                sizeLabel: sizeLabel,     // Отдельно слово "Маленький"
+                name: item.name,
+                sizeLabel: sizeLabel,
+                option: item.option,      // ДОБАВЛЕНО: Передаем опцию на фронтенд!
                 image_url: item.image_url,
                 quantity: item.quantity,
                 final_price: itemFinalPrice,

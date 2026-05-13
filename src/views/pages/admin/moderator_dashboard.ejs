@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <title>
+        <%= title %>
+    </title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <style>
+        .mod-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .mod-card {
+            background: #fff;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            text-decoration: none;
+            color: #333;
+            transition: 0.3s;
+            border: 1px solid #eee;
+        }
+
+        .mod-card:hover {
+            transform: translateY(-5px);
+            border-color: #E30613;
+        }
+
+        .mod-card h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .mod-count {
+            font-size: 48px;
+            font-weight: 800;
+            color: #E30613;
+        }
+
+        .mod-desc {
+            color: #888;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('../../partials/header') %>
+        <main class="container" style="padding: 40px 0; min-height: 70vh;">
+            <h1 class="page-title">Сводка модератора</h1>
+            <div class="mod-grid">
+                <a href="/panel/feedbacks" class="mod-card">
+                    <h2>Отзывы и вопросы</h2>
+                    <div class="mod-count">
+                        <%= newFeedbacks %>
+                    </div>
+                    <div class="mod-desc">Новых обращений</div>
+                </a>
+                <a href="/panel/vacancies" class="mod-card">
+                    <h2>Заявки на работу</h2>
+                    <div class="mod-count">
+                        <%= newVacancies %>
+                    </div>
+                    <div class="mod-desc">Новых анкет</div>
+                </a>
+            </div>
+        </main>
+</body>
+
+</html>

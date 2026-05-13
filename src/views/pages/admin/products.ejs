@@ -208,11 +208,13 @@
 
           <div class="form-grid" style="grid-template-columns: 2fr 1fr;">
             <div class="input-group"><label>Название блюда</label><input class="input" name="name" required></div>
+
             <div class="input-group"><label>Категория</label>
               <select class="input category-select" name="category_id" required>
                 <% categories.forEach(c=> { %><option value="<%= c.id %>">
                     <%= c.title %>
                   </option>
+
                   <% }) %>
               </select>
             </div>
@@ -221,6 +223,7 @@
           <div class="form-grid">
             <div class="input-group"><label>Цена (₽)</label><input class="input" name="price" type="number" step="0.01"
                 required></div>
+
             <div class="input-group"><label>Вес / Объем</label><input class="input" name="weight_g" type="text"
                 placeholder="Напр: 250/350 мл"></div>
             <div class="input-group"><label>Позиция в меню</label><input class="input" name="sort_order" type="number"
@@ -229,6 +232,7 @@
 
           <div class="dynamic-block sizes-block">
             <h4>Объемы напитка:</h4>
+
             <div class="sizes-container">
               <div class="dynamic-row"
                 style="display: flex; gap: 8px; margin-bottom: 10px; align-items: center; flex-wrap: wrap;">
@@ -236,6 +240,7 @@
                 <input type="number" name="size_price" placeholder="Цена" class="input" style="flex:1;">
                 <input type="text" name="size_prot" placeholder="Б" class="input" style="width:40px;">
                 <input type="text" name="size_fats" placeholder="Ж" class="input" style="width:40px;">
+
                 <input type="text" name="size_carbs" placeholder="У" class="input" style="width:40px;">
                 <input type="text" name="size_cal" placeholder="Ккал" class="input" style="width:55px;">
                 <button type="button" class="btn-remove-row"
@@ -247,7 +252,7 @@
           </div>
 
           <div class="dynamic-block options-block">
-            <h4>Выбор блинчика (для обеда):</h4>
+            <h4>Опции (Блинчик, Температура и т.д.):</h4>
             <div class="options-container">
               <div class="dynamic-row" style="display: flex; gap: 10px; margin-bottom: 10px; align-items: center;">
                 <input type="text" name="option_name" placeholder="Название варианта (напр: с маслом)" class="input"
@@ -257,7 +262,7 @@
               </div>
             </div>
             <button type="button" class="btn btn--outline btn-add-option"
-              style="width: 100%; padding: 8px; font-size: 14px; margin-top: 5px;">+ Добавить блинчик</button>
+              style="width: 100%; padding: 8px; font-size: 14px; margin-top: 5px;">+ Добавить опцию</button>
           </div>
 
           <div class="nutri-box">
@@ -265,12 +270,14 @@
             <div class="nutri-grid">
               <div class="input-group"><label>Белки (г)</label><input class="input" name="proteins" type="number"
                   step="0.1"></div>
+
               <div class="input-group"><label>Жиры (г)</label><input class="input" name="fats" type="number" step="0.1">
               </div>
               <div class="input-group"><label>Углеводы (г)</label><input class="input" name="carbs" type="number"
                   step="0.1"></div>
               <div class="input-group"><label>Калории (ккал)</label><input class="input" name="calories" type="number">
               </div>
+
             </div>
           </div>
 
@@ -280,6 +287,7 @@
           </div>
 
           <div class="input-group" style="margin-bottom: 15px;">
+
             <label>Доступные добавки (список с выбором)</label>
             <div class="addon-scroll-list">
               <% addons.forEach(a=> { %>
@@ -302,11 +310,12 @@
         <h2 style="margin: 0 0 16px; font-family: 'Manrope';">Список блюд</h2>
 
         <div class="filter-bar">
-          <input type="text" id="searchInput" class="input" placeholder="🔍 Поиск по названию..." style="flex-grow: 1;">
+          <input type="text" id="searchInput" class="input" placeholder="Поиск по названию..." style="flex-grow: 1;">
           <select id="categoryFilter" class="input" style="width: 250px;">
             <option value="all">Все категории</option>
             <% categories.forEach(c=> { %>
               <option value="<%= c.id %>">
+
                 <%= c.title %>
               </option>
               <% }) %>
@@ -316,12 +325,14 @@
         <div id="productsList">
           <% products.forEach(p=> {
             let pSizes = [];
+
             let pOptions = [];
             try {
             if (p.sizes) pSizes = typeof p.sizes === 'string' ? JSON.parse(p.sizes) : p.sizes;
             if (p.options) pOptions = typeof p.options === 'string' ? JSON.parse(p.options) : p.options;
             } catch(e) {}
             %>
+
             <div class="edit-card product-item <%= !p.is_active ? 'is-inactive' : '' %>"
               style="<%= !p.is_active ? 'opacity: 0.6;' : '' %>" data-name="<%= p.name.toLowerCase() %>"
               data-category="<%= p.category_id %>">
@@ -345,6 +356,7 @@
 
               <form class="edit-card-right" method="POST" action="/admin/products/<%= p.id %>/edit"
                 enctype="multipart/form-data">
+
                 <div class="form-grid">
                   <div class="input-group"><label>Название</label><input class="input" name="name" value="<%= p.name %>"
                       required></div>
@@ -356,6 +368,7 @@
                         <% }) %>
                     </select>
                   </div>
+
                   <div class="input-group"><label>Цена (₽)</label><input class="input" name="price" type="number"
                       step="0.01" value="<%= p.price %>" required></div>
                 </div>
@@ -367,11 +380,13 @@
                       value="<%= p.sort_order %>"></div>
                 </div>
 
+
                 <div class="dynamic-block sizes-block">
                   <h4>Объемы напитка:</h4>
                   <div class="sizes-container">
                     <% if (pSizes && pSizes.length> 0) { %>
                       <% pSizes.forEach(size=> { %>
+
                         <div class="dynamic-row"
                           style="display: flex; gap: 8px; margin-bottom: 10px; align-items: center; flex-wrap: wrap;">
                           <input type="text" name="size_name" placeholder="Объем" class="input" style="flex:2;"
@@ -391,13 +406,16 @@
                         </div>
                         <% }) %>
                           <% } else { %>
+
                             <div class="dynamic-row"
                               style="display: flex; gap: 8px; margin-bottom: 10px; align-items: center; flex-wrap: wrap;">
                               <input type="text" name="size_name" placeholder="Объем" class="input" style="flex:2;">
                               <input type="number" name="size_price" placeholder="Цена" class="input" style="flex:1;">
+
                               <input type="text" name="size_prot" placeholder="Б" class="input" style="width:40px;">
                               <input type="text" name="size_fats" placeholder="Ж" class="input" style="width:40px;">
                               <input type="text" name="size_carbs" placeholder="У" class="input" style="width:40px;">
+
                               <input type="text" name="size_cal" placeholder="Ккал" class="input" style="width:55px;">
                               <button type="button" class="btn-remove-row"
                                 style="background:none; border:none; color:#E30613; cursor:pointer; font-size:18px; padding:0 5px;">✕</button>
@@ -409,12 +427,14 @@
                 </div>
 
                 <div class="dynamic-block options-block">
-                  <h4>Выбор блинчика (для обеда):</h4>
+                  <h4>Опции (Блинчик, Температура и т.д.):</h4>
                   <div class="options-container">
+
                     <% if (pOptions && pOptions.length> 0) { %>
                       <% pOptions.forEach(opt=> { %>
                         <div class="dynamic-row"
                           style="display: flex; gap: 10px; margin-bottom: 10px; align-items: center;">
+
                           <input type="text" name="option_name" placeholder="Название варианта" class="input"
                             style="flex:1;" value="<%= opt.name %>">
                           <button type="button" class="btn-remove-row"
@@ -422,17 +442,19 @@
                         </div>
                         <% }) %>
                           <% } else { %>
+
                             <div class="dynamic-row"
                               style="display: flex; gap: 10px; margin-bottom: 10px; align-items: center;">
                               <input type="text" name="option_name" placeholder="Название варианта" class="input"
                                 style="flex:1;">
+
                               <button type="button" class="btn-remove-row"
                                 style="background:none; border:none; color:#E30613; cursor:pointer; font-size:18px; padding:0 5px;">✕</button>
                             </div>
                             <% } %>
                   </div>
                   <button type="button" class="btn btn--outline btn-add-option"
-                    style="width: 100%; padding: 8px; font-size: 14px; margin-top: 5px;">+ Добавить блинчик</button>
+                    style="width: 100%; padding: 8px; font-size: 14px; margin-top: 5px;">+ Добавить опцию</button>
                 </div>
 
                 <div class="nutri-box">
@@ -446,6 +468,7 @@
                     <div class="input-group"><label>Ккал</label><input class="input input--sm" name="calories"
                         type="number" value="<%= p.calories %>"></div>
                   </div>
+
                 </div>
 
                 <div class="input-group" style="margin-bottom: 15px;">
@@ -454,6 +477,7 @@
                 </div>
 
                 <div class="input-group" style="margin-bottom: 15px;">
+
                   <label>Добавки к блюду</label>
                   <div class="addon-scroll-list">
                     <% addons.forEach(a=> {
@@ -462,17 +486,20 @@
                       <label><input type="checkbox" name="addons" value="<%= a.id %>" <%=isChecked %>> <%= a.name %>
                       </label>
                       <% }) %>
+
                   </div>
                 </div>
 
                 <div
                   style="display: flex; justify-content: space-between; align-items: center; padding-top: 16px; border-top: 1px solid #eee; flex-wrap: wrap; gap: 10px;">
                   <div class="input-group">
+
                     <label>Обновить фото</label>
                     <input class="input" type="file" name="image" accept="image/*" style="max-width: 250px;">
                   </div>
                   <button class="btn btn--primary" type="submit" style="padding: 10px 32px;">Сохранить
                     изменения</button>
+
                 </div>
               </form>
             </div>
@@ -492,6 +519,7 @@
           // --- ЛОГИКА ФИЛЬТРАЦИИ И ПОИСКА ---
           const searchInput = document.getElementById('searchInput');
           const categoryFilter = document.getElementById('categoryFilter');
+
           const productItems = document.querySelectorAll('.product-item');
           const noResultsMsg = document.getElementById('noResultsMsg');
 
@@ -501,12 +529,12 @@
             let visibleCount = 0;
 
             productItems.forEach(item => {
+
               const productName = item.getAttribute('data-name');
               const productCategory = item.getAttribute('data-category');
 
               const matchesSearch = productName.includes(searchTerm);
               const matchesCategory = selectedCategory === 'all' || productCategory === selectedCategory;
-
               if (matchesSearch && matchesCategory) {
                 item.style.display = 'flex';
                 visibleCount++;
@@ -536,7 +564,7 @@
 
             if (selectedText.includes('напитки') || selectedText.includes('коктейли')) {
               sizesBlock.style.display = 'block';
-              optionsBlock.style.display = 'none';
+              optionsBlock.style.display = 'block'; // Теперь здесь стоит 'block', чтобы можно было указать температуру!
             }
             else if (selectedText.includes('обед') || selectedText.includes('комбо')) {
               sizesBlock.style.display = 'none';
@@ -562,11 +590,13 @@
             if (e.target.classList.contains('btn-add-option')) {
               const container = e.target.previousElementSibling;
               const row = document.createElement('div');
+
               row.className = 'dynamic-row';
               row.style.cssText = 'display: flex; gap: 10px; margin-bottom: 10px; align-items: center;';
               row.innerHTML = `
                 <input type="text" name="option_name" placeholder="Название варианта" class="input" style="flex:1;">
                 <button type="button" class="btn-remove-row" style="background:none; border:none; color:#E30613; cursor:pointer; font-size:18px; padding:0 5px;">✕</button>
+            
               `;
               container.appendChild(row);
             }
@@ -582,6 +612,7 @@
                 <input type="number" name="size_price" placeholder="Цена" class="input" style="flex:1;">
                 <input type="text" name="size_prot" placeholder="Б" class="input" style="width:40px;">
                 <input type="text" name="size_fats" placeholder="Ж" class="input" style="width:40px;">
+              
                 <input type="text" name="size_carbs" placeholder="У" class="input" style="width:40px;">
                 <input type="text" name="size_cal" placeholder="Ккал" class="input" style="width:55px;">
                 <button type="button" class="btn-remove-row" style="background:none; border:none; color:#E30613; cursor:pointer; font-size:18px; padding:0 5px;">✕</button>

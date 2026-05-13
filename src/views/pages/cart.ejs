@@ -282,7 +282,7 @@
                     btnPickup.addEventListener('click', () => switchMode('pickup'));
 
                     // === СИНХРОНИЗАЦИЯ С ШАПКОЙ ===
-                    const savedDataStr = localStorage.getItem('userAddress'); // Обновлено имя переменной на актуальное
+                    const savedDataStr = localStorage.getItem('userAddress');
                     if (savedDataStr) {
                         try {
                             const savedData = JSON.parse(savedDataStr);
@@ -371,6 +371,12 @@
                                     sizeHtml = `<div style="font-size: 13px; color: #888; margin-top: 4px;">Размер: <span style="color: #2b2b2b;">${item.sizeLabel}</span></div>`;
                                 }
 
+                                // === ВЫВОДИМ ОПЦИЮ (ТЕМПЕРАТУРУ / БЛИНЧИК) ===
+                                let optionHtml = '';
+                                if (item.option) {
+                                    optionHtml = `<div style="font-size: 13px; color: #888; margin-top: 4px;">Опция: <span style="color: #2b2b2b;">${item.option}</span></div>`;
+                                }
+
                                 // === ВЫВОДИМ ДОБАВКИ ===
                                 let addonsHtml = '';
                                 if (item.addons && item.addons.length > 0) {
@@ -385,7 +391,7 @@
                             <div>
                                 <div class="mc-title">${item.name}</div>
                                 ${sizeHtml}
-                                <div class="mc-addons">${addonsHtml}</div>
+                                ${optionHtml} <div class="mc-addons">${addonsHtml}</div>
                             </div>
                             <div class="qty-control">
                                 <button class="qty-btn" data-action="decrease" data-id="${item.cart_item_id}">-</button>

@@ -1,5 +1,20 @@
 const bcrypt = require("bcrypt");
 const { pool } = require("../config/db");
+const nodemailer = require("nodemailer");
+
+const transporter = nodemailer.createTransport({
+  host: "smtp.yandex.ru",
+  port: 465,
+  secure: true,
+  auth: {
+    user: "kcweltis@yandex.ru",
+    pass: "sztjlaaumpipwezw"
+  },
+  tls: {
+    rejectUnauthorized: false
+  },
+  family: 4 // 🟢 ИСПРАВЛЕНИЕ: Принудительно заставляем использовать IPv4 (решает проблему ENETUNREACH)
+});
 
 const getCrumbs = (name) => [{ name }];
 
@@ -62,31 +77,17 @@ async function createProduct(req, res) {
   const { category_id, name, description, price, weight_g, proteins, fats, carbs, calories, sort_order } = req.body;
   const image_url = req.file ? `/img/products/${req.file.filename}` : (req.body.image_url || null);
 
-  // --- ЛОГИКА ДЛЯ НАПИТКОВ (Сборка объемов и БЖУ) ---
   let sizesJson = [];
   if (req.body.size_name && req.body.size_price) {
     const names = [].concat(req.body.size_name);
     const prices = [].concat(req.body.size_price);
-    const prots = [].concat(req.body.size_prot);
-    const fatList = [].concat(req.body.size_fats);
-    const carbsList = [].concat(req.body.size_carbs);
-    const cals = [].concat(req.body.size_cal);
-
     for (let i = 0; i < names.length; i++) {
       if (names[i].trim() !== '') {
-        sizesJson.push({
-          name: names[i].trim(),
-          price: Number(prices[i]),
-          prot: prots[i] || 0,
-          fat: fatList[i] || 0,
-          carb: carbsList[i] || 0,
-          cal: cals[i] || 0
-        });
+        sizesJson.push({ name: names[i].trim(), price: Number(prices[i]) });
       }
     }
   }
 
-  // --- ЛОГИКА ДЛЯ ОБЕДОВ (Сборка вариантов блинчиков) ---
   let optionsJson = [];
   if (req.body.option_name) {
     const optNames = [].concat(req.body.option_name);
@@ -117,31 +118,17 @@ async function editProduct(req, res) {
   const { rows } = await pool.query("SELECT image_url FROM products WHERE id=$1", [productId]);
   const image_url = req.file ? `/img/products/${req.file.filename}` : (rows[0]?.image_url || null);
 
-  // --- ЛОГИКА ДЛЯ НАПИТКОВ (Сборка объемов и БЖУ) ---
   let sizesJson = [];
   if (req.body.size_name && req.body.size_price) {
     const names = [].concat(req.body.size_name);
     const prices = [].concat(req.body.size_price);
-    const prots = [].concat(req.body.size_prot);
-    const fatList = [].concat(req.body.size_fats);
-    const carbsList = [].concat(req.body.size_carbs);
-    const cals = [].concat(req.body.size_cal);
-
     for (let i = 0; i < names.length; i++) {
       if (names[i].trim() !== '') {
-        sizesJson.push({
-          name: names[i].trim(),
-          price: Number(prices[i]),
-          prot: prots[i] || 0,
-          fat: fatList[i] || 0,
-          carb: carbsList[i] || 0,
-          cal: cals[i] || 0
-        });
+        sizesJson.push({ name: names[i].trim(), price: Number(prices[i]) });
       }
     }
   }
 
-  // --- ЛОГИКА ДЛЯ ОБЕДОВ (Сборка вариантов блинчиков) ---
   let optionsJson = [];
   if (req.body.option_name) {
     const optNames = [].concat(req.body.option_name);
@@ -280,10 +267,157 @@ async function deletePromo(req, res) {
   res.redirect('/admin/promotions');
 }
 
+// ==========================================
+// ЛОГИКА ДЛЯ ОТЗЫВОВ И ОТПРАВКИ EMAIL
+// ==========================================
+async function submitFeedback(req, res) {
+  try {
+    const { topic, name, email, phone, restaurant, visit_date, visit_time, message } = req.body;
+    const file_url = req.file ? `/img/feedbacks/${req.file.filename}` : null;
+
+    // 1. Сохраняем в базу данных
+    await pool.query(
+      `INSERT INTO feedbacks (topic, name, email, phone, restaurant, visit_date, visit_time, message, file_url) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+      [topic, name, email, phone, restaurant, visit_date || null, visit_time || null, message, file_url]
+    );
+
+    // 2. Отправляем уведомление на email
+    try {
+      // Меняем домен на localhost:3000
+      const fileLink = file_url ? `<p><a href="http://localhost:3000${file_url}" style="color: #E30613; font-weight: bold;">📎 Открыть прикрепленный файл</a></p>` : '';
+
+      await transporter.sendMail({
+        from: "kcweltis@yandex.ru", // ИСПРАВЛЕНО: Теперь почта совпадает с настройками авторизации
+        to: "kcweltis@yandex.ru",   // Отправляем письмо самому себе (модератору)
+        subject: `Новое обращение с сайта: ${topic}`,
+        html: `
+            <h2 style="color: #E30613;">Поступило новое обращение</h2>
+            <p><b>Тема:</b> ${topic}</p>
+            <p><b>Клиент:</b> ${name}</p>
+            <p><b>Email:</b> ${email}</p>
+            <p><b>Телефон:</b> ${phone}</p>
+            <p><b>Ресторан:</b> ${restaurant}</p>
+            <p><b>Дата/Время визита:</b> ${visit_date || '-'} ${visit_time || '-'}</p>
+            <hr>
+            <p><b>Сообщение клиента:</b><br>${message}</p>
+            ${fileLink}
+            <br>
+            <p><i>Вы можете изменить статус обращения в <a href="http://localhost:3000/panel/feedbacks">Панели Модератора</a></i></p>
+        `
+      });
+    } catch (mailErr) {
+      console.error("Ошибка при отправке письма на email:", mailErr);
+    }
+
+    // Отвечаем фронтенду об успехе
+    res.json({ success: true, message: "Отзыв успешно отправлен" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Ошибка при отправке обращения" });
+  }
+}
+
+async function feedbacksPage(req, res) {
+  try {
+    const { rows: feedbacks } = await pool.query("SELECT * FROM feedbacks ORDER BY created_at DESC");
+    res.render("pages/admin/feedbacks", {
+      title: "Обращения клиентов",
+      feedbacks,
+      breadcrumbs: [{ name: "Обращения" }],
+      user: req.user
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Ошибка загрузки");
+  }
+}
+
+async function updateFeedbackStatus(req, res) {
+  try {
+    const { status } = req.body;
+    await pool.query("UPDATE feedbacks SET status = $1 WHERE id = $2", [status, req.params.id]);
+    res.redirect("/panel/feedbacks");
+  } catch (error) {
+    res.status(500).send("Ошибка обновления статуса");
+  }
+}
+
+// --- НОВАЯ ЛОГИКА ДЛЯ ВАКАНСИЙ И ДАШБОРДА ---
+
+async function submitVacancy(req, res) {
+  try {
+    const { name, email, phone, restaurant } = req.body;
+    await pool.query(
+      "INSERT INTO job_applications (name, email, phone, restaurant) VALUES ($1, $2, $3, $4)",
+      [name, email, phone, restaurant]
+    );
+
+    // Уведомление на почту
+    try {
+      await transporter.sendMail({
+        from: "kcweltis@yandex.ru",
+        to: "kcweltis@yandex.ru",
+        subject: `Новая заявка на работу от ${name}`,
+        html: `
+                    <h2>Новая анкета соискателя</h2>
+                    <p><b>Имя:</b> ${name}</p>
+                    <p><b>Телефон:</b> ${phone}</p>
+                    <p><b>Email:</b> ${email}</p>
+                    <p><b>Выбранный ресторан:</b> ${restaurant}</p>
+                    <br><p><a href="http://localhost:3000/panel/vacancies">Перейти в панель управления</a></p>
+                `
+      });
+    } catch (e) { console.error("Ошибка отправки письма о вакансии:", e); }
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false });
+  }
+}
+
+async function moderatorDashboard(req, res) {
+  try {
+    const { rows: f } = await pool.query("SELECT COUNT(*)::int FROM feedbacks WHERE status = 'Новый'");
+    const { rows: v } = await pool.query("SELECT COUNT(*)::int FROM job_applications WHERE status = 'Новая'");
+
+    res.render("pages/admin/moderator_dashboard", {
+      title: "Панель модератора",
+      newFeedbacks: f[0].count,
+      newVacancies: v[0].count,
+      user: req.user
+    });
+  } catch (error) {
+    res.status(500).send("Ошибка загрузки панели");
+  }
+}
+
+async function jobApplicationsPage(req, res) {
+  try {
+    const { rows: applications } = await pool.query("SELECT * FROM job_applications ORDER BY created_at DESC");
+    res.render("pages/admin/job_applications", { title: "Заявки на работу", applications, user: req.user });
+  } catch (error) {
+    res.status(500).send("Ошибка загрузки");
+  }
+}
+
+async function updateJobStatus(req, res) {
+  try {
+    await pool.query("UPDATE job_applications SET status = $1 WHERE id = $2", [req.body.status, req.params.id]);
+    res.redirect("/panel/vacancies");
+  } catch (error) {
+    res.status(500).send("Ошибка обновления");
+  }
+}
+
 module.exports = {
   dashboard, categoriesPage, createCategory, deleteCategory,
   productsPage, createProduct, editProduct, deleteProduct, toggleProductActive,
   featuredPage, addFeatured, removeFeatured, usersPage, updateUser, resetPassword,
   bannersPage, createBanner, toggleBanner, deleteBanner,
-  addonsPage, createAddon, deleteAddon, promoPage, addPromo, togglePromo, deletePromo
+  addonsPage, createAddon, deleteAddon, promoPage, addPromo, togglePromo, deletePromo,
+
+  submitFeedback, feedbacksPage, updateFeedbackStatus,
+  submitVacancy, moderatorDashboard, jobApplicationsPage, updateJobStatus
 };

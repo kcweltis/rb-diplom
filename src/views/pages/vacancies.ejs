@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+        <%= title %>
+    </title>
+    <link rel="icon" type="image/png" href="/img/favicon.png">
+    <link rel="stylesheet" href="/css/style.css" />
+    <style>
+        .vacancies-page {
+            padding: 40px 0 80px;
+            background: #fcfaf8;
+            min-height: 80vh;
+        }
+
+        /* Идеальная плоская лента с острыми краями наружу (как на скрине) */
+        .ribbon-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .ribbon {
+            display: inline-block;
+            background: #E30613;
+            color: #fff;
+            padding: 14px 60px;
+            font-size: 24px;
+            font-weight: 800;
+            text-transform: uppercase;
+            /* Вырезаем многоугольник: прямые верх и низ, острые углы по бокам */
+            clip-path: polygon(20px 0%, calc(100% - 20px) 0%, 100% 50%, calc(100% - 20px) 100%, 20px 100%, 0% 50%);
+        }
+
+        /* Текст под первым заголовком */
+        .vacancies-desc {
+            text-align: center;
+            font-size: 16px;
+            color: #444;
+            line-height: 1.6;
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Белая карточка для формы и преимуществ */
+        .vacancies-wrapper {
+            background: #fff;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            max-width: 700px;
+            margin: 0 auto 40px auto;
+            border: 1px solid #f0f0f0;
+        }
+
+        .benefits-list {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            line-height: 2.2;
+            margin-bottom: 30px;
+        }
+
+        .telegram-block {
+            text-align: center;
+        }
+
+        .telegram-block h3 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #111;
+            font-weight: 700;
+        }
+
+        /* Плашка уведомления */
+        .toast-notification {
+            visibility: hidden;
+            min-width: 300px;
+            background-color: #8CC63F;
+            color: #fff;
+            text-align: center;
+            border-radius: 12px;
+            padding: 16px 24px;
+            position: fixed;
+            z-index: 9999;
+            left: 50%;
+            bottom: -100px;
+            transform: translateX(-50%);
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2);
+            font-size: 15px;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.4s ease, bottom 0.4s ease;
+        }
+
+        .toast-notification.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .vacancies-wrapper {
+                padding: 30px 20px;
+            }
+
+            .ribbon {
+                padding: 12px 40px;
+                font-size: 18px;
+                clip-path: polygon(15px 0%, calc(100% - 15px) 0%, 100% 50%, calc(100% - 15px) 100%, 15px 100%, 0% 50%);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('../partials/header') %>
+
+        <main class="vacancies-page">
+            <div class="container">
+
+                <div class="ribbon-container">
+                    <div class="ribbon">ВАКАНСИИ</div>
+                </div>
+
+                <div class="vacancies-desc">
+                    Что ты любишь больше: общаться или готовить?<br>
+                    Выбирай и приходи!<br>
+                    Вакансии кассира или блинопека для тебя.<br>
+                    Учитываем твои интересы, всему обучаем, платим высокую зарплату.
+                </div>
+
+                <div class="vacancies-wrapper">
+                    <div class="ribbon-container">
+                        <div class="ribbon">ПРИСОЕДИНЯЙСЯ К КОМАНДЕ!</div>
+                    </div>
+
+                    <form class="form" id="vacancyForm">
+                        <!-- Поля в ряд вниз -->
+                        <div class="form-group">
+                            <label class="label">Ваше имя <span style="color:red">*</span></label>
+                            <input type="text" class="input" name="name" placeholder="Имя" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="label">Ваш email <span style="color:red">*</span></label>
+                            <input type="email" class="input" name="email" placeholder="Email" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="label">Ваш телефон <span style="color:red">*</span></label>
+                            <input type="tel" class="input" name="phone" placeholder="+7 (999) 999-99-99" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="label">Ближайший ресторан <span style="color:red">*</span></label>
+                            <select class="input" name="restaurant" required>
+                                <option value="" disabled selected>Выберите ресторан...</option>
+                                <option value="ул. Салмышская, 49">ул. Салмышская, 49</option>
+                                <option value="ул. Чкалова 26/1">ул. Чкалова 26/1</option>
+                                <option value="ул. Володарского, 14">ул. Володарского, 14</option>
+                                <option value="ул. Аксакова, 8">ул. Аксакова, 8</option>
+                                <option value="ул. Пролетарская, 294">ул. Пролетарская, 294</option>
+                                <option value="пр-т Победы, 20">пр-т Победы, 20</option>
+                                <option value="Загородное шоссе, 36/2 стр. 1">Загородное шоссе, 36/2 стр. 1</option>
+                                <option value="ул. 8 марта, д. 42 ТРЦ ВОСХОД">ул. 8 марта, д. 42 ТРЦ ВОСХОД</option>
+                                <option value="ул. Берёзовая Ростошь, 2а">ул. Берёзовая Ростошь, 2а</option>
+                                <option value="ул. Новая, 4 ТРК Гулливер">ул. Новая, 4 ТРК Гулливер</option>
+                                <option value="Нежинское шоссе, 2а ТРЦ Армада 2">Нежинское шоссе, 2а ТРЦ Армада 2
+                                </option>
+                                <option value="пр-т Дзержинского 23 ТРЦ Север">пр-т Дзержинского 23 ТРЦ Север</option>
+                                <option value="ул. Салмышская, 41 ТРЦ Новый Мир">ул. Салмышская, 41 ТРЦ Новый Мир
+                                </option>
+                                <option value="ул. Беляевская, 19/1">ул. Беляевская, 19/1</option>
+                                <option value="Шарлыкское шоссе, 1/2 Мегамолл Мармелад">Шарлыкское шоссе, 1/2 Мегамолл
+                                    Мармелад</option>
+                                <option value="ул. Советская, 13">ул. Советская, 13</option>
+                                <option value="ул. Советская, 44">ул. Советская, 44</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group consent-group" style="margin-top: 25px;">
+                            <label style="font-size: 12px; display: flex; gap: 8px; align-items: center;">
+                                <input type="checkbox" required>
+                                <span>Даю согласие на <a href="/consent"
+                                        style="color: #8CC63F; text-decoration: underline;" target="_blank">обработку
+                                        персональных данных</a> в соответствии с <a href="/privacy"
+                                        style="color: #8CC63F; text-decoration: underline;" target="_blank">политикой
+                                        конфиденциальности</a> сайта</span>
+                            </label>
+                        </div>
+
+                        <div style="margin-top: 25px;">
+                            <button type="submit" class="btn btn--primary"
+                                style="background: #8CC63F; border-color: #8CC63F; padding: 14px 40px; font-size: 16px;">Отправить</button>
+                            <p style="font-size: 11px; color: #999; margin-top: 12px;"><span style="color:red">*</span>
+                                — Обязательно для заполнения</p>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="vacancies-wrapper">
+                    <div class="ribbon-container">
+                        <div class="ribbon">НАШИ ПРЕИМУЩЕСТВА</div>
+                    </div>
+
+                    <div class="benefits-list">
+                        Стабильная заработная плата<br>
+                        Удобный график<br>
+                        Обучение с нуля
+                    </div>
+
+                </div>
+
+            </div>
+        </main>
+
+        <div id="vacancyToast" class="toast-notification">Заявка успешно отправлена! Мы скоро свяжемся с тобой.</div>
+
+        <%- include('../partials/footer') %>
+
+            <script>
+                // Маска телефона (как в контактах)
+                const phoneInput = document.querySelector('input[name="phone"]');
+                if (phoneInput) {
+                    phoneInput.addEventListener('input', function (e) {
+                        let input = e.target;
+                        let value = input.value.replace(/\D/g, '');
+                        if (!value) { input.value = ''; return; }
+                        if (['7', '8', '9'].includes(value[0])) {
+                            if (value[0] === '9') value = '7' + value;
+                            let firstSymbols = (value[0] === '8') ? '8' : '+7';
+                            let formatted = firstSymbols + ' ';
+                            if (value.length > 1) formatted += '(' + value.substring(1, 4);
+                            if (value.length >= 5) formatted += ') ' + value.substring(4, 7);
+                            if (value.length >= 8) formatted += '-' + value.substring(7, 9);
+                            if (value.length >= 10) formatted += '-' + value.substring(9, 11);
+                            input.value = formatted;
+                        } else {
+                            input.value = '+' + value.substring(0, 15);
+                        }
+                    });
+                }
+
+                // AJAX Отправка формы модератору
+                const form = document.getElementById('vacancyForm');
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+
+                    if (phoneInput.value.replace(/\D/g, '').length !== 11) {
+                        alert('Пожалуйста, введите корректный номер телефона (11 цифр)');
+                        return;
+                    }
+
+                    const btn = form.querySelector('button');
+                    const origText = btn.innerText;
+                    btn.innerText = 'Отправка...';
+                    btn.disabled = true;
+
+                    const formData = new FormData(form);
+                    const data = Object.fromEntries(formData.entries());
+
+                    try {
+                        const res = await fetch('/api/vacancies', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(data)
+                        });
+
+                        if (res.ok) {
+                            document.getElementById('vacancyToast').classList.add('show');
+                            form.reset();
+                            setTimeout(() => document.getElementById('vacancyToast').classList.remove('show'), 5000);
+                        } else {
+                            alert('Произошла ошибка при отправке заявки.');
+                        }
+                    } catch (err) {
+                        alert('Ошибка сети. Проверьте интернет-соединение.');
+                    } finally {
+                        btn.innerText = origText;
+                        btn.disabled = false;
+                    }
+                });
+            </script>
+</body>
+
+</html>
