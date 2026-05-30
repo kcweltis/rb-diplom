@@ -1,0 +1,161 @@
+/* order-tracker.css */
+/* Визуальный трекер статуса заказа */
+
+.order-tracker {
+    margin: 16px 0;
+    padding: 16px;
+    background: linear-gradient(135deg, #fef5f4 0%, #fff9f8 100%);
+    border-radius: 12px;
+    border-left: 4px solid #e74c3c;
+}
+
+/* TRACKER STEPS */
+.tracker-steps {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    gap: 0;
+    position: relative;
+}
+
+.tracker-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    position: relative;
+    gap: 8px;
+}
+
+.tracker-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #ecf0f1;
+    border: 2px solid #bdc3c7;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+    transition: all 0.3s ease;
+}
+
+.tracker-step.completed .tracker-dot {
+    background: #2ecc71;
+    border-color: #27ae60;
+    box-shadow: 0 0 8px rgba(46, 204, 113, 0.3);
+}
+
+.tracker-step.active .tracker-dot {
+    background: #e74c3c;
+    border-color: #c0392b;
+    box-shadow: 0 0 12px rgba(231, 76, 60, 0.5);
+    animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.15);
+    }
+}
+
+.tracker-label {
+    font-size: 12px;
+    color: #2c3e50;
+    text-align: center;
+    line-height: 1.3;
+    max-width: 80px;
+    font-weight: 500;
+}
+
+.tracker-line {
+    height: 2px;
+    background: #ecf0f1;
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    right: -50%;
+    z-index: 1;
+}
+
+.tracker-step:last-child .tracker-line {
+    display: none;
+}
+
+.tracker-step.completed .tracker-line {
+    background: #2ecc71;
+}
+
+.tracker-step.active .tracker-line {
+    background: #e74c3c;
+}
+
+/* ИНФОРМАЦИЯ О КУРЬЕРЕ */
+.courier-info {
+    margin-top: 12px;
+    padding: 12px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #ecf0f1;
+}
+
+.courier-badge {
+    font-size: 14px;
+    color: #2c3e50;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.courier-badge strong {
+    color: #e74c3c;
+}
+
+.btn-call-courier {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-call-courier:active {
+    transform: scale(0.98);
+    box-shadow: 0 2px 6px rgba(231, 76, 60, 0.3);
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+    .tracker-steps {
+        gap: 2px;
+    }
+
+    .tracker-dot {
+        width: 20px;
+        height: 20px;
+    }
+
+    .tracker-label {
+        font-size: 11px;
+        max-width: 70px;
+    }
+
+    .courier-badge {
+        font-size: 13px;
+    }
+}

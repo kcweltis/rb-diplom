@@ -1,0 +1,97 @@
+<div class="ai-chat-wrapper">
+    <button id="chatToggleBtn" class="chat-toggle-btn">💬</button>
+
+    <div id="chatWindow" class="chat-window hidden">
+        <div class="chat-header">
+            <h3>Блинобот 🥞</h3>
+            <button id="chatCloseBtn">&times;</button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="message ai-message">Привет! Я ИИ-помощник «Русских блинов». Чем могу помочь: выбрать блинчик,
+                найти работу или восстановить пароль?</div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="chatInput" placeholder="Напишите ваш вопрос..." autocomplete="off">
+            <button id="chatSendBtn">➤</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const chatToggleBtn = document.getElementById('chatToggleBtn');
+    const chatWindow = document.getElementById('chatWindow');
+    const chatCloseBtn = document.getElementById('chatCloseBtn');
+    const chatInput = document.getElementById('chatInput');
+    const chatSendBtn = document.getElementById('chatSendBtn');
+    const chatMessages = document.getElementById('chatMessages');
+
+    chatToggleBtn.addEventListener('click', () => chatWindow.classList.toggle('hidden'));
+    chatCloseBtn.addEventListener('click', () => chatWindow.classList.add('hidden'));
+
+    function appendMessage(text, sender) {
+        const msgDiv = document.createElement('div');
+        msgDiv.classList.add('message', sender === 'user' ? 'user-message' : 'ai-message');
+
+        if (sender === 'ai') {
+            msgDiv.innerHTML = text; // Разрешаем ИИ вставлять HTML (кнопки)
+        } else {
+            msgDiv.textContent = text; // Сообщения юзера вставляем как текст (безопасность)
+        }
+
+        chatMessages.appendChild(msgDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // Слушаем клики по кнопкам добавления в корзину внутри чата
+    document.getElementById('chatMessages').addEventListener('click', function (e) {
+        if (e.target.classList.contains('chat-cart-btn')) {
+            const productId = e.target.getAttribute('data-id');
+            const productName = e.target.getAttribute('data-name');
+
+            // ВАЖНО: Если у вас функция корзины называется иначе, замените addToCart(productId) на вашу!
+            if (typeof addToCart === 'function') {
+                addToCart(productId);
+            } else {
+                console.log('Добавлено в корзину: ' + productId); // Заглушка, если функции нет
+            }
+
+            e.target.textContent = '✅ В корзине!';
+            e.target.style.background = '#2b8a3e';
+            e.target.disabled = true;
+        }
+    });
+
+    async function sendMessage() {
+        const text = chatInput.value.trim();
+        if (!text) return;
+
+        appendMessage(text, 'user');
+        chatInput.value = '';
+
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'message ai-message';
+        loadingDiv.textContent = 'Печатает...';
+        chatMessages.appendChild(loadingDiv);
+
+        try {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: text })
+            });
+            const data = await response.json();
+
+            chatMessages.removeChild(loadingDiv);
+            appendMessage(data.reply, 'ai');
+
+        } catch (error) {
+            chatMessages.removeChild(loadingDiv);
+            appendMessage('Ошибка соединения. Попробуйте позже.', 'ai');
+        }
+    }
+
+    chatSendBtn.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+    });
+</script>

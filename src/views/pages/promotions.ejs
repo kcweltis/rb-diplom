@@ -244,10 +244,12 @@
                                         Будь в курсе последних событий, а так же новинок, акций<br>и специальных
                                         предложений
                                     </p>
-                                    <form class="subscribe-form" action="#" method="POST" id="subscribeForm">
-                                        <input type="email" class="subscribe-input" placeholder="ВАШ EMAIL" required>
+                                    <form class="subscribe-form" id="subscribeForm" novalidate>
+                                        <input type="email" class="subscribe-input" id="subscribeEmail"
+                                               placeholder="ВАШ EMAIL" required>
                                         <button type="submit" class="subscribe-btn">Подписаться</button>
                                     </form>
+                                    <div id="subscribeMsg" style="margin-top: 14px; font-size: 14px; display: none;"></div>
                                 </div>
 
             </div>
@@ -256,20 +258,46 @@
         <%- include('../partials/footer') %>
 
             <script>
-                // Заглушка для формы подписки (чтобы страница не перезагружалась при нажатии)
-                document.getElementById('subscribeForm').addEventListener('submit', function (e) {
+                document.getElementById('subscribeForm').addEventListener('submit', async function (e) {
                     e.preventDefault();
                     const btn = this.querySelector('button');
-                    const originalText = btn.innerText;
+                    const email = document.getElementById('subscribeEmail').value.trim();
+                    const msg = document.getElementById('subscribeMsg');
 
-                    btn.innerText = '✓ ОФОРМЛЕНО';
-                    btn.style.backgroundColor = '#8CC63F'; // Зеленый цвет успеха
-                    this.querySelector('input').value = '';
+                    if (!email) return;
 
-                    setTimeout(() => {
-                        btn.innerText = originalText;
-                        btn.style.backgroundColor = '';
-                    }, 3000);
+                    btn.disabled = true;
+                    btn.innerText = '...';
+
+                    try {
+                        const resp = await fetch('/api/newsletter/subscribe', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email })
+                        });
+                        const data = await resp.json();
+
+                        msg.style.display = 'block';
+                        if (data.success) {
+                            msg.style.color = '#155724';
+                            msg.innerText = data.message || 'Вы успешно подписались!';
+                            btn.innerText = '✓ ОФОРМЛЕНО';
+                            btn.style.backgroundColor = '#8CC63F';
+                            document.getElementById('subscribeEmail').value = '';
+                        } else {
+                            msg.style.color = '#721c24';
+                            msg.innerText = data.message || 'Ошибка. Попробуйте позже.';
+                            btn.innerText = 'Подписаться';
+                            btn.disabled = false;
+                            btn.style.backgroundColor = '';
+                        }
+                    } catch (err) {
+                        msg.style.display = 'block';
+                        msg.style.color = '#721c24';
+                        msg.innerText = 'Ошибка сети. Попробуйте позже.';
+                        btn.innerText = 'Подписаться';
+                        btn.disabled = false;
+                    }
                 });
             </script>
 </body>

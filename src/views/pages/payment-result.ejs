@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title><%= title %></title>
+    <link rel="icon" type="image/png" href="/img/favicon.png">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/header.css">
+</head>
+
+<body>
+    <%- include('../partials/header') %>
+
+        <main class="container" style="padding-top: 140px; padding-bottom: 80px; max-width: 760px;">
+            <section style="background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 32px;">
+                <% if (status === 'success') { %>
+                    <h1 class="page-title" style="margin-top: 0;">Оплата прошла</h1>
+                    <p class="muted">Заказ №<%= orderId %> оплачен и принят в работу.</p>
+                <% } else if (status === 'pending' || status === 'waiting_for_capture') { %>
+                    <h1 class="page-title" style="margin-top: 0;">Платеж обрабатывается</h1>
+                    <p class="muted">Заказ №<%= orderId %> создан. Статус оплаты обновится после подтверждения ЮKassa.</p>
+                <% } else if (status === 'canceled') { %>
+                    <h1 class="page-title" style="margin-top: 0;">Оплата отменена</h1>
+                    <p class="muted">Заказ №<%= orderId %> не был оплачен. Можно оформить заказ заново из меню.</p>
+                <% } else { %>
+                    <h1 class="page-title" style="margin-top: 0;">Не удалось проверить оплату</h1>
+                    <p class="muted">Попробуйте обновить страницу позже или проверьте заказ в личном кабинете.</p>
+                <% } %>
+
+                <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px;">
+                    <% if (locals.user) { %>
+                        <a class="btn btn--primary" href="/profile">В личный кабинет</a>
+                    <% } %>
+                    <a class="btn btn--outline" href="/menu">В меню</a>
+                </div>
+            </section>
+        </main>
+
+        <%- include('../partials/footer') %>
+</body>
+
+</html>

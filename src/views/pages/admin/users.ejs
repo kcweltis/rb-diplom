@@ -45,12 +45,13 @@
               </div>
               <div>
                 <form class="form form--inline" method="POST" action="/admin/users/<%= u.id %>/update">
-                  <select class="input" name="role_id">
+                  <select class="input" name="role_id" onchange="handleRoleChange(this)">
                     <% roles.forEach(r=> { %>
                       <option value="<%= r.id %>" <%=r.name===u.role ? 'selected' : '' %>><%= r.name %>
                       </option>
                       <% }) %>
                   </select>
+                  <input type="text" class="input" name="vehicle_type" placeholder="Тип транспорта (для курьеров)" style="display:none;max-width:150px;">
                   <select class="input" name="is_active" style="max-width:140px;">
                     <option value="1" <%=u.is_active ? 'selected' : '' %>>Активен</option>
                     <option value="0" <%=!u.is_active ? 'selected' : '' %>>Заблокирован</option>
@@ -75,6 +76,24 @@
         <a class="btn btn--outline" href="/admin">Назад</a>
     </main>
     <%- include('../../partials/footer') %>
+
+    <script>
+      function handleRoleChange(select) {
+        const form = select.closest('form');
+        const vehicleInput = form.querySelector('input[name="vehicle_type"]');
+        if (select.value === '3') { // 3 = COURIER
+          vehicleInput.style.display = 'inline-block';
+          vehicleInput.required = true;
+        } else {
+          vehicleInput.style.display = 'none';
+          vehicleInput.required = false;
+        }
+      }
+      // Инициализируем при загрузке
+      document.querySelectorAll('select[name="role_id"]').forEach(select => {
+        handleRoleChange(select);
+      });
+    </script>
 </body>
 
 </html>

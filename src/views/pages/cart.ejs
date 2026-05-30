@@ -192,10 +192,21 @@
                             <span>К оплате:</span>
                             <span id="summaryTotalPrice">0 ₽</span>
                         </div>
-                        <button class="btn btn--primary" style="width: 100%; font-size: 18px; padding: 16px;"
-                            id="submitOrderBtn" disabled>
-                            Оформить заказ
-                        </button>
+                        <% if (typeof user !=='undefined' && user) { %>
+                            <button class="btn btn--primary" style="width: 100%; font-size: 18px; padding: 16px;"
+                                id="submitOrderBtn" disabled>
+                                Оформить заказ
+                            </button>
+                            <% } else { %>
+                                <a href="/login" class="btn btn--primary"
+                                    style="width: 100%; font-size: 18px; padding: 16px; text-align: center; display: block; text-decoration: none; box-sizing: border-box; margin-top: 15px;">
+                                    Войти для оформления
+                                </a>
+                                <p
+                                    style="font-size: 13px; color: #666; text-align: center; margin-top: 10px; font-family: sans-serif;">
+                                    Только авторизованные пользователи могут совершать заказы
+                                </p>
+                                <% } %>
                     </div>
                 </div>
             </div>
@@ -484,6 +495,12 @@
                             const result = await response.json();
 
                             if (result.success) {
+                                if (result.confirmationUrl) {
+                                    submitBtn.innerText = 'Переходим к оплате...';
+                                    window.location.href = result.confirmationUrl;
+                                    return;
+                                }
+
                                 alert('Заказ №' + result.orderId + ' успешно оформлен!');
                                 window.location.href = '/profile';
                             } else {

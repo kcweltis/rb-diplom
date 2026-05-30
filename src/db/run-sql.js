@@ -8,6 +8,14 @@ async function run(filePath) {
   try {
     await pool.query(sql);
     console.log("OK:", filePath);
+  } catch (e) {
+    if (e.code === "28P01") {
+      console.error("Ошибка подключения к базе данных: неверный пользователь или пароль.");
+      console.error("Проверьте DATABASE_URL в файле .env и корректность учетных данных PostgreSQL.");
+    } else {
+      console.error(e);
+    }
+    process.exit(1);
   } finally {
     await pool.end();
   }
@@ -18,7 +26,4 @@ if (!file) {
   console.error("Usage: node src/db/run-sql.js <file.sql>");
   process.exit(1);
 }
-run(file).catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+run(file);

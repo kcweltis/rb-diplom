@@ -1,8 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-
-    // ==========================================
-    // 1. НАВИГАЦИЯ ПО КАТЕГОРИЯМ
-    // ==========================================
     const observerOptions = { root: null, rootMargin: '-20% 0px -70% 0px', threshold: 0 };
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -17,9 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.catBlock').forEach(block => observer.observe(block));
 
-    // ==========================================
-    // 2. МОДАЛЬНОЕ ОКНО ТОВАРА СО СТРЕЛОЧКАМИ
-    // ==========================================
     const prodOverlay = document.getElementById('prodModalOverlay');
     const prodContent = document.getElementById('prodModalContent');
     const prodClose = document.getElementById('prodModalClose');

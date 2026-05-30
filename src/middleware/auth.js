@@ -16,7 +16,7 @@ async function loadUser(req, res, next) {
         res.locals.user = rows[0];
       } else {
         req.user = null;
-        req.session.destroy(() => {});
+        req.session.destroy(() => { });
       }
     }
   } catch (e) {
@@ -28,7 +28,9 @@ async function loadUser(req, res, next) {
 }
 
 function requireAuth(req, res, next) {
-  if (!req.user) return res.status(401).render("pages/403", { title: "403" });
+  if (!req.user) {
+    return res.redirect("/login");
+  }
   next();
 }
 

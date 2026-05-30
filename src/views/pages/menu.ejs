@@ -71,30 +71,36 @@
                       </div>
 
                       <div class="itemCard__meta">
-                        <% if (p.weight_g || p.calories) { %>
 
-                          <% if (p.weight_g) { %>
-                            <% let wStr=String(p.weight_g).trim(); let finalWeight=wStr; if (wStr &&
-                              !/[а-яА-Яa-zA-Z]/.test(wStr)) { finalWeight +=wStr.includes('/') ? ' мл' : ' г' ; } %>
-                              <span>
-                                <%= finalWeight %>
-                              </span>
-                              <% } %>
+  <% if (p.weight_g || p.calories) { %>
 
-                                <% if (p.weight_g && p.calories) { %>
-                                  <span>·</span>
-                                  <% } %>
+    <% if (p.weight_g && c.title !== 'Детский обед') { %>
 
-                                    <% if (p.calories) { %>
-                                      <span>
-                                        <%= p.calories %> ккал
-                                      </span>
-                                      <% } %>
+      <%
+        let wStr = String(p.weight_g).trim();
+        let finalWeight = wStr;
 
-                                        <% } else { %>
-                                          <span class="muted">нет данных</span>
-                                          <% } %>
-                      </div>
+        if (wStr && !/[а-яА-Яa-zA-Z]/.test(wStr)) {
+          finalWeight += wStr.includes('/') ? ' мл' : ' г';
+        }
+      %>
+
+      <span><%= finalWeight %></span>
+
+    <% } %>
+
+    <% if (p.weight_g && c.title !== 'Детский обед' && p.calories) { %>
+      <span>·</span>
+    <% } %>
+
+    <% if (p.calories) { %>
+      <span><%= p.calories %> ккал</span>
+    <% } %>
+
+
+  <% } %>
+
+</div>
 
                       <div class="itemCard__bottom">
                         <div class="itemPrice">

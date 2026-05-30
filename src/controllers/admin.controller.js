@@ -7,13 +7,13 @@ const transporter = nodemailer.createTransport({
   port: 465,
   secure: true,
   auth: {
-    user: "kcweltis@yandex.ru",
-    pass: "sztjlaaumpipwezw"
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS
   },
   tls: {
     rejectUnauthorized: false
   },
-  family: 4 // 🟢 ИСПРАВЛЕНИЕ: Принудительно заставляем использовать IPv4 (решает проблему ENETUNREACH)
+  family: 4
 });
 
 const getCrumbs = (name) => [{ name }];
@@ -81,11 +81,23 @@ async function createProduct(req, res) {
   if (req.body.size_name && req.body.size_price) {
     const names = [].concat(req.body.size_name);
     const prices = [].concat(req.body.size_price);
-    for (let i = 0; i < names.length; i++) {
-      if (names[i].trim() !== '') {
-        sizesJson.push({ name: names[i].trim(), price: Number(prices[i]) });
-      }
-    }
+    const prots = [].concat(req.body.size_prot || []);
+    const fats = [].concat(req.body.size_fats || []);
+    const carbs = [].concat(req.body.size_carbs || []);
+    const cals = [].concat(req.body.size_cal || []);
+
+  for (let i = 0; i < names.length; i++) {
+  if (names[i].trim() !== '') {
+    sizesJson.push({
+      name: names[i].trim(),
+      price: Number(prices[i]) || 0,
+      prot: Number(prots[i]) || 0,
+      fat: Number(fats[i]) || 0,
+      carb: Number(carbs[i]) || 0,
+      cal: Number(cals[i]) || 0
+    });
+  }
+}
   }
 
   let optionsJson = [];
@@ -121,12 +133,24 @@ async function editProduct(req, res) {
   let sizesJson = [];
   if (req.body.size_name && req.body.size_price) {
     const names = [].concat(req.body.size_name);
-    const prices = [].concat(req.body.size_price);
-    for (let i = 0; i < names.length; i++) {
-      if (names[i].trim() !== '') {
-        sizesJson.push({ name: names[i].trim(), price: Number(prices[i]) });
-      }
-    }
+const prices = [].concat(req.body.size_price);
+const prots = [].concat(req.body.size_prot || []);
+const fats = [].concat(req.body.size_fats || []);
+const carbs = [].concat(req.body.size_carbs || []);
+const cals = [].concat(req.body.size_cal || []);
+
+for (let i = 0; i < names.length; i++) {
+  if (names[i].trim() !== '') {
+    sizesJson.push({
+      name: names[i].trim(),
+      price: Number(prices[i]) || 0,
+      prot: Number(prots[i]) || 0,
+      fat: Number(fats[i]) || 0,
+      carb: Number(carbs[i]) || 0,
+      cal: Number(cals[i]) || 0
+    });
+  }
+}
   }
 
   let optionsJson = [];
@@ -138,6 +162,7 @@ async function editProduct(req, res) {
       }
     }
   }
+
 
   await pool.query(
     `UPDATE products SET category_id=$1, name=$2, description=$3, price=$4, image_url=$5, weight_g=$6, proteins=$7, fats=$8, carbs=$9, calories=$10, sort_order=$11, sizes=$12::jsonb, options=$13::jsonb WHERE id=$14`,
@@ -185,7 +210,37 @@ async function usersPage(req, res) {
 }
 
 async function updateUser(req, res) {
-  await pool.query("UPDATE users SET role_id=$1, is_active=$2 WHERE id=$3", [req.body.role_id, req.body.is_active === "1", req.params.id]);
+  const userId = req.params.id;
+  const newRoleId = req.body.role_id;
+  const isActive = req.body.is_active === "1";
+
+  await pool.query("UPDATE users SET role_id=$1, is_active=$2 WHERE id=$3", [newRoleId, isActive, userId]);
+
+  // Если присваиваем роль COURIER (role_id=3)
+  if (String(newRoleId) === '3') {
+    const vehicle_type = req.body.vehicle_type || 'Без указания';
+    const { rows: existing } = await pool.query("SELECT id FROM couriers WHERE user_id=$1", [userId]);
+
+    if (existing.length === 0) {
+      // Создаём новую запись
+      await pool.query(
+        "INSERT INTO couriers (user_id, vehicle_type, is_on_shift) VALUES ($1, $2, $3)",
+        [userId, vehicle_type, false]
+      );
+    } else {
+      // Обновляем существующую запись
+      await pool.query(
+        "UPDATE couriers SET vehicle_type=$1 WHERE user_id=$2",
+        [vehicle_type, userId]
+      );
+    }
+  }
+
+  // Если снимаем роль COURIER, удаляем запись из couriers
+  if (String(newRoleId) !== '3') {
+    await pool.query("DELETE FROM couriers WHERE user_id=$1", [userId]);
+  }
+
   res.redirect("/admin/users");
 }
 
@@ -288,8 +343,8 @@ async function submitFeedback(req, res) {
       const fileLink = file_url ? `<p><a href="http://localhost:3000${file_url}" style="color: #E30613; font-weight: bold;">📎 Открыть прикрепленный файл</a></p>` : '';
 
       await transporter.sendMail({
-        from: "kcweltis@yandex.ru", // ИСПРАВЛЕНО: Теперь почта совпадает с настройками авторизации
-        to: "kcweltis@yandex.ru",   // Отправляем письмо самому себе (модератору)
+        from: process.env.SMTP_USER,
+        to: process.env.ADMIN_EMAIL,
         subject: `Новое обращение с сайта: ${topic}`,
         html: `
             <h2 style="color: #E30613;">Поступило новое обращение</h2>
@@ -356,8 +411,8 @@ async function submitVacancy(req, res) {
     // Уведомление на почту
     try {
       await transporter.sendMail({
-        from: "kcweltis@yandex.ru",
-        to: "kcweltis@yandex.ru",
+        from: process.env.SMTP_USER,
+        to: process.env.ADMIN_EMAIL,
         subject: `Новая заявка на работу от ${name}`,
         html: `
                     <h2>Новая анкета соискателя</h2>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= title %>
+    </title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            padding: 16px;
+        }
+
+        .profile-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #e74c3c;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+
+        .info-card {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+
+        .info-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background: #ecf0f1;
+            color: #2c3e50;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #e74c3c;
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="profile-container">
+        <a href="/courier/dashboard" class="back-link">← Назад</a>
+
+        <div class="header">
+            <h1>Профиль курьера</h1>
+            <p>
+                <%= courier.username %>
+            </p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">
+                    <%= stats.total_delivered || 0 %>
+                </div>
+                <div class="stat-label">Всего доставлено</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">
+                    <%= stats.avg_rating ? stats.avg_rating.toFixed(1) : 'N/A' %>
+                </div>
+                <div class="stat-label">Средний рейтинг</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">
+                    <%= stats.today_delivered || 0 %>
+                </div>
+                <div class="stat-label">Сегодня доставлено</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">
+                    <%= Math.round(stats.today_earned || 0) %> ₽
+                </div>
+                <div class="stat-label">Заработано сегодня</div>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <h3 style="margin-bottom: 12px; color: #2c3e50;">Контактная информация</h3>
+            <div class="info-row">
+                <span class="info-label">Телефон</span>
+                <span class="info-value">
+                    <%= courier.phone || 'Не указан' %>
+                </span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Email</span>
+                <span class="info-value">
+                    <%= courier.email || 'Не указан' %>
+                </span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Транспорт</span>
+                <span class="info-value">
+                    <%= courier.vehicle_type || 'Не указан' %>
+                </span>
+            </div>
+        </div>
+
+        <a href="/courier/history" class="btn btn-primary">📋 История доставок</a>
+        <a href="/courier/dashboard" class="btn btn-secondary">← На главную</a>
+        <a href="/logout" class="btn btn-secondary">🚪 Выход</a>
+    </div>
+</body>
+
+</html>

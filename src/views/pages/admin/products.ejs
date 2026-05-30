@@ -561,19 +561,36 @@
             const selectedText = selectElement.options[selectElement.selectedIndex].text.toLowerCase();
 
             if (!sizesBlock || !optionsBlock) return;
+            const weightField = form.querySelector('[name="weight_g"]');
+const weightGroup = weightField ? weightField.closest('.input-group') : null;
 
             if (selectedText.includes('напитки') || selectedText.includes('коктейли')) {
-              sizesBlock.style.display = 'block';
-              optionsBlock.style.display = 'block'; // Теперь здесь стоит 'block', чтобы можно было указать температуру!
-            }
-            else if (selectedText.includes('обед') || selectedText.includes('комбо')) {
-              sizesBlock.style.display = 'none';
-              optionsBlock.style.display = 'block';
-            }
-            else {
-              sizesBlock.style.display = 'none';
-              optionsBlock.style.display = 'none';
-            }
+  sizesBlock.style.display = 'block';
+  optionsBlock.style.display = 'block';
+
+  if (weightGroup) weightGroup.style.display = '';
+}
+else if (selectedText.includes('детский обед')) {
+  sizesBlock.style.display = 'none';
+  optionsBlock.style.display = 'block';
+
+  if (weightGroup) {
+    weightGroup.style.display = 'none';
+    weightField.value = '';
+  }
+}
+else if (selectedText.includes('обед') || selectedText.includes('комбо')) {
+  sizesBlock.style.display = 'none';
+  optionsBlock.style.display = 'block';
+
+  if (weightGroup) weightGroup.style.display = '';
+}
+else {
+  sizesBlock.style.display = 'none';
+  optionsBlock.style.display = 'none';
+
+  if (weightGroup) weightGroup.style.display = '';
+}
           }
 
           categorySelects.forEach(select => {

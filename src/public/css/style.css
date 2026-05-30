@@ -1071,6 +1071,175 @@ a {
   display: none;
 }
 
+/* ========================================= */
+/* СТИЛИ ИИ-ЧАТА (OPENROUTER)                */
+/* ========================================= */
+.ai-chat-wrapper {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  z-index: 1000;
+  font-family: 'Inter', sans-serif;
+}
+
+.chat-toggle-btn {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #E30613;
+  color: white;
+  font-size: 24px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(227, 6, 19, 0.4);
+  transition: transform 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-toggle-btn:hover {
+  transform: scale(1.1);
+}
+
+.chat-window {
+  width: 350px;
+  height: 500px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  bottom: 80px;
+  right: 0;
+  overflow: hidden;
+  transition: opacity 0.3s;
+}
+
+.chat-window.hidden {
+  display: none;
+}
+
+.chat-header {
+  background: #E30613;
+  color: #fff;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chat-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.chat-header button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 28px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.chat-messages {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #f9f9f9;
+}
+
+.message {
+  padding: 10px 14px;
+  border-radius: 12px;
+  max-width: 85%;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.ai-message {
+  background: #e2e8f0;
+  color: #333;
+  align-self: flex-start;
+  border-bottom-left-radius: 2px;
+}
+
+.user-message {
+  background: #E30613;
+  color: white;
+  align-self: flex-end;
+  border-bottom-right-radius: 2px;
+}
+
+.chat-input-area {
+  padding: 15px;
+  background: #fff;
+  border-top: 1px solid #eee;
+  display: flex;
+  gap: 10px;
+}
+
+.chat-input-area input {
+  flex: 1;
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  outline: none;
+  font-family: 'Inter', sans-serif;
+}
+
+.chat-input-area button {
+  background: #E30613;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Ссылки от ИИ */
+.ai-message a {
+  color: #E30613;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.ai-message a:hover {
+  color: #b5050f;
+}
+
+/* Кнопка "Добавить в корзину" от ИИ */
+.chat-cart-btn {
+  background-color: #E30613;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-block;
+  font-family: 'Inter', sans-serif;
+  width: 100%;
+}
+
+.chat-cart-btn:hover {
+  background-color: #c30510;
+  transform: translateY(-1px);
+}
+
 /* 2. ПРАВИЛА ДЛЯ ТЕЛЕФОНОВ (экраны 768px и меньше) */
 @media (max-width: 768px) {
 
@@ -1708,4 +1877,9 @@ a {
   object-fit: contain;
   /* Защита от сплющивания или растягивания */
   display: block;
+}
+
+html,
+body {
+    overflow-x: hidden;
 }

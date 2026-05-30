@@ -14,6 +14,42 @@
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 20px 0;
+      color: #aaa;
+      font-size: 13px;
+    }
+    .auth-divider::before,
+    .auth-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #e5e5e5;
+    }
+    .btn--yandex {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 12px;
+      background: #fc3f1d;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .btn--yandex:hover { background: #e5360f; }
+    .btn--yandex svg { flex-shrink: 0; }
+  </style>
 </head>
 
 <body>
@@ -24,28 +60,37 @@
         <div class="alert alert--error">
           <%= error %>
         </div>
-        <% } %>
-          <form class="form" method="POST" action="/register">
-            <label class="label">Имя</label>
-            <input class="input" name="username" required>
+      <% } %>
 
-            <label class="label">Email</label>
-            <input class="input" name="email" type="email" required>
+      <form class="form" method="POST" action="/register">
+        <label class="label">Имя</label>
+        <input class="input" name="username" required>
 
-            <label class="label">Телефон</label>
-            <input class="input" name="phone" placeholder="+7 ...">
+        <label class="label">Email</label>
+        <input class="input" name="email" type="email" required>
 
-            <label class="label">Пароль</label>
-            <input class="input" name="password" type="password" required>
+        <label class="label">Телефон</label>
+        <input class="input" name="phone" placeholder="+7 ...">
 
-            <button class="btn btn--primary" type="submit">Создать аккаунт</button>
-          </form>
-          <p class="muted" style="margin-top:12px;">
-            Есть аккаунт? <a href="/login" class="link">Войти</a>
-          </p>
+        <label class="label">Пароль</label>
+        <input class="input" name="password" type="password" required>
 
+        <button class="btn btn--primary" type="submit">Создать аккаунт</button>
+      </form>
+
+      <div class="auth-divider">или</div>
+
+      <a href="/auth/yandex" class="btn--yandex">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M13.797 12.564L17.69 20H15.22L11.37 12.564H9.895V20H7.7V4H12.076C14.86 4 16.757 5.65 16.757 8.27C16.757 10.38 15.598 11.878 13.797 12.564ZM12.008 5.796H9.895V10.768H12.008C13.556 10.768 14.494 9.934 14.494 8.27C14.494 6.606 13.556 5.796 12.008 5.796Z" fill="white"/>
+        </svg>
+        Зарегистрироваться через Яндекс ID
+      </a>
+
+      <p class="muted" style="margin-top: 16px;">
+        Есть аккаунт? <a href="/login" class="link">Войти</a>
+      </p>
     </main>
-
     <%- include('../partials/footer') %>
 </body>
 

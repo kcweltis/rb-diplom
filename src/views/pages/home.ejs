@@ -141,98 +141,100 @@
         РАБОТАЕМ С ДУШОЙ КАЖДЫЙ ДЕНЬ С 10.00 ДО 22.00
       </section>
     </main>
-    <%- include('../partials/footer') %>
+    <%- include('../partials/chat-widget') %>
+      <%- include('../partials/footer') %>
 
-      <script>
-        document.addEventListener('DOMContentLoaded', () => {
 
-          // ==========================================
-          // 1. АНИМАЦИЯ СЛАЙДЕРА
-          // ==========================================
-          const slides = document.querySelectorAll('.hero-slider .slide');
-          if (slides.length > 0) {
-            let currentSlide = 0;
-            const slideInterval = 4000;
+        <script>
+          document.addEventListener('DOMContentLoaded', () => {
 
-            setInterval(() => {
-              slides[currentSlide].classList.remove('active');
-              currentSlide = (currentSlide + 1) % slides.length;
-              slides[currentSlide].classList.add('active');
-            }, slideInterval);
-          }
+            // ==========================================
+            // 1. АНИМАЦИЯ СЛАЙДЕРА
+            // ==========================================
+            const slides = document.querySelectorAll('.hero-slider .slide');
+            if (slides.length > 0) {
+              let currentSlide = 0;
+              const slideInterval = 4000;
 
-          // ==========================================
-          // 2. АНИМАЦИЯ КУРЬЕРА (ОДИН РАЗ ПРИ ПОЯВЛЕНИИ)
-          // ==========================================
-          const observerOptions = {
-            threshold: 0.3 // Анимация начнется, когда 30% блока покажется на экране
-          };
-
-          const scrollObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-              if (entry.isIntersecting) {
-                entry.target.classList.add('is-animated'); // Добавляем класс, запускающий CSS
-                scrollObserver.unobserve(entry.target);    // Отписываемся, чтобы анимация была 1 раз
-              }
-            });
-          }, observerOptions);
-
-          const deliverySec = document.getElementById('deliverySection');
-          if (deliverySec) scrollObserver.observe(deliverySec);
-
-          // ==========================================
-          // 3. АНИМАЦИЯ ШАГОВ ЗАКАЗА (ПРИВЯЗКА К СКРОЛЛУ)
-          // ==========================================
-          const section = document.getElementById('stepsSection');
-          const maskPath = document.getElementById('maskPath');
-          const steps = document.querySelectorAll('.route-step');
-
-          if (section && maskPath) {
-            // ИСПРАВЛЕНИЕ 1: Если браузер не может посчитать скрытую линию и выдает 0, 
-            // мы ставим жесткое значение 1000 (этого с запасом хватит для нашего SVG)
-            let pathLength = maskPath.getTotalLength();
-            if (!pathLength || pathLength === 0) {
-              pathLength = 1000;
+              setInterval(() => {
+                slides[currentSlide].classList.remove('active');
+                currentSlide = (currentSlide + 1) % slides.length;
+                slides[currentSlide].classList.add('active');
+              }, slideInterval);
             }
 
-            // ИСПРАВЛЕНИЕ 2: Используем setAttribute вместо style для работы внутри <defs>
-            maskPath.setAttribute('stroke-dasharray', pathLength);
-            maskPath.setAttribute('stroke-dashoffset', pathLength);
+            // ==========================================
+            // 2. АНИМАЦИЯ КУРЬЕРА (ОДИН РАЗ ПРИ ПОЯВЛЕНИИ)
+            // ==========================================
+            const observerOptions = {
+              threshold: 0.3 // Анимация начнется, когда 30% блока покажется на экране
+            };
 
-            // Слушаем скролл
-            window.addEventListener('scroll', () => {
-              const rect = section.getBoundingClientRect();
-              const windowHeight = window.innerHeight;
-
-              // Определяем, когда начинать и заканчивать анимацию
-              const start = windowHeight * 0.8;
-              const end = windowHeight * 0.1;
-
-              // Вычисляем прогресс от 0 до 1
-              let progress = (start - rect.top) / (start - end);
-              progress = Math.max(0, Math.min(1, progress));
-
-              // Рисуем/стираем линию (через setAttribute)
-              const currentOffset = pathLength - (pathLength * progress);
-              maskPath.setAttribute('stroke-dashoffset', currentOffset);
-
-              // Показываем/прячем шаги
-              steps.forEach((step, index) => {
-                const threshold = (index + 1) * 0.22;
-                if (progress >= threshold) {
-                  step.classList.add('is-visible');
-                } else {
-                  step.classList.remove('is-visible');
+            const scrollObserver = new IntersectionObserver((entries) => {
+              entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                  entry.target.classList.add('is-animated'); // Добавляем класс, запускающий CSS
+                  scrollObserver.unobserve(entry.target);    // Отписываемся, чтобы анимация была 1 раз
                 }
               });
-            });
+            }, observerOptions);
 
-            // Вызываем один раз при загрузке
-            window.dispatchEvent(new Event('scroll'));
-          }
+            const deliverySec = document.getElementById('deliverySection');
+            if (deliverySec) scrollObserver.observe(deliverySec);
 
-        }); 
-      </script>
+            // ==========================================
+            // 3. АНИМАЦИЯ ШАГОВ ЗАКАЗА (ПРИВЯЗКА К СКРОЛЛУ)
+            // ==========================================
+            const section = document.getElementById('stepsSection');
+            const maskPath = document.getElementById('maskPath');
+            const steps = document.querySelectorAll('.route-step');
+
+            if (section && maskPath) {
+              // ИСПРАВЛЕНИЕ 1: Если браузер не может посчитать скрытую линию и выдает 0, 
+              // мы ставим жесткое значение 1000 (этого с запасом хватит для нашего SVG)
+              let pathLength = maskPath.getTotalLength();
+              if (!pathLength || pathLength === 0) {
+                pathLength = 1000;
+              }
+
+              // ИСПРАВЛЕНИЕ 2: Используем setAttribute вместо style для работы внутри <defs>
+              maskPath.setAttribute('stroke-dasharray', pathLength);
+              maskPath.setAttribute('stroke-dashoffset', pathLength);
+
+              // Слушаем скролл
+              window.addEventListener('scroll', () => {
+                const rect = section.getBoundingClientRect();
+                const windowHeight = window.innerHeight;
+
+                // Определяем, когда начинать и заканчивать анимацию
+                const start = windowHeight * 0.8;
+                const end = windowHeight * 0.1;
+
+                // Вычисляем прогресс от 0 до 1
+                let progress = (start - rect.top) / (start - end);
+                progress = Math.max(0, Math.min(1, progress));
+
+                // Рисуем/стираем линию (через setAttribute)
+                const currentOffset = pathLength - (pathLength * progress);
+                maskPath.setAttribute('stroke-dashoffset', currentOffset);
+
+                // Показываем/прячем шаги
+                steps.forEach((step, index) => {
+                  const threshold = (index + 1) * 0.22;
+                  if (progress >= threshold) {
+                    step.classList.add('is-visible');
+                  } else {
+                    step.classList.remove('is-visible');
+                  }
+                });
+              });
+
+              // Вызываем один раз при загрузке
+              window.dispatchEvent(new Event('scroll'));
+            }
+
+          }); 
+        </script>
 </body>
 
 </html>

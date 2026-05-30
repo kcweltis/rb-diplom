@@ -1,0 +1,450 @@
+:root {
+    --brand-red: #E30613;
+    --bg-input: #F8F9FA;
+    --text-main: #212529;
+    --transition-speed: 0.6s;
+}
+
+/* Обертка страницы адаптирована под шапку и футер */
+.auth-page-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    min-height: 70vh;
+    padding: 60px 0;
+    width: 100%;
+    position: relative;
+}
+
+/* Всплывающие уведомления (Ошибки и успехи) */
+.auth-alert-floating {
+    position: fixed;
+    top: 100px;
+    /* Отступ от шапки */
+    right: 30px;
+    /* Прижимаем к правому краю */
+    background: #fff5f5;
+    color: var(--brand-red);
+    padding: 16px 24px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    /* Красивая объемная тень */
+    border-left: 5px solid var(--brand-red);
+    font-weight: 600;
+    z-index: 9999;
+    font-family: 'Inter', sans-serif;
+    max-width: 350px;
+
+    /* Запускаем анимацию при появлении */
+    animation: slideInAlert 0.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+}
+
+.auth-alert-floating.success {
+    background: #f3faf4;
+    color: #2b8a3e;
+    border-left-color: #2b8a3e;
+}
+
+/* Сама анимация (плавно выезжает из-за правого края экрана) */
+@keyframes slideInAlert {
+    0% {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Главный контейнер формы */
+.auth-container {
+    position: relative;
+    overflow: hidden;
+    width: 1200px;
+    max-width: 100%;
+    min-height: 750px;
+}
+
+.form-container {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    transition: all var(--transition-speed) ease-in-out;
+}
+
+.form-container form {
+    display: flex;
+    align-items: flex-start;
+    /* Изменили с center на flex-start, чтобы элементы шли сверху вниз, а не центрировались */
+    justify-content: flex-start;
+    flex-direction: column;
+    /* Добавили отступ сверху 60px, чтобы заголовки начинались на одном уровне */
+    padding: 60px 60px 0 60px;
+    height: 100%;
+}
+
+.auth-title {
+    font-family: 'Manrope', sans-serif;
+    font-weight: 800;
+    font-size: 32px;
+    margin-bottom: 24px;
+    color: var(--text-main);
+}
+
+/* Текстовые поля и метки */
+.label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #495057;
+    font-family: 'Inter', sans-serif;
+}
+
+.input {
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--bg-input);
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    margin-bottom: 18px;
+    font-size: 14px;
+    font-family: inherit;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.input:focus {
+    border-color: var(--brand-red);
+    outline: none;
+}
+
+.forgot-wrap {
+    margin: -6px 0 20px 0;
+}
+
+.forgot-link {
+    color: #6c757d;
+    font-size: 13px;
+    text-decoration: none;
+}
+
+.forgot-link:hover {
+    text-decoration: underline;
+}
+
+.mobile-toggle-text {
+    display: none;
+    width: 100%;
+    text-align: center;
+    margin-top: 16px;
+    font-size: 14px;
+    color: #666;
+}
+
+.mobile-toggle-text span {
+    color: var(--brand-red);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Позиционирование половин */
+.sign-in-container {
+    left: 0;
+    width: 50%;
+    z-index: 2;
+}
+
+.sign-up-container {
+    left: 0;
+    width: 50%;
+    opacity: 0;
+    z-index: 1;
+}
+
+/* Анимация сдвига */
+.auth-container.right-panel-active .sign-in-container {
+    transform: translateX(100%);
+    opacity: 0;
+    z-index: 1;
+}
+
+.auth-container.right-panel-active .sign-up-container {
+    transform: translateX(100%);
+    opacity: 1;
+    z-index: 5;
+    animation: showForm var(--transition-speed);
+}
+
+@keyframes showForm {
+
+    0%,
+    49.99% {
+        opacity: 0;
+        z-index: 1;
+    }
+
+    50%,
+    100% {
+        opacity: 1;
+        z-index: 5;
+    }
+}
+
+/* ==================================================================== */
+/* ЛОГИКА ТВОЕЙ ПОЛНОЭКРАННОЙ МАТРЁШКИ СПРАВА */
+/* ==================================================================== */
+
+.overlay-container {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 50%;
+    height: 100%;
+    overflow: hidden;
+    transition: transform var(--transition-speed) ease-in-out;
+    z-index: 100;
+}
+
+.auth-container.right-panel-active .overlay-container {
+    transform: translateX(-100%);
+}
+
+.overlay {
+    /* Путь к одной цельной картинке матрешки */
+    background: url('/img/matryoshka.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    left: -100%;
+    height: 100%;
+    width: 200%;
+    transform: translateX(0);
+    transition: transform var(--transition-speed) ease-in-out;
+}
+
+.auth-container.right-panel-active .overlay {
+    transform: translateX(50%);
+}
+
+.overlay-panel {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0 50px;
+    text-align: center;
+    top: 0;
+    height: 100%;
+    width: 50%;
+    transform: translateX(0);
+    transition: transform var(--transition-speed) ease-in-out;
+    box-sizing: border-box;
+    /* Затемняющий слой поверх картинки, чтобы текст хорошо читался */
+    background: rgba(0, 0, 0, 0.45);
+    color: #ffffff;
+}
+
+.overlay-left {
+    transform: translateX(-20%);
+}
+
+.auth-container.right-panel-active .overlay-left {
+    transform: translateX(0);
+}
+
+.overlay-right {
+    right: 0;
+    transform: translateX(0);
+}
+
+.auth-container.right-panel-active .overlay-right {
+    transform: translateX(20%);
+}
+
+.overlay-heading {
+    font-family: 'Manrope', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 12px;
+}
+
+.overlay-subtext {
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 24px;
+    opacity: 0.9;
+}
+
+/* Кнопки */
+.btn-ghost {
+    background: transparent;
+    border: 2px solid #ffffff;
+    color: #ffffff;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 12px 40px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-ghost:hover {
+    background: #ffffff;
+    color: var(--brand-red);
+}
+
+/* Кнопка отправки формы */
+.btn--primary {
+    background: var(--brand-red);
+    color: #fff;
+    border: none;
+    padding: 14px;
+    border-radius: 8px;
+    width: 100%;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn--primary:hover {
+    background: #c30510;
+}
+
+/* Яндекс стили */
+.auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 16px 0;
+    color: #aaa;
+    font-size: 13px;
+    width: 100%;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #e5e5e5;
+}
+
+.btn--yandex {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    /* Убрали 100% и сделали авто-растягивание на всю доступную ширину родителя */
+    width: auto;
+    align-self: stretch;
+    /* Заставляет кнопку занять всю ширину формы */
+    border: 1px solid #e5e5e5;
+    background: #fff;
+    padding: 11px;
+    border-radius: 8px;
+    color: #000;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn--yandex:hover {
+    background: #fbfbfb;
+}
+
+/* ==================================================================== */
+/* АДАПТИВНАЯ ВЕРСТКА ДЛЯ ПЛАНШЕТОВ (до 1024px)                        */
+/* ==================================================================== */
+@media (max-width: 1024px) {
+    .auth-container {
+        width: 90%;
+        /* Контейнер становится резиновым и занимает 90% экрана */
+        min-height: 750px;
+    }
+
+    .form-container form {
+        padding: 50px 40px 0 40px;
+        /* Слегка уменьшаем боковые отступы */
+    }
+}
+
+
+/* ==================================================================== */
+/* АДАПТИВНАЯ ВЕРСТКА ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ (до 768px)               */
+/* ==================================================================== */
+@media (max-width: 768px) {
+    .auth-page-wrapper {
+        padding: 20px 10px;
+        /* Минимальные отступы на маленьких экранах */
+    }
+
+    .auth-container {
+        width: 100%;
+        max-width: 480px;
+        /* Ограничиваем максимальную ширину карточки на мобильном */
+        min-height: 750px;
+        border-radius: 12px;
+    }
+
+    /* Полностью прячем оверлей с матрешкой, так как для него нет места */
+    .overlay-container {
+        display: none !important;
+    }
+
+    /* Формы теперь занимают всю ширину (100%) контейнера */
+    .form-container {
+        width: 100% !important;
+    }
+
+    .form-container form {
+        padding: 40px 24px !important;
+        /* Компактные отступы для пальцев */
+    }
+
+    /* Показываем мобильный текст переключения ("Нет аккаунта? Регистрация") */
+    .mobile-toggle-text {
+        display: block !important;
+    }
+
+    /* --- Реализация мобильного скольжения форм --- */
+
+    /* Состояние по умолчанию: Вход активен (на экране), Регистрация спрятана справа */
+    .sign-in-container {
+        transform: translateX(0) !important;
+        opacity: 1 !important;
+        z-index: 5 !important;
+    }
+
+    .sign-up-container {
+        transform: translateX(100%) !important;
+        opacity: 0 !important;
+        z-index: 1 !important;
+    }
+
+    /* Активное состояние: Вход уезжает влево (-100%), Регистрация выезжает на экран (0) */
+    .auth-container.right-panel-active .sign-in-container {
+        transform: translateX(-100%) !important;
+        opacity: 0 !important;
+        z-index: 1 !important;
+    }
+
+    .auth-container.right-panel-active .sign-up-container {
+        transform: translateX(0) !important;
+        opacity: 1 !important;
+        z-index: 5 !important;
+    }
+}
+html,
+body {
+    overflow-x: hidden;
+}

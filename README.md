@@ -14,6 +14,7 @@
 
 ## 2) Настройка окружения
 Скопируй `.env.example` → `.env` и заполни `DATABASE_URL` и `SESSION_SECRET`.
+Если PostgreSQL установлен на другом порту или пароле, поправь строку `DATABASE_URL`.
 
 ## 3) Запуск
 ```bash

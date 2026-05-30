@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 
 <head>
@@ -13,30 +13,152 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800&display=swap"
     rel="stylesheet">
+
   <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/header.css" />
+  <link rel="stylesheet" href="/css/footer.css" />
+  <link rel="stylesheet" href="/css/auth-sliding.css" />
 </head>
 
 <body>
+
   <%- include('../partials/header') %>
-    <main class="container auth">
-      <h1 class="page-title">Вход</h1>
+
+    <div class="auth-page-wrapper">
       <% if (error) { %>
-        <div class="alert alert--error">
+        <div class="auth-alert-floating">
           <%= error %>
         </div>
         <% } %>
-          <form class="form" method="POST" action="/login">
-            <label class="label">Email</label>
-            <input class="input" name="email" type="email" required>
 
-            <label class="label">Пароль</label>
-            <input class="input" name="password" type="password" required>
+          <% if (typeof success !=='undefined' && success) { %>
+            <div class="auth-alert-floating success">Пароль успешно изменён. Войдите.</div>
+            <% } %>
 
-            <button class="btn btn--primary" type="submit">Войти</button>
-          </form>
-          <p class="muted">Нет аккаунта? <a href="/register">Регистрация</a></p>
-    </main>
+              <div class="auth-container" id="authContainer">
+
+                <div class="form-container sign-up-container">
+                  <form class="form" method="POST" action="/register">
+                    <h1 class="auth-title">Регистрация</h1>
+
+                    <label class="label">Имя</label>
+                    <input class="input" name="username" type="text" placeholder="Иван Иванов" required>
+
+                    <label class="label">Email</label>
+                    <input class="input" name="email" type="email" placeholder="example@mail.ru" required>
+
+                    <label class="label">Телефон</label>
+                    <input class="input" name="phone" type="text" placeholder="+7 (999) 999-99-99" required>
+
+                    <label class="label">Пароль</label>
+                    <input class="input" name="password" type="password" placeholder="••••••••" required>
+
+                    <button class="btn btn--primary" type="submit">Создать аккаунт</button>
+
+                    <div class="auth-divider">или</div>
+
+                    <a href="/auth/yandex" class="btn--yandex">
+                      <img src="/img/yandex-icon.png" alt="Яндекс" width="22" height="22" style="border-radius: 50%;">
+                      Зарегистрироваться через Яндекс ID
+                    </a>
+
+                    <p class="mobile-toggle-text">Уже есть аккаунт? <span id="toLoginMobile">Войти</span></p>
+                  </form>
+                </div>
+
+                <div class="form-container sign-in-container">
+                  <form class="form" method="POST" action="/login">
+                    <h1 class="auth-title">Вход</h1>
+
+                    <label class="label">Email или телефон</label>
+                    <input class="input" name="identifier" type="text" placeholder="example@mail.ru или +7..." required>
+
+                    <label class="label">Пароль</label>
+                    <input class="input" name="password" type="password" placeholder="••••••••" required>
+
+                    <p class="forgot-wrap">
+                      <a href="/forgot-password" class="forgot-link">Забыли пароль?</a>
+                    </p>
+
+                    <button class="btn btn--primary" type="submit">Войти</button>
+
+                    <div class="auth-divider">или</div>
+
+                    <a href="/auth/yandex" class="btn--yandex">
+                      <img src="/img/yandex-icon.png" alt="Яндекс" width="22" height="22" style="border-radius: 50%;">
+                      Войти через Яндекс ID
+                    </a>
+
+                    <p class="mobile-toggle-text">Нет аккаунта? <span id="toRegisterMobile">Регистрация</span></p>
+                  </form>
+                </div>
+
+                <div class="overlay-container">
+                  <div class="overlay">
+
+                    <div class="overlay-panel overlay-left">
+                      <h2 class="overlay-heading">Добро пожаловать обратно!</h2>
+                      <p class="overlay-subtext">Чтобы оставаться на связи, пожалуйста, войдите под своими данными</p>
+                      <button class="btn-ghost" id="btnToSignIn">Войти</button>
+                    </div>
+
+                    <div class="overlay-panel overlay-right">
+                      <h2 class="overlay-heading">Привет, гость!</h2>
+                      <p class="overlay-subtext">Зарегистрируйся и открой для себя доставку лучших блинов</p>
+                      <button class="btn-ghost" id="btnToSignUp">Регистрация</button>
+                    </div>
+
+                  </div>
+                </div>
+
+              </div>
+    </div>
+
     <%- include('../partials/footer') %>
+
+      <script src="/js/validation.js"></script>
+      <script>
+        const container = document.getElementById('authContainer');
+        const toSignUp = document.getElementById('btnToSignUp');
+        const toSignIn = document.getElementById('btnToSignIn');
+
+        toSignUp.addEventListener('click', () => { container.classList.add("right-panel-active"); });
+        toSignIn.addEventListener('click', () => { container.classList.remove("right-panel-active"); });
+
+        document.getElementById('toRegisterMobile').addEventListener('click', () => { container.classList.add("right-panel-active"); });
+        document.getElementById('toLoginMobile').addEventListener('click', () => { container.classList.remove("right-panel-active"); });
+
+        const urlParams = new URLSearchParams(window.location.search);
+        if (window.location.pathname === '/register' || urlParams.get('mode') === 'register') {
+          container.classList.add("right-panel-active");
+        }
+
+        // Инициализация валидации
+        document.addEventListener('DOMContentLoaded', function () {
+          // Маска для телефона в регистрации
+          initPhoneMask('form[action="/register"] input[name="phone"]');
+          
+          // Маска для телефона в входе (для идентификатора, если он телефон)
+          const identifierInput = document.querySelector('form[action="/login"] input[name="identifier"]');
+          if (identifierInput) {
+            identifierInput.addEventListener('input', function (e) {
+              const val = e.target.value;
+              // Если начинается с цифры, применяем маску
+              if (/^\d/.test(val) || val.startsWith('+')) {
+                e.target.value = formatPhone(val.replace(/\D/g, ''));
+              }
+            });
+          }
+
+          // Валидация полей при blur
+          setupFieldValidation('form[action="/register"]');
+          setupFieldValidation('form[action="/login"]');
+
+          // Валидация перед отправкой
+          setupFormValidation('form[action="/register"]');
+          setupFormValidation('form[action="/login"]');
+        });
+      </script>
 </body>
 
 </html>
